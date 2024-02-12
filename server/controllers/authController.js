@@ -87,51 +87,92 @@ const activateUser = async (req, res) => {
 };
 
 
-const signIn = async (req, res) => {
-	const { email, password } = req.body;
+const login = async (req, res) => {
+	// const { email, password } = req.body;
 
-	try {
-		// Checking if the user exists in the database
-		const existingUser = await User.findOne({ email });
+	// try {
+	// 	// Checking if the user exists in the database
+	// 	const existingUser = await User.findOne({ email });
 
-		if (!existingUser)
-			return res.status(404).json({ error: "User doesn't exist" });
+	// 	if (!existingUser)
+	// 		return res.status(404).json({ error: "User doesn't exist" });
 
-		if (!existingUser.password) {
-			return res.status(404).json({
-				error: "This user was registered using google Authentication",
-			});
-		}
+	// 	if (!existingUser.password) {
+	// 		return res.status(404).json({
+	// 			error: "This user was registered using google Authentication",
+	// 		});
+	// 	}
 
-		// Comparing the provided password with the hashed password stored in the database
-		const correctPassword = await bcrypt.compare(
-			password,
-			existingUser.password
-		);
-		if (!correctPassword)
-			return res.status(400).json({ error: "Invalid credentials" });
+	// 	// Comparing the provided password with the hashed password stored in the database
+	// 	const correctPassword = await bcrypt.compare(
+	// 		password,
+	// 		existingUser.password
+	// 	);
+	// 	if (!correctPassword)
+	// 		return res.status(400).json({ error: "Invalid credentials" });
 
-		// Generating a JSON Web Token (JWT) for authentication
+	// 	// Generating a JSON Web Token (JWT) for authentication
 
-		// const token = generateCookieToken({
-		// 	email: existingUser.email,
-		// 	id: existingUser._id,
-		// });
-
-
+	// 	// const token = generateCookieToken({
+	// 	// 	email: existingUser.email,
+	// 	// 	id: existingUser._id,
+	// 	// });
 
 
-		existingUser.password = null;
-		existingUser.updatedAt = null;
-		existingUser.createdAt = null;
 
-		res.status(200).json({ loggedInUser: existingUser, token });
-	} catch (error) {
-		// Handling any errors that occur during the process
-		console.log(error);
-		res.status(500).json({ message: "Something went wrong" });
-	}
+
+	// 	existingUser.password = null;
+	// 	existingUser.updatedAt = null;
+	// 	existingUser.createdAt = null;
+
+	// 	res.status(200).json({ loggedInUser: existingUser, token });
+	// } catch (error) {
+	// 	// Handling any errors that occur during the process
+	// 	console.log(error);
+	// 	res.status(500).json({ message: "Something went wrong" });
+	// }
+
+    const { user, password } = req.body;
+    if (!user || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
+
+    const foundUser = await User.findOne({ username: user } || { email: user}).exec();
+    if (!foundUser) return res.sendStatus(401); //Unauthorized 
+    // evaluate password 
+    const match = await bcrypt.compare(password, foundUser.password);
+    if (match) {
+        const roles = Object.values(foundUser.roles).filter(Boolean);
+        // create JWTs
+        const accessToken = jwt.sign(
+            {
+                "UserInfo": {
+                    "username": foundUser.username,
+                    "roles": roles
+                }
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '10s' }
+        );
+        const refreshToken = jwt.sign(
+            { "username": foundUser.username },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '1d' }
+        );
+        // Saving refreshToken with current user
+        foundUser.refreshToken = refreshToken;
+        const result = await foundUser.save();
+        console.log(result);
+        console.log(roles);
+ 
+        // Creates Secure Cookie with refresh token
+        res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
+
+        // Send authorization roles and access token to user
+        res.json({ roles, result, accessToken });
+
+    } else {
+        res.sendStatus(401);
+    }
 };
 
 
-module.exports = { signUp, activateUser };
+module.exports = { signUp, activateUser, login };

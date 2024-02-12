@@ -8,6 +8,7 @@ const credentials = require("./middleware/credentials");
 // const initializePassport = require("./config/passport-setup");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
+const refreshRoute = require('./routes/refresh')
 
 
 
@@ -28,6 +29,8 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 
 app.use("/auth", authRoutes);
+app.use('/refresh', refreshRoute);
+
 
 
 mongoose

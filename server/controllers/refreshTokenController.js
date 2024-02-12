@@ -1,4 +1,4 @@
-const User = require('../model/UserModel');
+const User = require("../models/userModel");
 const jwt = require('jsonwebtoken');
 
 const handleRefreshToken = async (req, res) => {
@@ -23,7 +23,7 @@ const handleRefreshToken = async (req, res) => {
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '10s' }
+                { expiresIn: '1m' }
             );
             res.json({ roles, accessToken })
         }
