@@ -88,50 +88,6 @@ const activateUser = async (req, res) => {
 
 
 const login = async (req, res) => {
-	// const { email, password } = req.body;
-
-	// try {
-	// 	// Checking if the user exists in the database
-	// 	const existingUser = await User.findOne({ email });
-
-	// 	if (!existingUser)
-	// 		return res.status(404).json({ error: "User doesn't exist" });
-
-	// 	if (!existingUser.password) {
-	// 		return res.status(404).json({
-	// 			error: "This user was registered using google Authentication",
-	// 		});
-	// 	}
-
-	// 	// Comparing the provided password with the hashed password stored in the database
-	// 	const correctPassword = await bcrypt.compare(
-	// 		password,
-	// 		existingUser.password
-	// 	);
-	// 	if (!correctPassword)
-	// 		return res.status(400).json({ error: "Invalid credentials" });
-
-	// 	// Generating a JSON Web Token (JWT) for authentication
-
-	// 	// const token = generateCookieToken({
-	// 	// 	email: existingUser.email,
-	// 	// 	id: existingUser._id,
-	// 	// });
-
-
-
-
-	// 	existingUser.password = null;
-	// 	existingUser.updatedAt = null;
-	// 	existingUser.createdAt = null;
-
-	// 	res.status(200).json({ loggedInUser: existingUser, token });
-	// } catch (error) {
-	// 	// Handling any errors that occur during the process
-	// 	console.log(error);
-	// 	res.status(500).json({ message: "Something went wrong" });
-	// }
-
     const { user, password } = req.body;
     if (!user || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
 
@@ -175,4 +131,29 @@ const login = async (req, res) => {
 };
 
 
-module.exports = { signUp, activateUser, login };
+const logout = async (req, res) => {
+    // On client, also delete the accessToken
+
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.sendStatus(204); //No content
+    const refreshToken = cookies.jwt;
+
+    // Is refreshToken in db?
+    const foundUser = await User.findOne({ refreshToken }).exec();
+    if (!foundUser) {
+        res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+        return res.sendStatus(204);
+    }
+
+    // Delete refreshToken in db
+    foundUser.refreshToken = '';
+    const result = await foundUser.save();
+    console.log(result);
+
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+    res.sendStatus(204);
+}
+
+
+
+module.exports = { signUp, activateUser, login, logout };
