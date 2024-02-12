@@ -8,30 +8,39 @@ const userSchema = new Schema(
 			required: true,
 			unique: true,
 		},
+		name: String,
 		email: {
 			type: String,
 			required: true,
 			unique: true,
 		},
+		password: {
+			type: String,
+			required: true,
+		},
 		avatar: String,
-        bio: String,
+		bio: String,
 		followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
 		following: [{ type: Schema.Types.ObjectId, ref: "User" }],
 		roles: {
 			Student: {
-				type: Number,
+				type: String,
 				default: "Student",
 			},
 			Editor: String,
 			Admin: String,
 		},
-		password: {
-			type: String,
-			required: true,
-		},
-		enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course"  }],
+		enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 		createdCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 		refreshToken: String,
+		points: [
+			{
+				description: String,
+				amount: Number,
+				date: Date,
+			},
+		],
+		badges: [{ type: Schema.Types.ObjectId, ref: "Badge" }],
 	},
 	{
 		timestamps: true,
