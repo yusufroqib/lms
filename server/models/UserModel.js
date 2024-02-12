@@ -27,7 +27,7 @@ const userSchema = new Schema(
 				type: String,
 				default: "Student",
 			},
-			Editor: String,
+			Tutor: String,
 			Admin: String,
 		},
 		enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
