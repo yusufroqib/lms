@@ -1,10 +1,132 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken")
-
+const passport = require('passport');
 
 const { sendMail } = require("../utils/sendMail.js");
 const createActivationToken = require("../utils/createActivationToken.js");
+
+// Google authentication callback
+
+const successRedirect = async (req, res) => {
+	try {
+		//   // Assuming the user is available in req.user after successful authentication
+		const googleProfile = req.user;
+
+		// Fetch user profile from MongoDB based on the email
+		const user = await User.findOne({ email: googleProfile.email });
+
+		if (!user) {
+			// Handle the case where the user is not found in the database
+			return res
+				.status(404)
+				.json({ message: "User not found in the database" });
+		}
+
+		// const roles = Object.values(user.roles).filter(Boolean);
+		// create JWTs
+		// const sessionToken = jwt.sign(
+		// 	{
+		// 		UserInfo: {
+		// 			email: user.email,
+        //             id: user._id,
+		// 		},
+		// 	},
+		// 	process.env.SESSION_SECRET,
+		// 	{ expiresIn: "20s" }
+		// );
+		// const refreshToken = jwt.sign(
+		// 	{ username: user.username },
+		// 	process.env.REFRESH_TOKEN_SECRET,
+		// 	{ expiresIn: "1d" }
+		// );
+		// Saving refreshToken with current user
+		// user.refreshToken = refreshToken;
+		// const result = await user.save();
+		// console.log(result);
+		// console.log(roles);
+
+		// Creates Secure Cookie with refresh token
+		// res.cookie("goggleSession", sessionToken, {
+		// 	httpOnly: true,
+		// 	secure: true,
+		// 	sameSite: "None",
+		// 	maxAge: 20 * 1000,
+		// });
+
+		// Send authorization roles and access token to user
+		// res.json({ roles, result, accessToken });
+
+		//   Perform any additional actions with the user profile
+		//   ...
+
+		// const token = generateCookieToken({
+		// 	email: user.email,
+		// 	id: user._id,
+		// });
+
+		// Creates Secure Cookie with token token
+		// res.cookie("jwt", token, {
+		// 	// domain: ".onrender.com",
+		// 	// path: "/",
+		// 	httpOnly: true,
+		// 	secure: true,
+		// 	sameSite: "None",
+		// 	maxAge: 1 * 60 * 60 * 1000, //1hr
+		// });
+
+		// //   Redirect or send a response as needed
+		//   res.redirect(`https://quickbillpay.onrender.com/auth/google-verify?token=${token}`);
+		req.session.user = req.user;
+        // console.log(req.session.user)
+		res.redirect(`http://localhost:3000/auth/google-verify`);
+	} catch (error) {
+		// Handle errors
+		console.error("Error fetching user profile:", error);
+		res.status(500).json({ message: "Internal Server Error" });
+	}
+};
+
+const getCurrentUserInfo =  async (req, res) => {
+    console.log(req.user)
+	// try {
+		// const email = req.user.email;
+		// // console.log(token)
+		// // console.log(token)
+		// if (!email) return res.status(401).json({ error: "Unauthorized" });
+
+		// // let decodeData;
+
+		// //If token is custom token do this
+
+		// // decodeData = jwt.verify(token, process.env.SESSION_SECRET);
+
+		// // const userId = decodeData?.id;
+        // // console.log(userId)
+		// const user = await User.findOne({email})
+
+		// res.json(user);
+        try {
+            // Check if session exists
+            // if (!req.user) {
+            //     return res.status(404).json({ message: "Session not found" });
+            // }
+    
+            // Check if user information exists in the session
+            if (!req.user) {
+                return res.status(404).json({ message: "User information not found in the session" });
+            }
+    
+            // Retrieve user information from the session
+            const user = req.user;
+    
+            // Send user information to the frontend
+            return res.status(200).json({ user });
+        } catch (error) {
+            console.error("Error retrieving user information:", error);
+            return res.status(500).json({ message: "Internal Server Error" });
+        }
+};
 
 const signUp = async (req, res) => {
 	try {
@@ -47,7 +169,7 @@ const signUp = async (req, res) => {
 		res.status(500).json({ error: "Something went wrong" });
 	}
 };
- 
+
 const activateUser = async (req, res) => {
 	try {
 		const { activation_token, activation_code } = req.body;
@@ -67,93 +189,107 @@ const activateUser = async (req, res) => {
 		}
 		const user = await User.create({
 			name,
-            username,
+			username,
 			email,
 			password,
 		});
 
 		res.status(201).json({
 			success: true,
-            user
+			user,
 		});
 	} catch (error) {
 		// return next(new ErrorHandler(error.message, 400));
-        console.log(error);
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ error: 'Token expired, kindly signup again' });
-        }
+		console.log(error);
+		if (error.name === "TokenExpiredError") {
+			return res
+				.status(401)
+				.json({ error: "Token expired, kindly signup again" });
+		}
 		res.status(500).json({ error: "Something went wrong" });
 	}
 };
 
-
 const login = async (req, res) => {
-    const { user, password } = req.body;
-    if (!user || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
+	const { user, password } = req.body;
+	if (!user || !password)
+		return res
+			.status(400)
+			.json({ message: "Username and password are required." });
 
-    const foundUser = await User.findOne({ username: user } || { email: user}).exec();
-    if (!foundUser) return res.sendStatus(401); //Unauthorized 
-    // evaluate password 
-    const match = await bcrypt.compare(password, foundUser.password);
-    if (match) {
-        const roles = Object.values(foundUser.roles).filter(Boolean);
-        // create JWTs
-        const accessToken = jwt.sign(
-            {
-                "UserInfo": {
-                    "username": foundUser.username,
-                    "roles": roles
-                }
-            },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '10s' }
-        );
-        const refreshToken = jwt.sign(
-            { "username": foundUser.username },
-            process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: '1d' }
-        );
-        // Saving refreshToken with current user
-        foundUser.refreshToken = refreshToken;
-        const result = await foundUser.save();
-        console.log(result);
-        console.log(roles);
- 
-        // Creates Secure Cookie with refresh token
-        res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
+	const foundUser = await User.findOne(
+		{ username: user } || { email: user }
+	).exec();
+	if (!foundUser) return res.sendStatus(401); //Unauthorized
+	// evaluate password
+	const match = await bcrypt.compare(password, foundUser.password);
+	if (match) {
+		const roles = Object.values(foundUser.roles).filter(Boolean);
+		// create JWTs
+		const accessToken = jwt.sign(
+			{
+				UserInfo: {
+					username: foundUser.username,
+					roles: roles,
+				},
+			},
+			process.env.ACCESS_TOKEN_SECRET,
+			{ expiresIn: "10s" }
+		);
+		const refreshToken = jwt.sign(
+			{ username: foundUser.username },
+			process.env.REFRESH_TOKEN_SECRET,
+			{ expiresIn: "1d" }
+		);
+		// Saving refreshToken with current user
+		foundUser.refreshToken = refreshToken;
+		const result = await foundUser.save();
+		console.log(result);
+		console.log(roles);
 
-        // Send authorization roles and access token to user
-        res.json({ roles, result, accessToken });
+		// Creates Secure Cookie with refresh token
+		res.cookie("jwt", refreshToken, {
+			httpOnly: true,
+			secure: true,
+			sameSite: "None",
+			maxAge: 24 * 60 * 60 * 1000,
+		});
 
-    } else {
-        res.sendStatus(401);
-    }
+		// Send authorization roles and access token to user
+		res.json({ roles, result, accessToken });
+	} else {
+		res.sendStatus(401);
+	}
 };
 
-
 const logout = async (req, res) => {
-    // On client, also delete the accessToken
+	// On client, also delete the accessToken
 
-    const cookies = req.cookies;
-    if (!cookies?.jwt) return res.sendStatus(204); //No content
-    const refreshToken = cookies.jwt;
+	const cookies = req.cookies;
+	if (!cookies?.jwt) return res.sendStatus(204); //No content
+	const refreshToken = cookies.jwt;
 
-    // Is refreshToken in db?
-    const foundUser = await User.findOne({ refreshToken }).exec();
-    if (!foundUser) {
-        res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
-        return res.sendStatus(204);
-    }
+	// Is refreshToken in db?
+	const foundUser = await User.findOne({ refreshToken }).exec();
+	if (!foundUser) {
+		res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
+		return res.sendStatus(204);
+	}
 
-    // Delete refreshToken in db
-    foundUser.refreshToken = '';
-    const result = await foundUser.save();
-    console.log(result);
+	// Delete refreshToken in db
+	foundUser.refreshToken = "";
+	const result = await foundUser.save();
+	console.log(result);
 
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
-    res.sendStatus(204);
-}
+	res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
+	res.sendStatus(204);
+};
 
-
-
-module.exports = { signUp, activateUser, login, logout };
+module.exports = {
+	signUp,
+	activateUser,
+	login,
+	logout,
+	successRedirect,
+	getCurrentUserInfo,
+};

@@ -2,11 +2,11 @@ const passport = require('passport');
 const User = require('../models/userModel');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-const initializePassport = (passport) => {
+// const initializePassport = (passport) => {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'https://quickbill-2oy7.onrender.com/auth/googleauth/callback', // Adjust accordingly
+    callbackURL: '/auth/google/callback', // Adjust accordingly
     scope: ['profile', 'email'],
   },
   async (accessToken, refreshToken, profile, done) => {
@@ -17,7 +17,7 @@ const initializePassport = (passport) => {
       if (existingUser) {
         // User found, update any necessary information
         existingUser.googleId = profile.id;
-        existingUser.name = profile.displayName;
+        existingUser.name = existingUser.name || profile.displayName;
         existingUser.avatar = existingUser.avatar || profile.photos[0].value;
         await existingUser.save();
 
@@ -52,6 +52,6 @@ const initializePassport = (passport) => {
       done(error, null);
     }
   });
-};
+// };
 
-module.exports = initializePassport;
+// module.exports = initializePassport;
