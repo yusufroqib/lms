@@ -16,7 +16,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
       if (existingUser) {
         // User found, update any necessary information
-        existingUser.googleId = profile.id;
+        existingUser.googleId = existingUser.googleId || profile.id;
         existingUser.name = existingUser.name || profile.displayName;
         existingUser.avatar = existingUser.avatar || profile.photos[0].value;
         await existingUser.save();

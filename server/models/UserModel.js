@@ -5,7 +5,7 @@ const userSchema = new Schema(
 	{
 		username: {
 			type: String,
-			required: true,
+			// required: true,
 			unique: true,
 		},
 		name: String,
@@ -17,10 +17,10 @@ const userSchema = new Schema(
 		googleId: String,
 		password: {
 			type: String,
-			required: true,
+			// required: true,
 		},
-		avatar: String,
 		bio: String,
+		avatar: String,
 		followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
 		following: [{ type: Schema.Types.ObjectId, ref: "User" }],
 		roles: {

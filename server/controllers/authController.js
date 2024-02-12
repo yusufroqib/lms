@@ -1,131 +1,27 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
-const jwt = require("jsonwebtoken")
-const passport = require('passport');
-
+const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/sendMail.js");
 const createActivationToken = require("../utils/createActivationToken.js");
 
-// Google authentication callback
-
-const successRedirect = async (req, res) => {
+const getCurrentUserInfo = async (req, res) => {
 	try {
-		//   // Assuming the user is available in req.user after successful authentication
-		const googleProfile = req.user;
-
-		// Fetch user profile from MongoDB based on the email
-		const user = await User.findOne({ email: googleProfile.email });
-
-		if (!user) {
-			// Handle the case where the user is not found in the database
+		// Check if user information exists in the session
+		if (!req.user) {
 			return res
 				.status(404)
-				.json({ message: "User not found in the database" });
+				.json({ message: "User information not found in the session" });
 		}
 
-		// const roles = Object.values(user.roles).filter(Boolean);
-		// create JWTs
-		// const sessionToken = jwt.sign(
-		// 	{
-		// 		UserInfo: {
-		// 			email: user.email,
-        //             id: user._id,
-		// 		},
-		// 	},
-		// 	process.env.SESSION_SECRET,
-		// 	{ expiresIn: "20s" }
-		// );
-		// const refreshToken = jwt.sign(
-		// 	{ username: user.username },
-		// 	process.env.REFRESH_TOKEN_SECRET,
-		// 	{ expiresIn: "1d" }
-		// );
-		// Saving refreshToken with current user
-		// user.refreshToken = refreshToken;
-		// const result = await user.save();
-		// console.log(result);
-		// console.log(roles);
+		// Retrieve user information from the session
+		const user = req.user;
 
-		// Creates Secure Cookie with refresh token
-		// res.cookie("goggleSession", sessionToken, {
-		// 	httpOnly: true,
-		// 	secure: true,
-		// 	sameSite: "None",
-		// 	maxAge: 20 * 1000,
-		// });
-
-		// Send authorization roles and access token to user
-		// res.json({ roles, result, accessToken });
-
-		//   Perform any additional actions with the user profile
-		//   ...
-
-		// const token = generateCookieToken({
-		// 	email: user.email,
-		// 	id: user._id,
-		// });
-
-		// Creates Secure Cookie with token token
-		// res.cookie("jwt", token, {
-		// 	// domain: ".onrender.com",
-		// 	// path: "/",
-		// 	httpOnly: true,
-		// 	secure: true,
-		// 	sameSite: "None",
-		// 	maxAge: 1 * 60 * 60 * 1000, //1hr
-		// });
-
-		// //   Redirect or send a response as needed
-		//   res.redirect(`https://quickbillpay.onrender.com/auth/google-verify?token=${token}`);
-		req.session.user = req.user;
-        // console.log(req.session.user)
-		res.redirect(`http://localhost:3000/auth/google-verify`);
+		// Send user information to the frontend
+		return res.status(200).json({ user });
 	} catch (error) {
-		// Handle errors
-		console.error("Error fetching user profile:", error);
-		res.status(500).json({ message: "Internal Server Error" });
+		console.error("Error retrieving user information:", error);
+		return res.status(500).json({ message: "Internal Server Error" });
 	}
-};
-
-const getCurrentUserInfo =  async (req, res) => {
-    console.log(req.user)
-	// try {
-		// const email = req.user.email;
-		// // console.log(token)
-		// // console.log(token)
-		// if (!email) return res.status(401).json({ error: "Unauthorized" });
-
-		// // let decodeData;
-
-		// //If token is custom token do this
-
-		// // decodeData = jwt.verify(token, process.env.SESSION_SECRET);
-
-		// // const userId = decodeData?.id;
-        // // console.log(userId)
-		// const user = await User.findOne({email})
-
-		// res.json(user);
-        try {
-            // Check if session exists
-            // if (!req.user) {
-            //     return res.status(404).json({ message: "Session not found" });
-            // }
-    
-            // Check if user information exists in the session
-            if (!req.user) {
-                return res.status(404).json({ message: "User information not found in the session" });
-            }
-    
-            // Retrieve user information from the session
-            const user = req.user;
-    
-            // Send user information to the frontend
-            return res.status(200).json({ user });
-        } catch (error) {
-            console.error("Error retrieving user information:", error);
-            return res.status(500).json({ message: "Internal Server Error" });
-        }
 };
 
 const signUp = async (req, res) => {
@@ -217,9 +113,9 @@ const login = async (req, res) => {
 			.status(400)
 			.json({ message: "Username and password are required." });
 
-	const foundUser = await User.findOne(
-		{ username: user } || { email: user }
-	).exec();
+	const foundUser =
+		(await User.findOne({ username: user }).exec()) ||
+		(await User.findOne({ email: user }).exec());
 	if (!foundUser) return res.sendStatus(401); //Unauthorized
 	// evaluate password
 	const match = await bcrypt.compare(password, foundUser.password);
@@ -244,8 +140,8 @@ const login = async (req, res) => {
 		// Saving refreshToken with current user
 		foundUser.refreshToken = refreshToken;
 		const result = await foundUser.save();
-		console.log(result);
-		console.log(roles);
+		// console.log(result);
+		// console.log(roles);
 
 		// Creates Secure Cookie with refresh token
 		res.cookie("jwt", refreshToken, {
@@ -290,6 +186,5 @@ module.exports = {
 	activateUser,
 	login,
 	logout,
-	successRedirect,
 	getCurrentUserInfo,
 };

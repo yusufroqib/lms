@@ -30,7 +30,7 @@ app.use(
 	session({
 		secret: process.env.SESSION_SECRET, // Change this to a secure secret key
 		resave: false,
-		saveUninitialized: true,
+		saveUninitialized: false,
 		store: store, // Use MongoDB store
 	})
 );
