@@ -1,8 +1,10 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
+const jwt = require("jsonwebtoken")
 
-const {sendMail} = require('../utils/sendMail.js')
-const createActivationToken = require('../utils/createActivationToken.js')
+
+const { sendMail } = require("../utils/sendMail.js");
+const createActivationToken = require("../utils/createActivationToken.js");
 
 const signUp = async (req, res) => {
 	try {
@@ -15,7 +17,7 @@ const signUp = async (req, res) => {
 			return res.status(400).json({ error: "User already exists" });
 
 		const hashedPassword = await bcrypt.hash(password, 12);
-		const user = { email, password: hashedPassword, name, username };
+		const user = { name, username, email, password: hashedPassword };
 
 		const activationToken = createActivationToken(user);
 		const activationCode = activationToken.activationCode;
@@ -36,30 +38,100 @@ const signUp = async (req, res) => {
 			});
 		} catch (error) {
 			// return next(new ErrorHandler(error.message, 400));
-            console.log(error)
-            res.status(400).json({ error: error.message });
+			console.log(error);
+			return res.status(400).json({ error: error.message });
 		}
-
-		// Creating a new Unconfirmed user using the provided email, hashed password, and name
-		// const token = crypto.randomBytes(32).toString("hex");
-		// const tokenExpiryDate = new Date() + 10 * 60 * 1000; // 10 mins from now
-
-		// const newUnconfirmedUser = await UnconfirmedUser.create({
-		// 	email,
-		// 	password: hashedPassword,
-		// 	name,
-		// 	token,
-		// 	// tokenExpiryDate,
-		// });
-		
-		// sendConfirmationMail(newUnconfirmedUser, res);
 	} catch (error) {
 		// Handling any errors that occur during the process
 		console.log(error);
 		res.status(500).json({ error: "Something went wrong" });
 	}
 };
+ 
+const activateUser = async (req, res) => {
+	try {
+		const { activation_token, activation_code } = req.body;
+
+		const newUser = jwt.verify(activation_token, process.env.ACTIVATION_SECRET);
+
+		if (newUser.activationCode !== activation_code) {
+			return res.status(400).json({ error: "Invalid activation code" });
+		}
+
+		const { name, email, username, password } = newUser.user;
+
+		const existUser = await User.findOne({ email });
+
+		if (existUser) {
+			return res.status(400).json({ error: "User already exists" });
+		}
+		const user = await User.create({
+			name,
+            username,
+			email,
+			password,
+		});
+
+		res.status(201).json({
+			success: true,
+            user
+		});
+	} catch (error) {
+		// return next(new ErrorHandler(error.message, 400));
+        console.log(error);
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: 'Token expired, kindly signup again' });
+        }
+		res.status(500).json({ error: "Something went wrong" });
+	}
+};
+
+
+const signIn = async (req, res) => {
+	const { email, password } = req.body;
+
+	try {
+		// Checking if the user exists in the database
+		const existingUser = await User.findOne({ email });
+
+		if (!existingUser)
+			return res.status(404).json({ error: "User doesn't exist" });
+
+		if (!existingUser.password) {
+			return res.status(404).json({
+				error: "This user was registered using google Authentication",
+			});
+		}
+
+		// Comparing the provided password with the hashed password stored in the database
+		const correctPassword = await bcrypt.compare(
+			password,
+			existingUser.password
+		);
+		if (!correctPassword)
+			return res.status(400).json({ error: "Invalid credentials" });
+
+		// Generating a JSON Web Token (JWT) for authentication
+
+		// const token = generateCookieToken({
+		// 	email: existingUser.email,
+		// 	id: existingUser._id,
+		// });
 
 
 
-module.exports = { signUp };
+
+		existingUser.password = null;
+		existingUser.updatedAt = null;
+		existingUser.createdAt = null;
+
+		res.status(200).json({ loggedInUser: existingUser, token });
+	} catch (error) {
+		// Handling any errors that occur during the process
+		console.log(error);
+		res.status(500).json({ message: "Something went wrong" });
+	}
+};
+
+
+module.exports = { signUp, activateUser };
