@@ -55,7 +55,6 @@ const signUp = async (req, res) => {
 				activationToken: activationToken.token,
 			});
 		} catch (error) {
-			// return next(new ErrorHandler(error.message, 400));
 			console.log(error);
 			return res.status(400).json({ error: error.message });
 		}
@@ -95,7 +94,6 @@ const activateUser = async (req, res) => {
 			user,
 		});
 	} catch (error) {
-		// return next(new ErrorHandler(error.message, 400));
 		console.log(error);
 		if (error.name === "TokenExpiredError") {
 			return res
