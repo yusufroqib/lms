@@ -106,6 +106,92 @@ const activateUser = async (req, res) => {
 	}
 };
 
+const passwordReset = async (req, res) => {
+	const { email } = req.body;
+	
+	try {
+			const user = await User.findOne({ email });
+		
+			if (!user) {
+				return res.status(400).json({ error: "User not found" });
+			}
+		
+			const activationToken = createActivationToken(user);
+			const activationCode = activationToken.activationCode;
+		
+			const data = { user: { name: user.name }, activationCode };
+		await sendMail({
+			email: user.email,
+			subject: "Reset your password",
+			template: "password-reset-mail.ejs",
+			data,
+		});
+		res.status(201).json({
+			success: true,
+			message: `Please check your email ${user.email} to reset your password`,
+			activationToken: activationToken.token,
+		});
+	} catch (error) {
+		// return next(new ErrorHandler(error.message, 400));
+		console.log(error);
+		res.status(500).json({ error: "Something went wrong" });
+	}
+
+}
+
+const confirmPasswordResetOTP = async (req, res) => {
+	const { activation_token, activation_code } = req.body;
+
+	const decoded = jwt.verify(activation_token, process.env.ACTIVATION_SECRET);
+
+	try {
+		if (decoded.activationCode !== activation_code) {
+			return res.status(400).json({ error: "Invalid activation code" });
+		}
+	
+		res.status(201).json({
+			success: true,
+			message: "OTP verified successfully",
+		});
+	} catch (error) {
+		res.status(500).json({ error: "Something went wrong" });
+
+	}
+
+}
+
+
+const passwordResetConfirmed = async (req, res) => {
+	const { activation_token, activation_code, password } = req.body;
+
+	try {
+		const decoded = jwt.verify(activation_token, process.env.ACTIVATION_SECRET);
+	
+		if (decoded.activationCode !== activation_code) {
+			return res.status(400).json({ error: "Invalid activation code" });
+		}
+	
+		const { email } = decoded.user;
+	
+		const hashedPassword = await bcrypt.hash(password, 12);
+	
+		const user = await User.findOneAndUpdate(
+			{ email },
+			{ password: hashedPassword },
+			{ new: true }
+		);
+	
+		res.status(201).json({
+			success: true,
+			user,
+		});
+		
+	} catch (error) {
+		res.status(500).json({ error: "Something went wrong" });
+	}
+
+}
+
 const login = async (req, res) => {
 	const { user, password } = req.body;
 	if (!user || !password)
@@ -187,4 +273,8 @@ module.exports = {
 	login,
 	logout,
 	getCurrentUserInfo,
+	passwordReset,	
+	confirmPasswordResetOTP,
+	passwordResetConfirmed
+	
 };
