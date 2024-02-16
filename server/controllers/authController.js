@@ -105,33 +105,32 @@ const activateUser = async (req, res) => {
 };
 
 //To request for password reset, we need to send the user's email to the server.
-	// We will then send a password reset email to the user that will allow them to reset their password.
-	// The mail will contain a token that will be used to verify the user's identity and to reset their password.
-	// The token will be signed using the secret key and will expire after a certain period of time.
-	// The user will be able to reset their password by providing the new password along with the token.
-	// The server will then verify the token and the user's email and update the user's password in the database.
-	// The user will then be able to login with their new password.
-	// The password reset link will be sent to the user's email address.
-	// The user will then be able to click on the link to reset their password.
-	// The user will then be able to enter their new password and click on the "Reset Password" button.
-	// The server will then verify the token and the user's email and update the user's password in the database.
-	// The user will then be able to login with their new password.
+// We will then send a password reset email to the user that will allow them to reset their password.
+// The mail will contain a token that will be used to verify the user's identity and to reset their password.
+// The token will be signed using the secret key and will expire after a certain period of time.
+// The user will be able to reset their password by providing the new password along with the token.
+// The server will then verify the token and the user's email and update the user's password in the database.
+// The user will then be able to login with their new password.
+// The password reset link will be sent to the user's email address.
+// The user will then be able to click on the link to reset their password.
+// The user will then be able to enter their new password and click on the "Reset Password" button.
+// The server will then verify the token and the user's email and update the user's password in the database.
+// The user will then be able to login with their new password.
 
 const passwordReset = async (req, res) => {
-	
 	const { email } = req.body;
-	
+
 	try {
-			const user = await User.findOne({ email });
-		
-			if (!user) {
-				return res.status(400).json({ error: "User not found" });
-			}
-		
-			const activationToken = createActivationToken(user);
-			const activationCode = activationToken.activationCode;
-		
-			const data = { user: { name: user.name }, activationCode };
+		const user = await User.findOne({ email });
+
+		if (!user) {
+			return res.status(400).json({ error: "User not found" });
+		}
+
+		const activationToken = createActivationToken(user);
+		const activationCode = activationToken.activationCode;
+
+		const data = { user: { name: user.name }, activationCode };
 		await sendMail({
 			email: user.email,
 			subject: "Reset your password",
@@ -148,73 +147,71 @@ const passwordReset = async (req, res) => {
 		console.log(error);
 		res.status(500).json({ error: "Something went wrong" });
 	}
-}
+};
 
 const confirmPasswordResetOTP = async (req, res) => {
 	const { activation_token, activation_code } = req.body;
 
-	
 	try {
 		const decoded = jwt.verify(activation_token, process.env.ACTIVATION_SECRET);
 		if (decoded.activationCode !== activation_code) {
 			return res.status(400).json({ error: "Invalid activation code" });
 		}
-	
+
 		res.status(201).json({
 			success: true,
 			message: "OTP verified successfully",
 		});
 	} catch (error) {
 		res.status(500).json({ error: error.message });
-
 	}
-}
-
+};
 
 const passwordResetConfirmed = async (req, res) => {
 	const { activation_token, activation_code, password } = req.body;
 
 	try {
 		const decoded = jwt.verify(activation_token, process.env.ACTIVATION_SECRET);
-	
+
 		if (decoded.activationCode !== activation_code) {
 			return res.status(400).json({ error: "Invalid activation code" });
 		}
-	
+
 		const { email } = decoded.user;
-	
+
 		const hashedPassword = await bcrypt.hash(password, 12);
-	
+
 		const user = await User.findOneAndUpdate(
 			{ email },
 			{ password: hashedPassword },
 			{ new: true }
 		);
-	
+
 		res.status(201).json({
 			success: true,
 			user,
 		});
-		
 	} catch (error) {
 		res.status(500).json({ error: "Something went wrong" });
 	}
-}
+};
 
 const login = async (req, res) => {
+	const cookies = req.cookies;
 	const { user, password } = req.body;
 
 	try {
-		
 		if (!user || !password)
 			return res
 				.status(400)
 				.json({ message: "Username and password are required." });
-	
-		const foundUser =
-			(await User.findOne({ username: user }).exec()) ||
-			(await User.findOne({ email: user }).exec());
+
+		const foundUser = await User.findOne({
+			$or: [{ username: user }, { email: user }],
+		}).exec();
+
 		if (!foundUser) return res.sendStatus(401); //Unauthorized
+
 		// evaluate password
 		const match = await bcrypt.compare(password, foundUser.password);
 		if (match) {
@@ -230,25 +227,53 @@ const login = async (req, res) => {
 				process.env.ACCESS_TOKEN_SECRET,
 				{ expiresIn: "10s" }
 			);
-			const refreshToken = jwt.sign(
+
+			const newRefreshToken = jwt.sign(
 				{ username: foundUser.username },
 				process.env.REFRESH_TOKEN_SECRET,
 				{ expiresIn: "1d" }
 			);
+
+			let newRefreshTokenArray = !cookies?.jwt
+				? foundUser.refreshToken
+				: foundUser.refreshToken.filter((rt) => rt !== cookies.jwt);
+
+			if (cookies?.jwt) {
+			/*
+					Scenario added here: 
+					1) User logs in but never uses RT and does not logout 
+					2) RT is stolen
+					3) If 1 & 2 occurs, reuse detection is needed to clear all RTs when user logs in
+				*/
+				const refreshToken = cookies.jwt;
+				const foundToken = await User.findOne({ refreshToken }).exec();
+
+				//Detected refresh token reuse!
+				if (!foundToken) {
+					// console.log("Used cookie already");
+					// clear out ALL previous refresh tokens
+					newRefreshTokenArray = [];
+				}
+
+				res.clearCookie("jwt", {
+					httpOnly: true,
+					sameSite: "None",
+					secure: true,
+				});
+			}
+
 			// Saving refreshToken with current user
-			foundUser.refreshToken = refreshToken;
+			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
 			const result = await foundUser.save();
-			// console.log(result);
-			// console.log(roles);
-	
+
 			// Creates Secure Cookie with refresh token
-			res.cookie("jwt", refreshToken, {
+			res.cookie("jwt", newRefreshToken, {
 				httpOnly: true,
 				secure: true,
 				sameSite: "None",
 				maxAge: 24 * 60 * 60 * 1000,
 			});
-	
+
 			// Send authorization roles and access token to user
 			res.json({ roles, result, accessToken });
 		} else {
@@ -265,28 +290,32 @@ const logout = async (req, res) => {
 	const cookies = req.cookies;
 
 	try {
-		
 		if (!cookies?.jwt) return res.sendStatus(204); //No content
 		const refreshToken = cookies.jwt;
-	
+
 		// Is refreshToken in db?
 		const foundUser = await User.findOne({ refreshToken }).exec();
 		if (!foundUser) {
-			res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
+			res.clearCookie("jwt", {
+				httpOnly: true,
+				sameSite: "None",
+				secure: true,
+			});
 			return res.sendStatus(204);
 		}
-	
+
 		// Delete refreshToken in db
-		foundUser.refreshToken = "";
+		foundUser.refreshToken = foundUser.refreshToken.filter(
+			(rt) => rt !== refreshToken
+		);
 		const result = await foundUser.save();
 		console.log(result);
-	
+
 		res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
 		res.sendStatus(204);
 	} catch (error) {
 		res.status(500).json({ message: error.message });
 	}
-
 };
 
 module.exports = {
@@ -295,8 +324,7 @@ module.exports = {
 	login,
 	logout,
 	getCurrentUserInfo,
-	passwordReset,	
+	passwordReset,
 	confirmPasswordResetOTP,
-	passwordResetConfirmed
-	
+	passwordResetConfirmed,
 };

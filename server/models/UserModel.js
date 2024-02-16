@@ -33,7 +33,7 @@ const userSchema = new Schema(
 		},
 		enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 		createdCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
-		refreshToken: String,
+		refreshToken: [String],
 		points: [
 			{
 				description: String,
