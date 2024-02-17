@@ -1,0 +1,56 @@
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes fadeIn {
+	0% {
+		opacity: 0.25;
+	}
+
+	50% {
+		opacity: 0.5;
+	}
+
+	75% {
+		opacity: 0.75;
+	}
+
+	100% {
+		opacity: 0.5;
+	}
+}
+
+.svg-container {
+	z-index: 99999;
+  /* background: #000; */
+  width: fit-content;
+}
+
+svg {
+  width: 50px;
+	fill: #50c6db;
+}
+
+#outer-wheel {
+	animation: spin 1s infinite linear;
+}
+
+#inner-wheel {
+	animation: fadeIn 2s infinite linear;
+}
+
+/* @media screen and (max-width: 980px) {
+	svg {
+		width: 6%;
+	}
+}
+@media screen and (max-width: 768px) {
+	svg {
+		width: 10%;
+	}
+} */

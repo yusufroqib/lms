@@ -1,12 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import LVSpinner from "./LVSpinner/LVSpinner";
 
 function App() {
-
-
 	return (
-		<div className="text-xl bg-black text-white rounded-md w-[75%]" >
-			APP
+		<div className="flex justify-center items-center h-screen">
+			<LVSpinner />
 		</div>
 	);
 }
