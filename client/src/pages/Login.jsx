@@ -34,7 +34,7 @@ const Login = () => {
 		[...Object.values(allData)].every(Boolean) 
 
 	return (
-		<div className="flex flex-col bg-[#ededed] justify-center items-center min-h-screen px-4">
+		<div className="flex flex-col bg-[#ededed] justify-center items-center min-h-screen ">
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
 				<img
 					className="w-80 mb-6"
@@ -123,7 +123,7 @@ const Login = () => {
 						Don&apos;t have an account?{" "}
 						<span
 							className="text-purple-600 cursor-pointer hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-100 hover:underline"
-							onClick={() => dispatch(loginScreen("login"))}
+							onClick={() => dispatch(loginScreen("signup"))}
 						>
 							Sign up instead
 						</span>

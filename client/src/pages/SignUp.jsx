@@ -43,7 +43,7 @@ const SignUp = () => {
 		[...Object.values(allData)].every(Boolean) && pwd === confirmPasword;
 
 	return (
-		<div className="flex flex-col bg-[#ededed] justify-center items-center min-h-screen px-4">
+		<div className="flex flex-col bg-[#ededed] justify-center items-center min-h-screen">
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
 				<img
 					className="w-80 mb-6"
