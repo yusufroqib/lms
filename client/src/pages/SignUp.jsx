@@ -33,7 +33,7 @@ const SignUp = () => {
 		} else {
 			setConfirmPwdStyle("hidden");
 		}
-		console.log(confirmPasword)
+		// console.log(confirmPasword)
 	}, [confirmPasword, pwd]);
 
 	const { ...allData } = data;
