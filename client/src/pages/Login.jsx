@@ -15,8 +15,7 @@ const Login = () => {
 	const [pwd, setPwd] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const [data, setData] = useState({
-		fullName: "",
-		email: "",
+	
 		password: "",
 		username: "",
 	});
@@ -44,7 +43,7 @@ const Login = () => {
 				/>
 				<div className="w-full px-6 py-6 bg-white dark:bg-gray-900 shadow-md rounded-md sm:rounded-lg max-w-sm">
 					<div className="text-center text-4xl font-bold mb-3">
-						<h1 className=" text-slate-600">Sign Up</h1>
+						<h1 className=" text-slate-600">Login</h1>
 					</div>
 					<form action="" onSubmit={handleRegistration} className="group">
 						
@@ -109,38 +108,7 @@ const Login = () => {
 								</span>
 							</div>
 						</div>
-						<div className="mt-4">
-							<label
-								htmlFor="password_confirmation"
-								className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-							>
-								Confirm Password <span className="text-red-500 ">*</span>
-							</label>
-							<div className="flex flex-col items-start">
-								<input
-									type="password"
-									name="password_confirmation"
-									placeholder="Confirm password"
-									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
-									autoComplete="off"
-									required
-									pattern="[0-9a-zA-Z]{8,}"
-									onChange={(e) => {
-										setData({
-											...data,
-											password: e.target.value,
-										});
-										setConfirmPassword(e.target.value);
-									}}
-								/>
-								<span className="mt-1 hidden text-sm text-red-400">
-									Password must be at least 8 characters.{" "}
-								</span>
-								<p className={`mt-1 ${confirmPwdStyle} text-sm text-red-400`}>
-									Password must match
-								</p>
-							</div>
-						</div>
+						
 						<div className="flex items-center mt-4">
 							<button
 								type="submit"
@@ -152,12 +120,12 @@ const Login = () => {
 						</div>
 					</form>
 					<div className="mt-4 text-zinc-600 text-md dark:text-zinc-300">
-						Already have an account?{" "}
+						Don&apos;t have an account?{" "}
 						<span
 							className="text-purple-600 cursor-pointer hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-100 hover:underline"
 							onClick={() => dispatch(loginScreen("login"))}
 						>
-							Login instead
+							Sign up instead
 						</span>
 					</div>
 					<div className="flex items-center w-full my-4">
