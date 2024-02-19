@@ -1,11 +1,14 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import LVSpinner from "./LVSpinner/LVSpinner";
+import { Button } from "@material-tailwind/react";
+import SignUp from "./pages/SignUp";
+
 
 function App() {
 	return (
-		<div className="flex justify-center items-center h-screen">
-			<LVSpinner />
-		</div>
+	<Routes>
+      <Route path="/" element={<SignUp />}/>
+	</Routes>
 	);
 }
 
