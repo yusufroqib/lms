@@ -210,7 +210,8 @@ const login = async (req, res) => {
 			$or: [{ username: user }, { email: user }],
 		}).exec();
 
-		if (!foundUser) return res.sendStatus(401); //Unauthorized
+		if (!foundUser)
+			return res.status(401).json({ message: "Invalid username or password" }); //Unauthorized
 
 		// evaluate password
 		const match = await bcrypt.compare(password, foundUser.password);
@@ -239,7 +240,7 @@ const login = async (req, res) => {
 				: foundUser.refreshToken.filter((rt) => rt !== cookies.jwt);
 
 			if (cookies?.jwt) {
-			/*
+				/*
 					Scenario added here: 
 					1) User logs in but never uses RT and does not logout 
 					2) RT is stolen

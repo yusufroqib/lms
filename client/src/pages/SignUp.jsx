@@ -8,7 +8,6 @@ import {
 } from "@/features/authScreen";
 
 const SignUp = () => {
-	const authScreenPage = useSelector(selectAuthScreen);
 	const dispatch = useDispatch();
 	const [confirmPasword, setConfirmPassword] = useState("");
 	const [confirmPwdStyle, setConfirmPwdStyle] = useState("hidden");
@@ -43,7 +42,7 @@ const SignUp = () => {
 		[...Object.values(allData)].every(Boolean) && pwd === confirmPasword;
 
 	return (
-		<div className="flex flex-col bg-[#ededed] justify-center items-center min-h-screen">
+		<div className="flex flex-col bg-[#dfdfe6] justify-center items-center min-h-screen">
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
 				<img
 					className="w-80 mb-6"
@@ -154,7 +153,7 @@ const SignUp = () => {
 									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
 									autoComplete="off"
 									required
-									pattern="[0-9a-zA-Z]{8,}"
+									pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
 									onChange={(e) => {
 										setData({
 											...data,
@@ -167,8 +166,9 @@ const SignUp = () => {
 									}}
 								/>
 								<span className="mt-1 hidden text-sm text-red-400">
-									Password must be at least 8 characters.{" "}
-								</span>
+								Password must be at least 8 characters long and must contain
+									at least 1 uppercase letter, 1 lowercase letter, 1
+									number and can include optional special characters.								</span>
 							</div>
 						</div>
 						<div className="mt-4">
