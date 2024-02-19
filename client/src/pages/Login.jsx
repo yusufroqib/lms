@@ -7,7 +7,7 @@ import {
 	signupScreen,
 } from "@/features/authScreen";
 
-const SignUp = () => {
+const Login = () => {
 	const authScreenPage = useSelector(selectAuthScreen);
 	const dispatch = useDispatch();
 	const [confirmPasword, setConfirmPassword] = useState("");
@@ -27,20 +27,12 @@ const SignUp = () => {
 		console.log(data);
 	};
 
-	useEffect(() => {
-		if (confirmPasword.length > 7 && confirmPasword !== pwd) {
-			setConfirmPwdStyle("block");
-		} else {
-			setConfirmPwdStyle("hidden");
-		}
-		// console.log(confirmPasword)
-	}, [confirmPasword, pwd]);
 
 	const { ...allData } = data;
 
 	// Disable submit button until all fields are filled in
 	const canSubmit =
-		[...Object.values(allData)].every(Boolean) && pwd === confirmPasword;
+		[...Object.values(allData)].every(Boolean) 
 
 	return (
 		<div className="flex flex-col bg-[#ededed] justify-center items-center min-h-screen px-4">
@@ -55,33 +47,7 @@ const SignUp = () => {
 						<h1 className=" text-slate-600">Sign Up</h1>
 					</div>
 					<form action="" onSubmit={handleRegistration} className="group">
-						<div>
-							<label
-								htmlFor="fullName"
-								className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-							>
-								Full Name <span className="text-red-500"> *</span>
-							</label>
-							<div className="flex flex-col items-start">
-								<input
-									type="text"
-									name="fullName"
-									placeholder="Full Name"
-									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
-									pattern="^(?!\s+$).{5,}$"
-									required
-									onChange={(e) => {
-										setData({
-											...data,
-											fullName: e.target.value,
-										});
-									}}
-								/>
-								<span className="mt-1 hidden text-sm text-red-400">
-									Full name must be at least 5 characters long
-								</span>
-							</div>
-						</div>
+						
 						<div className="mt-4">
 							<label
 								htmlFor="username"
@@ -110,35 +76,7 @@ const SignUp = () => {
 								</span>
 							</div>
 						</div>
-						<div className="mt-4">
-							<label
-								htmlFor="email"
-								className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-							>
-								Email <span className="text-red-500"> *</span>
-							</label>
-							<div className="flex flex-col items-start">
-								<input
-									type="email"
-									name="email"
-									placeholder="Email"
-									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
-									autoComplete="off"
-									required
-									pattern="[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-									onChange={(e) => {
-										setData({
-											...data,
-											email: e.target.value,
-										});
-									}}
-								/>
-								<span className="mt-1 hidden text-sm text-red-400">
-									Please enter a valid email address.{" "}
-								</span>
-							</div>
-						</div>
-
+						
 						<div className="mt-4">
 							<label
 								htmlFor="password"
@@ -249,4 +187,4 @@ const SignUp = () => {
 	);
 };
 
-export default SignUp;
+export default Login;
