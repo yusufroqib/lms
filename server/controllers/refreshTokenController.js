@@ -55,10 +55,9 @@ const handleRefreshToken = async (req, res) => {
 			const accessToken = jwt.sign(
 				{
 					UserInfo: {
-						...foundUser,
+						username: foundUser.username,
 						roles: roles,
-						refreshToken: '',
-						password: ''
+						
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,
@@ -84,7 +83,7 @@ const handleRefreshToken = async (req, res) => {
 				maxAge: 24 * 60 * 60 * 1000,
 			})
 
-			res.json({ roles, accessToken });
+			res.json({ accessToken });
 		}
 	);
 };

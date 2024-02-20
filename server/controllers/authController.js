@@ -270,10 +270,8 @@ const login = async (req, res) => {
 			const accessToken = jwt.sign(
 				{
 					UserInfo: {
-						...foundUser,
+						username: foundUser.username,
 						roles: roles,
-						refreshToken: '',
-						password: ''
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,
@@ -290,11 +288,11 @@ const login = async (req, res) => {
 				maxAge: 24 * 60 * 60 * 1000,
 			});
 
-			console.log(accessToken)
-			console.log(accessToken)
+			// console.log(accessToken)
+			// console.log(accessToken)
 
 			// Send authorization roles and access token to user
-			res.json({ roles, userInfo, accessToken });
+			res.json({ accessToken });
 		} else {
 			res.sendStatus(401);
 		}
