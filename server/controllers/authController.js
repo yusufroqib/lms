@@ -30,9 +30,16 @@ const signUp = async (req, res) => {
 		const { email, username, password, name } = req.body;
 
 		// Checking if the user already exists
+
 		const existingUser = await User.findOne({ email }).select("-password");
 		if (existingUser)
-			return res.status(400).json({ error: "User already exists" });
+			return res.status(400).json({ error: "User already exists with this email" });
+
+		const existingUsername = await User.findOne({ username }).select(
+			"-password"
+		);		
+		if (existingUsername)
+			return res.status(400).json({ error: "Username already taken" });
 
 		const hashedPassword = await bcrypt.hash(password, 12);
 		const user = { name, username, email, password: hashedPassword };
@@ -199,7 +206,7 @@ const passwordResetConfirmed = async (req, res) => {
 const login = async (req, res) => {
 	const cookies = req.cookies;
 	const { user, password } = req.body;
-	console.log(req.body)
+	console.log(req.body);
 
 	try {
 		if (!user || !password)
@@ -209,7 +216,9 @@ const login = async (req, res) => {
 
 		const foundUser = await User.findOne({
 			$or: [{ username: user }, { email: user }],
-		}).select('+password').exec();
+		})
+			.select("+password")
+			.exec();
 
 		if (!foundUser)
 			return res.status(401).json({ message: "Invalid username or password" }); //Unauthorized

@@ -35,9 +35,9 @@ const SignUpOTP = () => {
 		setSeconds(60); // Reset countdown duration to 60 seconds
 	};
 
-	useEffect(() => {
-		console.log(otp);
-	}, [otp]);
+	// useEffect(() => {
+	// 	console.log(otp);
+	// }, [otp]);
 
 	const handleChange = (enteredOtp) => {
 		setOtp(enteredOtp);
