@@ -1,5 +1,36 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes shake {
+	0% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-5px);
+	}
+	50% {
+		transform: translateX(5px);
+	}
+	75% {
+		transform: translateX(-5px);
+	}
+	100% {
+		transform: translateX(0);
+	}
+}
+.otp-input {
+	width: 5rem;
+	height: 4rem;
+	border: solid black 1px;
+	border-radius: 5px;
+}
+/* .error-text {
+	animation: shake 1s infinite;
+	border: solid red 1px;
+	height: 40px;
+	width: 40px;
+	border-radius: 5px;
+} */
