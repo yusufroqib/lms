@@ -1,11 +1,22 @@
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 // import OtpInput from "react-otp-input";
 import OtpInput from "react18-input-otp";
 import { Button } from "@material-tailwind/react";
+import { useVerifySignUpOTPMutation } from "@/features/auth/authApiSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+	selectCurrentActivationToken,
+	setUser,
+} from "@/features/auth/authSlice";
 
 const SignUpOTP = () => {
+	const dispatch = useDispatch();
 	const [otp, setOtp] = useState("");
-	const [seconds, setSeconds] = useState(0); // Initial countdown duration in seconds
+	const [seconds, setSeconds] = useState(60); // Initial countdown duration in seconds
+	const [verifySignUpOTP, { isLoading }] = useVerifySignUpOTPMutation();
+	const activationToken = useSelector(selectCurrentActivationToken);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		let countdown = setInterval(() => {
@@ -32,7 +43,41 @@ const SignUpOTP = () => {
 		setOtp(enteredOtp);
 	};
 
-	const handleRegistration = () => {};
+	const verifyOTP = async (e) => {
+		e.preventDefault();
+		try {
+			const { user } = await verifySignUpOTP({
+				activation_code: otp,
+				activation_token: activationToken,
+			}).unwrap();
+			console.log(user);
+			// console.log(res)
+			dispatch(setUser({ user }));
+			console.log(user);
+			// setData({
+			// 	...data,
+			// 	fullName: "",
+			// 	email: "",
+			// 	password: "",
+			// 	username: "",
+			// });
+			// navigate("/verify");
+		} catch (err) {
+			if (!err.status) {
+				console.log("No Server Response");
+			} else if (err.status === 400) {
+				console.log("Missing Username or Password");
+			} else if (err.status === 401) {
+				console.log("Unauthorized");
+			} else {
+				console.log(err.data?.message);
+			}
+			// errRef.current.focus();
+		}
+
+		// console.log(data);
+	};
+
 	return (
 		<div className="flex flex-col bg-[#dfdfe6] justify-center items-center min-h-screen ">
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
@@ -49,7 +94,7 @@ const SignUpOTP = () => {
 						Enter the OTP you received at <strong>yusufroqib@gmail.com</strong>
 					</h4>
 					<form
-						onSubmit={handleRegistration}
+						onSubmit={verifyOTP}
 						className=" flex justify-center w-full flex-col "
 					>
 						<OtpInput
@@ -57,6 +102,7 @@ const SignUpOTP = () => {
 							onChange={handleChange}
 							numInputs={6}
 							isInputNum
+							shouldAutoFocus={true}
 							// hasErrored={true}
 							isInputSecure={true}
 							errorStyle={{
@@ -107,7 +153,7 @@ const SignUpOTP = () => {
 
 						<Button type="submit" className="mt-6" color="blue">
 							{" "}
-							Confirm
+							Verify
 						</Button>
 					</form>
 				</div>

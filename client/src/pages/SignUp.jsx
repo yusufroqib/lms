@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@material-tailwind/react";
-import {
-	loginScreen,
-	selectAuthScreen,
-	signupScreen,
-} from "@/features/authScreen";
+import { authScreen } from "@/features/authScreen";
+import { useSignUpMutation } from "@/features/auth/authApiSlice";
+import { setSignUpToken } from "@/features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
 	const dispatch = useDispatch();
 	const [confirmPasword, setConfirmPassword] = useState("");
 	const [confirmPwdStyle, setConfirmPwdStyle] = useState("hidden");
 	const [pwd, setPwd] = useState("");
-	const [showPassword, setShowPassword] = useState(false);
+	// const [showPassword, setShowPassword] = useState(false);
+	const [signUp, { isLoading }] = useSignUpMutation();
+	const navigate = useNavigate();
+
+
 	const [data, setData] = useState({
 		fullName: "",
 		email: "",
@@ -20,8 +23,33 @@ const SignUp = () => {
 		username: "",
 	});
 
-	const handleRegistration = (e) => {
+	const handleRegistration = async (e) => {
 		e.preventDefault();
+		try {
+			const { activationToken } = await signUp(data).unwrap();
+			// console.log(res)
+			dispatch(setSignUpToken({ activationToken }));
+			console.log(activationToken);
+			setData({
+				...data,
+				fullName: "",
+				email: "",
+				password: "",
+				username: "",
+			});
+			navigate('/verify')
+		} catch (err) {
+			if (!err.status) {
+				console.log("No Server Response");
+			} else if (err.status === 400) {
+				console.log("Missing Username or Password");
+			} else if (err.status === 401) {
+				console.log("Unauthorized");
+			} else {
+				console.log(err.data?.message);
+			}
+			// errRef.current.focus();
+		}
 
 		console.log(data);
 	};
@@ -166,9 +194,10 @@ const SignUp = () => {
 									}}
 								/>
 								<span className="mt-1 hidden text-sm text-red-400">
-								Password must be at least 8 characters long and must contain
-									at least 1 uppercase letter, 1 lowercase letter, 1
-									number and can include optional special characters.								</span>
+									Password must be at least 8 characters long and must contain
+									at least 1 uppercase letter, 1 lowercase letter, 1 number and
+									can include optional special characters.{" "}
+								</span>
 							</div>
 						</div>
 						<div className="mt-4">
@@ -186,7 +215,7 @@ const SignUp = () => {
 									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
 									autoComplete="off"
 									required
-									pattern="[0-9a-zA-Z]{8,}"
+									pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
 									onChange={(e) => {
 										setData({
 											...data,
@@ -217,7 +246,7 @@ const SignUp = () => {
 						Already have an account?{" "}
 						<span
 							className="text-purple-600 cursor-pointer hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-100 hover:underline"
-							onClick={() => dispatch(loginScreen("login"))}
+							onClick={() => dispatch(authScreen("login"))}
 						>
 							Login instead
 						</span>

@@ -3,6 +3,20 @@ import { logOut, setCredentials } from "./authSlice"
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
+        signUp: builder.mutation({
+            query: credentials => ({
+                url: '/auth/signup',
+                method: 'POST',
+                body: { ...credentials}
+            })
+        }),
+        verifySignUpOTP: builder.mutation({
+            query: credentials => ({
+                url: '/auth/activate-account',
+                method: 'POST',
+                body: { ...credentials}
+            })
+        }),
         login: builder.mutation({
             query: credentials => ({
                 url: '/auth/login',
@@ -48,6 +62,8 @@ export const authApiSlice = apiSlice.injectEndpoints({
 })
 
 export const {
+    useSignUpMutation,
+    useVerifySignUpOTPMutation,
     useLoginMutation,
     useSendLogoutMutation,
     useRefreshMutation,

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@material-tailwind/react";
-import { loginScreen } from "@/features/authScreen";
+import { authScreen } from "@/features/authScreen";
 import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/features/auth/authApiSlice";
 import { setCredentials } from "@/features/auth/authSlice";
@@ -211,7 +211,7 @@ const Login = () => {
 						Don&apos;t have an account?{" "}
 						<span
 							className="text-purple-600 cursor-pointer hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-100 hover:underline"
-							onClick={() => dispatch(loginScreen("signup"))}
+							onClick={() => dispatch(authScreen("signup"))}
 						>
 							Sign up instead
 						</span>
