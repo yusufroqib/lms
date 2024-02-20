@@ -50,12 +50,15 @@ const handleRefreshToken = async (req, res) => {
 				return res.sendStatus(403);
 
 			// Refresh token was still valid
-			const roles = Object.values(foundUser.roles);
+			// const roles = Object.values(foundUser.roles);
+			const roles = Object.values(foundUser.roles).filter(Boolean);
 			const accessToken = jwt.sign(
 				{
 					UserInfo: {
-						username: decoded.username,
+						...foundUser,
 						roles: roles,
+						refreshToken: '',
+						password: ''
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,

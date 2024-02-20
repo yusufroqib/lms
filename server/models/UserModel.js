@@ -17,6 +17,7 @@ const userSchema = new Schema(
 		googleId: String,
 		password: {
 			type: String,
+			select: false // Excludes the password field from query results
 			// required: true,
 		},
 		bio: String,

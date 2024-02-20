@@ -32,14 +32,6 @@ const SignUpOTP = () => {
 		setOtp(enteredOtp);
 	};
 
-	// const handleChange = (e) => {
-	// 	const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-	// 	console.log(Number(e))
-	// 	// if (typeof Number(e) !== Number) return;
-
-	// 	// setOtp(e);
-	// };
-
 	const handleRegistration = () => {};
 	return (
 		<div className="flex flex-col bg-[#dfdfe6] justify-center items-center min-h-screen ">

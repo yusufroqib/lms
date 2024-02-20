@@ -199,6 +199,7 @@ const passwordResetConfirmed = async (req, res) => {
 const login = async (req, res) => {
 	const cookies = req.cookies;
 	const { user, password } = req.body;
+	console.log(req.body)
 
 	try {
 		if (!user || !password)
@@ -208,7 +209,7 @@ const login = async (req, res) => {
 
 		const foundUser = await User.findOne({
 			$or: [{ username: user }, { email: user }],
-		}).exec();
+		}).select('+password').exec();
 
 		if (!foundUser)
 			return res.status(401).json({ message: "Invalid username or password" }); //Unauthorized
@@ -218,16 +219,16 @@ const login = async (req, res) => {
 		if (match) {
 			const roles = Object.values(foundUser.roles).filter(Boolean);
 			// create JWTs
-			const accessToken = jwt.sign(
-				{
-					UserInfo: {
-						username: foundUser.username,
-						roles: roles,
-					},
-				},
-				process.env.ACCESS_TOKEN_SECRET,
-				{ expiresIn: "10s" }
-			);
+			// const accessToken = jwt.sign(
+			// 	{
+			// 		UserInfo: {
+			// 			username: foundUser.username,
+			// 			roles: roles,
+			// 		},
+			// 	},
+			// 	process.env.ACCESS_TOKEN_SECRET,
+			// 	{ expiresIn: "10s" }
+			// );
 
 			const newRefreshToken = jwt.sign(
 				{ username: foundUser.username },
@@ -266,6 +267,20 @@ const login = async (req, res) => {
 			// Saving refreshToken with current user
 			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
 			const result = await foundUser.save();
+			const accessToken = jwt.sign(
+				{
+					UserInfo: {
+						...foundUser,
+						roles: roles,
+						refreshToken: '',
+						password: ''
+					},
+				},
+				process.env.ACCESS_TOKEN_SECRET,
+				{ expiresIn: "10s" }
+			);
+
+			// const userInfo = {...result, password: ''}
 
 			// Creates Secure Cookie with refresh token
 			res.cookie("jwt", newRefreshToken, {
@@ -275,8 +290,11 @@ const login = async (req, res) => {
 				maxAge: 24 * 60 * 60 * 1000,
 			});
 
+			console.log(accessToken)
+			console.log(accessToken)
+
 			// Send authorization roles and access token to user
-			res.json({ roles, result, accessToken });
+			res.json({ roles, userInfo, accessToken });
 		} else {
 			res.sendStatus(401);
 		}
