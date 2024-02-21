@@ -8,7 +8,7 @@ const Dashboard = () => {
 		isSuccess,
 		isError,
 		error,
-	} = useGetMyDetailsQuery(undefined, {
+	} = useGetMyDetailsQuery('myDetails', {
 		pollingInterval: 60000,
 		refetchOnFocus: true,
 		refetchOnMountOrArgChange: true,
