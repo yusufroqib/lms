@@ -66,7 +66,7 @@ const SignUpOTP = () => {
 			if (!err.status) {
 				console.log("No Server Response");
 			} else if (err.status === 400) {
-				console.log("Missing Username or Password");
+				console.log(err, "Missing Username or Password");
 			} else if (err.status === 401) {
 				console.log("Unauthorized");
 			} else {

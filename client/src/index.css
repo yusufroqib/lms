@@ -4,33 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes shake {
-	0% {
-		transform: translateX(0);
-	}
-	25% {
-		transform: translateX(-5px);
-	}
-	50% {
-		transform: translateX(5px);
-	}
-	75% {
-		transform: translateX(-5px);
-	}
-	100% {
-		transform: translateX(0);
-	}
+html {
+	font-family: 'Roboto', sans-serif;
+  }
+  
+
+.link {
+	@apply p-2.5 flex rounded-md gap-6 items-center md:cursor-pointer cursor-default duration-300 font-medium;
 }
-.otp-input {
-	width: 5rem;
-	height: 4rem;
-	border: solid black 1px;
-	border-radius: 5px;
+
+.active {
+	@apply bg-blue-100 text-blue-600;
 }
-/* .error-text {
-	animation: shake 1s infinite;
-	border: solid red 1px;
-	height: 40px;
-	width: 40px;
-	border-radius: 5px;
-} */

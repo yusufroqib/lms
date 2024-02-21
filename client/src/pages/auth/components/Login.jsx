@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@material-tailwind/react";
-import { authScreen } from "@/features/authScreen";
+import { authScreen } from "@/features/authScreenSlice";
 import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/features/auth/authApiSlice";
-import { setCredentials } from "@/features/auth/authSlice";
+import { setCredentials, setLoggedUser } from "@/features/auth/authSlice";
+
 
 const Login = () => {
 	const dispatch = useDispatch();
@@ -19,7 +20,6 @@ const Login = () => {
 	const [isValidPassword, setIsValidPassword] = useState(true);
 	const errorMessageRef = useRef(null);
 	const inputRef = useRef(null);
-
 
 	const navigate = useNavigate();
 	const [login, { isLoading }] = useLoginMutation();
@@ -49,6 +49,8 @@ const Login = () => {
 			errorMessageRef.current.style.display = "none";
 		}
 	};
+	
+	
 
 	useEffect(() => {
 		if (!inputRef.current) return;
@@ -74,10 +76,13 @@ const Login = () => {
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		try {
-			const {accessToken} = await login(data).unwrap();
+			const { accessToken, loggedUser } = await 
+				login(data).unwrap()
 			// console.log(res)
 			dispatch(setCredentials({ accessToken }));
-			console.log(accessToken)
+			dispatch(setLoggedUser({loggedUser}))
+			// console.log(loggedUser);
+			navigate("/dashboard")
 			setData({
 				...data,
 				user: "",
@@ -88,7 +93,7 @@ const Login = () => {
 			if (!err.status) {
 				console.log("No Server Response");
 			} else if (err.status === 400) {
-				console.log("Missing Username or Password");
+				console.log(err, "Missing Username or Password");
 			} else if (err.status === 401) {
 				console.log("Unauthorized");
 			} else {
@@ -130,7 +135,7 @@ const Login = () => {
 									name="username"
 									placeholder="Email or Username"
 									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
-									autoComplete="off"
+									// autoComplete="off"
 									required
 									pattern="^(?!\s+$).{3,}$"
 									onChange={(e) => {

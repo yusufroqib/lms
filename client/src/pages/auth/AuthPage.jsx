@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import Login from "./Login";
-import SignUp from "./SignUp";
-import { selectAuthScreen } from "@/features/authScreen";
+import Login from "./components/Login";
+import SignUp from "./components/SignUp";
+import { selectAuthScreen } from "@/features/authScreenSlice";
 
 const AuthPage = () => {
 	const authScreenPage = useSelector(selectAuthScreen);

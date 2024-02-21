@@ -20,7 +20,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     // console.log(extraOptions) //custom like {shout: true}
 
     let result = await baseQuery(args, api, extraOptions)
-    console.log(result)
+    // console.log(result)
 
     // If you want, handle other status codes, too
     if (result?.error?.status === 403) {
@@ -40,6 +40,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
             if (refreshResult?.error?.status === 403) {
                 refreshResult.error.data.message = "Your login has expired."
+                console.log('Your login has expired.')
             }
             return refreshResult
         }
@@ -50,6 +51,6 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
 export const apiSlice = createApi({
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Note', 'User'],
+    tagTypes: ['Note', 'User', 'MyInfo'],
     endpoints: builder => ({})
 })

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@material-tailwind/react";
-import { authScreen } from "@/features/authScreen";
+import { authScreen } from "@/features/authScreenSlice";
 import { useSignUpMutation } from "@/features/auth/authApiSlice";
 import { setSignUpToken } from "@/features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast';
+
 
 const SignUp = () => {
 	const dispatch = useDispatch();
@@ -42,7 +44,7 @@ const SignUp = () => {
 			if (!err.status) {
 				console.log("No Server Response");
 			} else if (err.status === 400) {
-				console.log("Missing Username or Password");
+				toast.error(err.data.error);
 			} else if (err.status === 401) {
 				console.log("Unauthorized");
 			} else {
@@ -71,6 +73,7 @@ const SignUp = () => {
 
 	return (
 		<div className="flex flex-col bg-[#dfdfe6] justify-center items-center min-h-screen">
+			<Toaster/>
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
 				<img
 					className="w-80 mb-6"
@@ -122,7 +125,7 @@ const SignUp = () => {
 									name="username"
 									placeholder="Username"
 									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
-									autoComplete="off"
+									// autoComplete="off"
 									required
 									pattern="^(?!\s+$).{3,}$"
 									onChange={(e) => {
@@ -150,7 +153,7 @@ const SignUp = () => {
 									name="email"
 									placeholder="Email"
 									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
-									autoComplete="off"
+									// autoComplete="off"
 									required
 									pattern="[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
 									onChange={(e) => {

@@ -206,7 +206,7 @@ const passwordResetConfirmed = async (req, res) => {
 const login = async (req, res) => {
 	const cookies = req.cookies;
 	const { user, password } = req.body;
-	console.log(req.body);
+	// console.log(req.body);
 
 	try {
 		if (!user || !password)
@@ -227,17 +227,6 @@ const login = async (req, res) => {
 		const match = await bcrypt.compare(password, foundUser.password);
 		if (match) {
 			const roles = Object.values(foundUser.roles).filter(Boolean);
-			// create JWTs
-			// const accessToken = jwt.sign(
-			// 	{
-			// 		UserInfo: {
-			// 			username: foundUser.username,
-			// 			roles: roles,
-			// 		},
-			// 	},
-			// 	process.env.ACCESS_TOKEN_SECRET,
-			// 	{ expiresIn: "10s" }
-			// );
 
 			const newRefreshToken = jwt.sign(
 				{ username: foundUser.username },
@@ -275,7 +264,12 @@ const login = async (req, res) => {
 
 			// Saving refreshToken with current user
 			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+			console.log(foundUser)
 			const result = await foundUser.save();
+			// console.log(result)
+			result.password = ''
+			result.refreshToken = ''
+			// console.log(result)
 			const accessToken = jwt.sign(
 				{
 					UserInfo: {
@@ -301,7 +295,7 @@ const login = async (req, res) => {
 			// console.log(accessToken)
 
 			// Send authorization roles and access token to user
-			res.json({ accessToken });
+			res.json({ accessToken, loggedUser: result });
 		} else {
 			res.sendStatus(401);
 		}
