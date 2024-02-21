@@ -44,7 +44,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }),
         refresh: builder.mutation({
             query: () => ({
-                url: '/auth/refresh',
+                url: '/refresh',
                 method: 'GET',
             }),
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {

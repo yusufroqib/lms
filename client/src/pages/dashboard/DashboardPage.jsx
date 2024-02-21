@@ -21,7 +21,7 @@ const Dashboard = () => {
 		localStorage.setItem("myInfo", JSON.stringify(userInfo));
 	}, [user]);
 
-	return <div>Dashboard: {JSON.stringify(user)}</div>;
+	if (isSuccess)return <div>Dashboard: {JSON.stringify(user)}</div>;
 };
 
 export default Dashboard;

@@ -12,7 +12,7 @@ import Prefetch from "./features/auth/Prefetch";
 function App() {
 	return (
 		<Routes>
-			<Route path="/" element={<AuthPage />} />
+			<Route path="/auth" element={<AuthPage />} />
 			<Route path="/verify" element={<SignUpOTP />} />
 			<Route element={<PersistLogin />}>
 				<Route
@@ -20,7 +20,7 @@ function App() {
 				>
 					<Route element={<Prefetch />}>
 						<Route element={<RootLayout />}>
-							<Route path="/dashboard" element={<Dashboard />} />
+							<Route path="dashboard" element={<Dashboard />} />
 						</Route>
 					</Route>
 				</Route>
