@@ -1,32 +1,72 @@
-// import Sidebar from "./sidebar";
+// // import Sidebar from "./sidebar";
 
-// function RootLayout({ children }) {
-//   return (
-//     <div className="flex gap-5">
-//       <Sidebar />
-//       <main className="max-w-5xl flex-1 mx-auto py-4">{children}</main>
-//     </div>
-//   );
+// // function RootLayout({ children }) {
+// //   return (
+// //     <div className="flex gap-5">
+// //       <Sidebar />
+// //       <main className="max-w-5xl flex-1 mx-auto py-4">{children}</main>
+// //     </div>
+// //   );
+// // }
+
+// // export default RootLayout;
+
+// import { Outlet } from "react-router-dom";
+// import Sidebar from "./sidebar";
+// import Navbar from "./navbar/Navbar";
+
+// function RootLayout() {
+// 	return (
+// 		<div className="flex">
+// 			<Sidebar />
+// 			<div className=" flex-1 mx-auto">
+//         <Navbar/>
+//         <main className="px-10 bg-gray-50py-4 ">
+
+// 				<Outlet /> {/* Render nested child routes */}
+//         </main>
+// 			</div>
+// 		</div>
+// 	);
 // }
 
 // export default RootLayout;
 
-import { Outlet } from "react-router-dom";
-import Sidebar from "./sidebar";
 
-function RootLayout() {
-	return (
-		<div className="flex ">
-			<Sidebar />
-			<div className="bg-blue-gray-500 flex-1 mx-auto">
-				<div className="bg-red-500 h-16">ddsdfdffd</div>
-        <main className="px-10  py-4 ">
+import React, { useState } from 'react';
+import Header from '../layouts/Header/index';
+import Sidebar from './Sidebar/index';
+import { Outlet } from 'react-router-dom';
 
-				<Outlet /> {/* Render nested child routes */}
+const RootLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  return (<div className="dark:bg-boxdark-2 dark:text-bodydark">
+    {/* <!-- ===== Page Wrapper Start ===== --> */}
+    <div className="flex h-screen overflow-hidden">
+      {/* <!-- ===== Sidebar Start ===== --> */}
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+      {/* <!-- ===== Sidebar End ===== --> */}
+
+      {/* <!-- ===== Content Area Start ===== --> */}
+      <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        {/* <!-- ===== Header Start ===== --> */}
+        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+        {/* <!-- ===== Header End ===== --> */}
+
+        {/* <!-- ===== Main Content Start ===== --> */}
+        <main>
+          <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+            {/* {children} */}
+          			<Outlet /> {/* Render nested child routes */}
+
+          </div>
         </main>
-			</div>
-		</div>
-	);
-}
+        {/* <!-- ===== Main Content End ===== --> */}
+      </div>
+      {/* <!-- ===== Content Area End ===== --> */}
+    </div>
+    {/* <!-- ===== Page Wrapper End ===== --> */}
+  </div>);
+};
 
 export default RootLayout;
