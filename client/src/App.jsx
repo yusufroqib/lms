@@ -8,6 +8,9 @@ import { ROLES } from "../config/roles";
 import RequireAuth from "./features/auth/RequireAuth";
 import PersistLogin from "./features/auth/PersistLogin";
 import Prefetch from "./features/auth/Prefetch";
+import CoursesIndex from "./pages/courses/CoursesIndex";
+import TutorCourses from "./pages/tutor/course/TutorCourses";
+import CreateCourse from "./pages/tutor/course/createCourse/CreateCourse";
 
 function App() {
 	return (
@@ -21,6 +24,13 @@ function App() {
 					<Route element={<Prefetch />}>
 						<Route element={<RootLayout />}>
 							<Route path="dashboard" element={<Dashboard />} />
+							<Route path="courses">
+								<Route index element={<CoursesIndex />} />
+							</Route>
+							<Route path="tutors">
+								<Route path="my-courses" element={<TutorCourses />} />
+								<Route path="create-course" element={<CreateCourse />} />
+							</Route>
 						</Route>
 					</Route>
 				</Route>

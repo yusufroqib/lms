@@ -18,6 +18,7 @@ export default withMT({
 			// 	...colors,
 			// },
 			colors: {
+				...colors,
 				current: 'currentColor',
 				transparent: 'transparent',
 				white: '#FFFFFF',
@@ -30,7 +31,7 @@ export default withMT({
 				primary: '#3C50E0',
 				secondary: '#80CAEE',
 				stroke: '#E2E8F0',
-				gray: '#EFF4FB',
+				
 				graydark: '#333A48',
 				'gray-2': '#F7F9FC',
 				'gray-3': '#FAFAFA',
@@ -53,6 +54,7 @@ export default withMT({
 				success: '#219653',
 				danger: '#D34053',
 				warning: '#FFA70B',
+				// ...colors,
 			  },
 			  fontSize: {
 				'title-xxl': ['44px', '55px'],

@@ -4,9 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-a{
-	text-decoration: none;
-}
+
 html {
 	font-family: 'Roboto', sans-serif;
   }
@@ -81,15 +79,15 @@ html {
 .apexcharts-yaxistooltip {
   @apply dark:!border-meta-4 dark:!bg-meta-4 dark:!text-bodydark1;
 }
-.apexcharts-xaxistooltip-bottom:after {
+/* .apexcharts-xaxistooltip-bottom:after {
   @apply !border-b-gray dark:!border-b-meta-4;
-}
-.apexcharts-xaxistooltip-bottom:before {
+} */
+/* .apexcharts-xaxistooltip-bottom:before {
   @apply !border-b-gray dark:!border-b-meta-4;
-}
-.apexcharts-xaxistooltip-bottom {
+} */
+/* .apexcharts-xaxistooltip-bottom {
   @apply !rounded !border-none !bg-gray !text-xs !font-medium !text-black dark:!text-white;
-}
+} */
 .apexcharts-tooltip-series-group {
   @apply !pl-1.5;
 }
@@ -144,9 +142,9 @@ span.flatpickr-weekday,
 .flatpickr-day.nextMonthDay:hover,
 .flatpickr-day:focus,
 .flatpickr-day.prevMonthDay:focus,
-.flatpickr-day.nextMonthDay:focus {
+/* .flatpickr-day.nextMonthDay:focus {
   @apply border-gray bg-gray dark:!border-meta-4 dark:!bg-meta-4;
-}
+} */
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
 .flatpickr-day.selected,
