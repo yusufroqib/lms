@@ -37,7 +37,7 @@ const DropdownMessage = () => {
       <Link ref={trigger} onClick={() => {
             setNotifying(false);
             setDropdownOpen(!dropdownOpen);
-        }} className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white" to="#">
+        }} className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray-100 hover:text-blue-500 dark:border-strokedark dark:bg-meta-4 dark:text-white" to="#">
         <span className={`absolute -top-0.5 -right-0.5 z-1 h-2 w-2 rounded-full bg-meta-1 ${notifying === false ? 'hidden' : 'inline'}`}>
           <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
         </span>

@@ -1,4 +1,5 @@
-import { Button } from "@material-tailwind/react";
+// import { Button } from "@material-tailwind/react";
+import { Button } from "@/components/ui/button";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -24,7 +25,7 @@ const CoursesIndex = () => {
 						</h2>
 					</div>
 				</div>
-				<Button onClick={() => navigate('/tutors/my-courses')} className="mt-12 py-3 text-2xl bg-primary transition-all duration-400 hover:bg-blue-700 rounded-lg ">
+				<Button onClick={() => navigate('/tutors/my-courses')} className="mt-12 py-3 text-2xl bg-primary transition-all duration-400 hover:bg-slate-800 rounded-lg ">
 					Tutor's Page
 				</Button>
 			</div>
