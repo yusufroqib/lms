@@ -264,7 +264,7 @@ const login = async (req, res) => {
 
 			// Saving refreshToken with current user
 			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-			console.log(foundUser)
+			// console.log(foundUser)
 			const result = await foundUser.save();
 			// console.log(result)
 			result.password = ''
@@ -279,7 +279,7 @@ const login = async (req, res) => {
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,
-				{ expiresIn: "15m" }
+				{ expiresIn: "30s" }
 			);
 
 			// const userInfo = {...result, password: ''}
@@ -298,7 +298,7 @@ const login = async (req, res) => {
 			// Send authorization roles and access token to user
 			res.json({ accessToken, loggedUser: result });
 		} else {
-			res.sendStatus(401);
+			res.status(401).json({ message: "Invalid username or password" }); //Unauthorized
 		}
 	} catch (error) {
 		res.status(500).json({ message: error.message });

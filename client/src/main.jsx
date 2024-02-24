@@ -6,11 +6,13 @@ import App from "./App";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
 import { ThemeProvider } from "@material-tailwind/react";
+import { Toaster } from "react-hot-toast";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<React.StrictMode>
 		<Provider store={store}>
 			<ThemeProvider>
+				<Toaster />
 				<BrowserRouter>
 					<Routes>
 						<Route path="/*" element={<App />} />
@@ -18,5 +20,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 				</BrowserRouter>
 			</ThemeProvider>
 		</Provider>
-	 </React.StrictMode>
+	</React.StrictMode>
 );

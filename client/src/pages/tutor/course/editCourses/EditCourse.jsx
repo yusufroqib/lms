@@ -6,4 +6,4 @@ const EditCourse = () => {
   )
 }
 
-export default EditCourse
+export default React.memo(EditCourse)

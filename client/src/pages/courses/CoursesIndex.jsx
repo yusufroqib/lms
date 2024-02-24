@@ -34,4 +34,4 @@ const CoursesIndex = () => {
 	);
 };
 
-export default CoursesIndex;
+export default React.memo(CoursesIndex)

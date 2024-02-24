@@ -3,6 +3,7 @@ import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import LogoIcon from "../../images/logo/logo-icon.svg";
+import React from "react";
 // import DarkModeSwitcher from './DarkModeSwitcher';
 const Header = (props) => {
 	return (
@@ -96,4 +97,4 @@ const Header = (props) => {
 		</header>
 	);
 };
-export default Header;
+export default React.memo(Header)

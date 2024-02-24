@@ -5,7 +5,9 @@ import { Button } from "@material-tailwind/react";
 import { authScreen } from "@/features/authScreenSlice";
 import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/features/auth/authApiSlice";
-import { setCredentials, setLoggedUser } from "@/features/auth/authSlice";
+import { setCredentials } from "@/features/auth/authSlice";
+import toast from 'react-hot-toast';
+
 
 
 const Login = () => {
@@ -80,7 +82,7 @@ const Login = () => {
 				login(data).unwrap()
 			// console.log(res)
 			dispatch(setCredentials({ accessToken }));
-			dispatch(setLoggedUser({loggedUser}))
+			// dispatch(setLoggedUser({loggedUser}))
 			// console.log(loggedUser);
 			navigate("/dashboard")
 			setData({
@@ -90,6 +92,8 @@ const Login = () => {
 			});
 			// navigate('/dash')
 		} catch (err) {
+			console.log(err)
+			toast.error(err.data?.message)
 			if (!err.status) {
 				console.log("No Server Response");
 			} else if (err.status === 400) {

@@ -5,7 +5,7 @@ import { authScreen } from "@/features/authScreenSlice";
 import { useSignUpMutation } from "@/features/auth/authApiSlice";
 import { setSignUpToken } from "@/features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 
 const SignUp = () => {
@@ -73,7 +73,6 @@ const SignUp = () => {
 
 	return (
 		<div className="flex flex-col bg-[#dfdfe6] justify-center items-center min-h-screen">
-			<Toaster/>
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
 				<img
 					className="w-80 mb-6"

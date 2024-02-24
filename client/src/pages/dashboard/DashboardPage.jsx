@@ -1,27 +1,14 @@
 import { useGetMyDetailsQuery } from "@/features/users/usersApiSlice";
 import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
-	const {
-		data: user,
-		isLoading,
-		isSuccess,
-		isError,
-		error,
-	} = useGetMyDetailsQuery('myDetails', {
-		pollingInterval: 60000,
-		refetchOnFocus: true,
-		refetchOnMountOrArgChange: true,
-	});
-	console.log(user);
+	const loggedUser = useSelector((state) => state.auth.loggedUser);
 
-	useEffect(() => {
-		const userId = user?.ids[0];
-		const userInfo = user?.entities[userId];
-		localStorage.setItem("myInfo", JSON.stringify(userInfo));
-	}, [user]);
+	// console.log(loggedUser)
 
-	if (isSuccess) return <div className="min-h-screen">Dashboard: {JSON.stringify(user)}</div>;
+
+	if (loggedUser.roles) return <div className="min-h-screen">Dashboard: {JSON.stringify(loggedUser)}</div>;
 };
 
-export default Dashboard;
+export default React.memo(Dashboard);

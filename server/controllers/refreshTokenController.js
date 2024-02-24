@@ -62,7 +62,7 @@ const handleRefreshToken = async (req, res) => {
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,
-				{ expiresIn: "15m" }
+				{ expiresIn: "30s" }
 			);
 
             const newRefreshToken = jwt.sign(
@@ -74,7 +74,7 @@ const handleRefreshToken = async (req, res) => {
 			// Saving refreshToken with current user
 			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken] 
 			const result = await foundUser.save();
-			console.log(result);
+			// console.log(result);
 
 			// Creates Secure Cookie with refresh token
 			res.cookie("jwt", newRefreshToken, {

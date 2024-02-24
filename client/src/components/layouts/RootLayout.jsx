@@ -1,72 +1,69 @@
-// // import Sidebar from "./sidebar";
-
-// // function RootLayout({ children }) {
-// //   return (
-// //     <div className="flex gap-5">
-// //       <Sidebar />
-// //       <main className="max-w-5xl flex-1 mx-auto py-4">{children}</main>
-// //     </div>
-// //   );
-// // }
-
-// // export default RootLayout;
-
-// import { Outlet } from "react-router-dom";
-// import Sidebar from "./sidebar";
-// import Navbar from "./navbar/Navbar";
-
-// function RootLayout() {
-// 	return (
-// 		<div className="flex">
-// 			<Sidebar />
-// 			<div className=" flex-1 mx-auto">
-//         <Navbar/>
-//         <main className="px-10 bg-gray-50py-4 ">
-
-// 				<Outlet /> {/* Render nested child routes */}
-//         </main>
-// 			</div>
-// 		</div>
-// 	);
-// }
-
-// export default RootLayout;
-
-
-import React, { useState } from 'react';
-import Header from '../layouts/Header/index';
-import Sidebar from './Sidebar/index';
-import { Outlet } from 'react-router-dom';
+import { useGetMyDetailsQuery } from "@/features/users/usersApiSlice";
+import React, { useEffect, useState } from "react";
+import Header from "../layouts/Header/index";
+import Sidebar from "./Sidebar/index";
+import { Outlet } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoggedUser } from "@/features/auth/authSlice";
 
 const RootLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  return (<div className="dark:bg-boxdark-2 dark:text-bodydark">
-    {/* <!-- ===== Page Wrapper Start ===== --> */}
-    <div className="flex h-screen overflow-hidden">
-      {/* <!-- ===== Sidebar Start ===== --> */}
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
-      {/* <!-- ===== Sidebar End ===== --> */}
+	const [sidebarOpen, setSidebarOpen] = useState(false);
+	const loggedUser = useSelector((state) => state.auth.loggedUser);
+	const dispatch = useDispatch();
+	const {
+		data: user,
+		isLoading,
+		isSuccess,
+		isError,
+		error,
+	} = useGetMyDetailsQuery();
+	//   "myDetails",
+	//  {
+	// 	pollingInterval: 60000,
+	// 	refetchOnFocus: true,
+	// 	refetchOnMountOrArgChange: true,
+	// }
+	console.log(user);
 
-      {/* <!-- ===== Content Area Start ===== --> */}
-      <div className="relative flex flex-1 flex-col min-h-screen overflow-y-auto overflow-x-hidden">
-        {/* <!-- ===== Header Start ===== --> */}
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
-        {/* <!-- ===== Header End ===== --> */}
+	useEffect(() => {
+		const userId = user?.ids[0];
+		const userInfo = user?.entities[userId];
+		dispatch(setLoggedUser({ loggedUser: userInfo }));
+		// localStorage.setItem("myInfo", JSON.stringify(userInfo));
+	}, [user]);
 
-        {/* <!-- ===== Main Content Start ===== --> */}
-        <main className='flex flex-1'>
-          <div className="mx-auto flex-grow max-w-screen-2xl p-4 md:p-6 2xl:p-10">
-            {/* {children} */}
-          			<Outlet /> {/* Render nested child routes */}
+	if (isLoading) {
+		return <h1>Fetching Details...</h1>;
+	} else if (loggedUser) {
+		return (
+			<div className="dark:bg-boxdark-2 dark:text-bodydark">
+				{/* <!-- ===== Page Wrapper Start ===== --> */}
+				<div className="flex h-screen overflow-hidden">
+					{/* <!-- ===== Sidebar Start ===== --> */}
+					<Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+					{/* <!-- ===== Sidebar End ===== --> */}
 
-          </div>
-        </main>
-        {/* <!-- ===== Main Content End ===== --> */}
-      </div>
-      {/* <!-- ===== Content Area End ===== --> */}
-    </div>
-    {/* <!-- ===== Page Wrapper End ===== --> */}
-  </div>);
+					{/* <!-- ===== Content Area Start ===== --> */}
+					<div className="relative flex flex-1 flex-col min-h-screen overflow-y-auto overflow-x-hidden">
+						{/* <!-- ===== Header Start ===== --> */}
+						<Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+						{/* <!-- ===== Header End ===== --> */}
+
+						{/* <!-- ===== Main Content Start ===== --> */}
+						<main className="flex flex-1">
+							<div className="mx-auto flex-grow max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+								{/* {children} */}
+								<Outlet /> {/* Render nested child routes */}
+							</div>
+						</main>
+						{/* <!-- ===== Main Content End ===== --> */}
+					</div>
+					{/* <!-- ===== Content Area End ===== --> */}
+				</div>
+				{/* <!-- ===== Page Wrapper End ===== --> */}
+			</div>
+		);
+	}
 };
 
-export default RootLayout;
+export default React.memo(RootLayout)
