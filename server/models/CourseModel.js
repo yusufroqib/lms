@@ -40,7 +40,7 @@ const courseSchema = new Schema(
 		},
 		description: {
 			type: String,
-			required: true,
+			// required: true,
 		},
 		tutor: {
 			type: Schema.Types.ObjectId,
@@ -48,7 +48,7 @@ const courseSchema = new Schema(
 		},
 		price: {
 			type: Number,
-			required: true,
+			// required: true,
 		},
 		estimatePrice: {
 			type: String,
@@ -67,7 +67,7 @@ const courseSchema = new Schema(
 		// },
 		level: {
 			type: String,
-			required: true,
+			// required: true,
 		},
 		// demoUrl: {
 		// 	type: String,

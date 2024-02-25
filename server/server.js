@@ -10,7 +10,8 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
 const refreshRoute = require("./routes/refresh");
-const userRoute = require("./routes/userRoutes");
+const userRoutes = require("./routes/userRoutes");
+const tutorRoutes = require("./routes/tutorRoutes");
 require("./config/passport-setup");
 
 dotenv.config();
@@ -54,7 +55,8 @@ app.use(cookieParser());
 
 app.use("/auth", authRoutes);
 app.use("/refresh", refreshRoute);
-app.use("/users", userRoute);
+app.use("/users", userRoutes);
+app.use("/tutors", tutorRoutes);
 
 mongoose
 	.connect(process.env.MONGO_URI)

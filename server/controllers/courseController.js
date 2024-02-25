@@ -8,10 +8,10 @@ const createTitle = async (req, res) => {
 		const userId = req.userId;
 		const course = new Course({ title, tutor: userId });
         await course.save();
-        res.json({ msg: "Created course title", course });
+        res.status(201).json({ msg: "Created course title", course });
 
 	} catch (error) {
-		clg(error);
+		console.log(error);
 	}
 };
 
