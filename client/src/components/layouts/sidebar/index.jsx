@@ -413,7 +413,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 							</SidebarLinkGroup>
 							{/* <!-- Menu Item Forms --> */}
 
-							{/* <!-- Menu Item Tables --> */}
+							{/* <!-- Menu Item Tables --> */} 
 							{/* <li>
 								<NavLink
 									to="/tables"

@@ -12,10 +12,6 @@ const reviewSchema = new Schema({
 	// commentReplies: [Object],
 });
 
-const linkSchema = new Schema({
-	title: String,
-	url: String,
-});
 
 const commentSchema = new Schema({
 	user: Object,
@@ -27,24 +23,28 @@ const courseDataSchema = new Schema({
 	videoUrl: String,
 	videoThumbnail: String,
 	title: String,
-	videoSection: String,
+	// videoSection: String,
 	description: String,
-	videoLength: Number,
-	videoPlayer: String,
-	links: [linkSchema],
-	suggestion: String,
+	// videoLength: Number,
+	// videoPlayer: String,
+	// links: [linkSchema],
+	// suggestion: String,
 	questions: [commentSchema],
 });
 
 const courseSchema = new Schema(
 	{
-		name: {
+		title: {
 			type: String,
 			required: true,
 		},
 		description: {
 			type: String,
 			required: true,
+		},
+		tutor: {
+			type: Schema.Types.ObjectId,
+			ref: "User",
 		},
 		price: {
 			type: Number,
@@ -61,18 +61,18 @@ const courseSchema = new Schema(
 				type: String,
 			},
 		},
-		tags: {
-			type: String,
-			required: true,
-		},
+		// tags: {
+		// 	type: String,
+		// 	required: true,
+		// },
 		level: {
 			type: String,
 			required: true,
 		},
-		demoUrl: {
-			type: String,
-			required: true,
-		},
+		// demoUrl: {
+		// 	type: String,
+		// 	required: true,
+		// },
 		benefits: [{ title: String }],
 		prerequisites: [{ title: String }],
 		reviews: [reviewSchema],
@@ -81,14 +81,22 @@ const courseSchema = new Schema(
 			type: Number,
 			default: 0,
 		},
-		purchased: {
-			type: Number,
-			default: 0,
-		},
+		purchasedBy: [
+			{
+				user: {
+					type: Schema.Types.ObjectId,
+					ref: "User",
+				},
+				date: {
+					type: Date,
+					default: Date.now, // Optional: Set a default value to the current date and time
+				},
+			},
+		],
 	},
 	{ timestamps: true }
 );
 
-const CourseModel = model("Course", courseSchema);
+module.exports = model("Course", courseSchema);
 
-module.exports = CourseModel;
+// module.exports = CourseModel;

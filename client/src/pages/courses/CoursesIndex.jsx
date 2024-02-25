@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const CoursesIndex = () => {
     const navigate = useNavigate()
-	return (
+	return ( 
 		<>
 			{/* <div className="h-full w-full "> */}
 			<div className="flex w-full justify-between">
