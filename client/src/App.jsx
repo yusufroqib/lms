@@ -11,6 +11,8 @@ import Prefetch from "./features/auth/Prefetch";
 import CoursesIndex from "./pages/courses/CoursesIndex";
 import TutorCourses from "./pages/tutor/course/TutorCourses";
 import CreateCourse from "./pages/tutor/course/createCourse/CreateCourse";
+import EditCourse from "./pages/tutor/course/editCourse/EditCourse";
+// import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
 	return (
@@ -30,6 +32,7 @@ function App() {
 							<Route path="tutors">
 								<Route path="my-courses" element={<TutorCourses />} />
 								<Route path="create-course" element={<CreateCourse />} />
+								<Route path="edit-course/:id" element={<EditCourse />} />
 							</Route>
 						</Route>
 					</Route>

@@ -23,7 +23,8 @@ const RootLayout = () => {
 	// 	refetchOnFocus: true,
 	// 	refetchOnMountOrArgChange: true,
 	// }
-	console.log(user);
+	
+	// console.log(user);
 
 	useEffect(() => {
 		const userId = user?.ids[0];
