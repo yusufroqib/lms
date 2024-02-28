@@ -7,6 +7,7 @@ import { Actions } from "./components/Actions";
 import { IconBadge } from "@/components/ui/icon-badge";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { TitleForm } from "./components/TitleForm";
+import { DescriptionForm } from "./components/DescriptionForm";
 
 
 const EditCourse = () => {
@@ -81,8 +82,8 @@ const EditCourse = () => {
 								<h2 className="text-xl">Customize your course</h2>
 							</div>
 							 <TitleForm initialData={course} courseId={course.id} />
-							{/*<DescriptionForm initialData={course} courseId={course.id} />
-							<ImageForm initialData={course} courseId={course.id} />
+							<DescriptionForm initialData={course} courseId={course.id} />
+							{/*<ImageForm initialData={course} courseId={course.id} />
 							<CategoryForm
 								initialData={course}
 								courseId={course.id}
