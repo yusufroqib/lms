@@ -17,9 +17,9 @@ const createTitle = async (req, res) => {
 //Get all courses by tutor
 const getAllTutorCourses = async (req, res) => {
 	try {
-		console.log(req.userId)
+		// console.log(req.userId)
 		const courses = await Course.find({ tutor: req.userId });
-		console.log(courses)
+		// console.log(courses)
 		// if (!courses) return res.status(404).json({ msg: "No courses found" });
 		res.status(200).json( courses );
 	} catch (error) {
@@ -27,6 +27,18 @@ const getAllTutorCourses = async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 };
+
+const updateCourse = async (req, res) => {
+	try {
+		console.log(req.body)
+		const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+		
+		if (!course) return res.status(404).json({ msg: "Course not found" });
+		res.status(200).json({ course });
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+}
 
 // //Get Course by Id
 // const getCourseById = async (req, res) => {
@@ -40,4 +52,4 @@ const getAllTutorCourses = async (req, res) => {
 
 // }
 
-module.exports = { createTitle, getAllTutorCourses };
+module.exports = { createTitle, getAllTutorCourses, updateCourse };

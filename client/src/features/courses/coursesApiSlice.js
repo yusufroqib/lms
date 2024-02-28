@@ -40,7 +40,6 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				},
 			}),
 			transformResponse: (responseData) => {
-				console.log(responseData);
 				const tutorCourses = responseData.map((course) => {
 					course.id = course._id;
 					return course;
@@ -65,6 +64,32 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: [{ type: "TutorCourse", id: "LIST" }],
 		}),
+		updateCourse: builder.mutation({
+			query: ({id, ...data}) => ({
+				url: `/tutors/edit-course/${id}`,
+				method: "PUT",
+				body: { ...data },
+			}),
+			invalidatesTags: (result, error, arg) => [
+				{ type: "TutorCourse", id: arg.id },
+			],
+			onQueryStarted: (arg, { dispatch, queryFulfilled }) => {
+				const patchResult = dispatch(
+					coursesApiSlice.util.updateQueryData(
+						"getCourses",
+						'allTutorCourses',
+						(draft) => {
+							const course = draft.entities[arg.id];
+							if (course) {
+								Object.assign(course, arg.data);
+							}
+						}
+					)
+				);
+				return queryFulfilled.catch(() => patchResult); // reset the query if the patch fails
+
+			}
+		}),
 	}),
 });
 
@@ -72,6 +97,7 @@ export const {
 	useGetCoursesQuery,
 	useGetTutorCoursesQuery,
 	useCreateCourseTitleMutation,
+	useUpdateCourseMutation,
 } = coursesApiSlice;
 
 // export const selectallCoursesResult = coursesApiSlice.endpoints.getCourses.select();

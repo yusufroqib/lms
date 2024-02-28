@@ -46,6 +46,10 @@ const courseSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "User",
 		},
+		isPublished: {
+			type: Boolean,
+			default: false,
+		},
 		price: {
 			type: Number,
 			// required: true,
@@ -53,11 +57,8 @@ const courseSchema = new Schema(
 		estimatePrice: {
 			type: String,
 		},
-		thumbnail: {
-			public_id: {
-				type: String,
-			},
-			url: {
+		courseImage: {
+			courseImage: {
 				type: String,
 			},
 		},

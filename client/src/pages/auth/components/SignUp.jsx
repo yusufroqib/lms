@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@material-tailwind/react";
-import { authScreen } from "@/features/authScreenSlice";
+import { setAuthScreen } from "@/features/authScreenSlice";
 import { useSignUpMutation } from "@/features/auth/authApiSlice";
 import { setSignUpToken } from "@/features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
@@ -248,7 +248,7 @@ const SignUp = () => {
 						Already have an account?{" "}
 						<span
 							className="text-purple-600 cursor-pointer hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-100 hover:underline"
-							onClick={() => dispatch(authScreen("login"))}
+							onClick={() => dispatch(setAuthScreen("login"))}
 						>
 							Login instead
 						</span>

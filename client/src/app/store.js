@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit"
 import { apiSlice } from './api/apiSlice'
 import { setupListeners } from "@reduxjs/toolkit/query"
 import authReducer from '../features/auth/authSlice'
+import confettiReducer from "@/features/confettiSlice"
 
 
 export const store = configureStore({
@@ -10,6 +11,7 @@ export const store = configureStore({
 		[apiSlice.reducerPath]: apiSlice.reducer,
 		auth: authReducer,
 		authScreen: authScreenReducer,
+		confetti: confettiReducer,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware().concat(apiSlice.middleware),

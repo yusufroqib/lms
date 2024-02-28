@@ -8,7 +8,7 @@ export const authScreenSlice = createSlice({
 	name: "authScreen",
 	initialState,
 	reducers: {
-		authScreen: (state, action) => {
+		setAuthScreen: (state, action) => {
 			state.authScreenPage = action.payload;
 		},
 	
@@ -20,6 +20,6 @@ export const selectAuthScreen = createSelector(
 	(state) => state.authScreen,
 	(authScreen) => authScreen.authScreenPage
 );
-export const { authScreen } = authScreenSlice.actions;
+export const { setAuthScreen } = authScreenSlice.actions;
 
 export default authScreenSlice.reducer;

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const TutorCourses = () => {
     const navigate = useNavigate()
-	const { data: courses, isLoading, isSuccess } = useGetTutorCoursesQuery();
+	const { data: courses, isLoading, isSuccess } = useGetTutorCoursesQuery('allTutorCourses');
 
 	if(isLoading) return <p>Fetching all tutor courses</p>
 	return (
