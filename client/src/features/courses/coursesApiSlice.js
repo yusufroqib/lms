@@ -3,9 +3,11 @@ import { apiSlice } from "@/app/api/apiSlice";
 
 const coursesAdapter = createEntityAdapter({});
 const tutorCoursesAdapter = createEntityAdapter({});
+const courseCategoriesAdapter = createEntityAdapter({});
 
 const initialState = coursesAdapter.getInitialState();
 const tutorInitialState = tutorCoursesAdapter.getInitialState();
+const courseCategoriesInitialState = courseCategoriesAdapter.getInitialState();
 
 export const coursesApiSlice = apiSlice.injectEndpoints({
 	endpoints: (builder) => ({
@@ -30,6 +32,24 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 						...result.ids.map((id) => ({ type: "Course", id })),
 					];
 				} else return [{ type: "Course", id: "LIST" }];
+			},
+		}),
+		getCourseCategories: builder.query({
+			query: () => ({
+				url: "/tutors/course-categories",
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+			transformResponse: (responseData) => {
+				const allCategories = responseData.map((category) => {
+					category.id = category._id;
+					return category;
+				});
+				return courseCategoriesAdapter.setAll(
+					courseCategoriesInitialState,
+					allCategories
+				);
 			},
 		}),
 		getTutorCourses: builder.query({
@@ -65,7 +85,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			invalidatesTags: [{ type: "TutorCourse", id: "LIST" }],
 		}),
 		updateCourse: builder.mutation({
-			query: ({id, ...data}) => ({
+			query: ({ id, ...data }) => ({
 				url: `/tutors/edit-course/${id}`,
 				method: "PUT",
 				body: { ...data },
@@ -77,7 +97,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				const patchResult = dispatch(
 					coursesApiSlice.util.updateQueryData(
 						"getCourses",
-						'allTutorCourses',
+						"allTutorCourses",
 						(draft) => {
 							const course = draft.entities[arg.id];
 							if (course) {
@@ -87,14 +107,14 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 					)
 				);
 				return queryFulfilled.catch(() => patchResult); // reset the query if the patch fails
-
-			}
+			},
 		}),
 	}),
 });
 
 export const {
 	useGetCoursesQuery,
+	useGetCourseCategoriesQuery,
 	useGetTutorCoursesQuery,
 	useCreateCourseTitleMutation,
 	useUpdateCourseMutation,

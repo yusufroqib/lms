@@ -1,14 +1,18 @@
 import { Navigate, useParams } from "react-router-dom";
 import React, { useEffect } from "react";
 import useAuth from "@/hooks/useAuth";
-import { useGetTutorCoursesQuery } from "@/features/courses/coursesApiSlice";
+import {
+	useGetCourseCategoriesQuery,
+	useGetTutorCoursesQuery,
+} from "@/features/courses/coursesApiSlice";
 import { Banner } from "@/components/ui/banner";
 import { Actions } from "./components/Actions";
 import { IconBadge } from "@/components/ui/icon-badge";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { TitleForm } from "./components/TitleForm";
 import { DescriptionForm } from "./components/DescriptionForm";
-
+import { ImageForm } from "./components/ImageForm";
+import { CategoryForm } from "./components/CategoryForm";
 
 const EditCourse = () => {
 	const { courseId } = useParams();
@@ -25,6 +29,11 @@ const EditCourse = () => {
 		}
 	);
 
+	const { data} =
+		useGetCourseCategoriesQuery("courseCategories");
+
+        // console.log(categories)
+
 	// console.log(import.meta.env.VITE_FIREBASE_API_KEY)
 
 	console.log(isFetching);
@@ -35,7 +44,7 @@ const EditCourse = () => {
 		requiredFields = [
 			course.title,
 			course.description,
-			course.imageUrl,
+			course.courseImage,
 			course.price,
 			course.categoryId,
 			course.chapters?.some((chapter) => chapter.isPublished),
@@ -55,7 +64,8 @@ const EditCourse = () => {
 	}
 	// return <div>{isSuccess && JSON.stringify(course)}</div>;
 
-	if (isSuccess && course) {
+	if (isSuccess && course && data) {
+        const categories = data?.ids.map((id) => data.entities[id])
 		return (
 			<>
 				{!course.isPublished && (
@@ -81,9 +91,10 @@ const EditCourse = () => {
 								<IconBadge icon={LuLayoutDashboard} />
 								<h2 className="text-xl">Customize your course</h2>
 							</div>
-							 <TitleForm initialData={course} courseId={course.id} />
+							<TitleForm initialData={course} courseId={course.id} />
+							{/* <DescriptionForm initialData={course} courseId={course.id} /> */}
 							<DescriptionForm initialData={course} courseId={course.id} />
-							{/*<ImageForm initialData={course} courseId={course.id} />
+							<ImageForm initialData={course} courseId={course.id} />
 							<CategoryForm
 								initialData={course}
 								courseId={course.id}
@@ -91,7 +102,7 @@ const EditCourse = () => {
 									label: category.name,
 									value: category.id,
 								}))}
-							/> */}
+							/>
 						</div>
 						{/* <div className="space-y-6">
             <div>

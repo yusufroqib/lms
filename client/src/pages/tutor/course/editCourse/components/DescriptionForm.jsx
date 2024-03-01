@@ -34,10 +34,12 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 	const [updateCourse, { isLoading, isError, isSuccess, error }] =
 		useUpdateCourseMutation();
 	// const router = useRouter();
+	
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: initialData,
 	});
+
 	const { isSubmitting, isValid } = form.formState;
 
 	const onSubmit = async (values) => {

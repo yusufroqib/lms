@@ -33,6 +33,7 @@ function App() {
 								<Route path="my-courses" element={<TutorCourses />} />
 								<Route path="create-course" element={<CreateCourse />} />
 								<Route path="edit-course/:courseId" element={<EditCourse />} />
+								{/* <Route path="edit-course/:courseId" element={<Index />} /> */}
 							</Route>
 						</Route>
 					</Route>

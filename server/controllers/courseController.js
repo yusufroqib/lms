@@ -1,4 +1,16 @@
 const Course = require("../models/CourseModel");
+const Category = require("../models/CategoryModel");
+
+
+//Get all courses categories
+const getCategories = async (req, res) => {
+	try {
+		const categories = await Category.find();
+		res.status(200).json(categories);
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+}
 
 //Create course title
 const createTitle = async (req, res) => {
@@ -30,7 +42,7 @@ const getAllTutorCourses = async (req, res) => {
 
 const updateCourse = async (req, res) => {
 	try {
-		console.log(req.body)
+		// console.log(req.body)
 		const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
 		
 		if (!course) return res.status(404).json({ msg: "Course not found" });
@@ -52,4 +64,4 @@ const updateCourse = async (req, res) => {
 
 // }
 
-module.exports = { createTitle, getAllTutorCourses, updateCourse };
+module.exports = { createTitle, getAllTutorCourses, updateCourse, getCategories };

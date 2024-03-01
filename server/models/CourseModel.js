@@ -12,7 +12,6 @@ const reviewSchema = new Schema({
 	// commentReplies: [Object],
 });
 
-
 const commentSchema = new Schema({
 	user: Object,
 	question: String,
@@ -58,18 +57,12 @@ const courseSchema = new Schema(
 			type: String,
 		},
 		courseImage: {
-			courseImage: {
-				type: String,
-			},
+			type: String,
 		},
 		// tags: {
 		// 	type: String,
 		// 	required: true,
 		// },
-		level: {
-			type: String,
-			// required: true,
-		},
 		// demoUrl: {
 		// 	type: String,
 		// 	required: true,
