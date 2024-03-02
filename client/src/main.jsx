@@ -9,6 +9,8 @@ import { Provider } from "react-redux";
 import { ThemeProvider } from "@material-tailwind/react";
 import { Toaster } from "react-hot-toast";
 import { ConfettiProvider } from "./components/providers/ConfettiProvider";
+import {registerLicense} from "@syncfusion/ej2-base";
+registerLicense(import.meta.env.VITE_EJ2_LICENSE_KEY);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<React.StrictMode>

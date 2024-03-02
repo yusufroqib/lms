@@ -13,6 +13,7 @@ import { TitleForm } from "./components/TitleForm";
 import { DescriptionForm } from "./components/DescriptionForm";
 import { ImageForm } from "./components/ImageForm";
 import { CategoryForm } from "./components/CategoryForm";
+// import { DescriptionForm } from "./components/DescForm";
 
 const EditCourse = () => {
 	const { courseId } = useParams();

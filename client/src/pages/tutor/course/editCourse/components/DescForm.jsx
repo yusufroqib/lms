@@ -1,189 +1,105 @@
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import React, { useState, useEffect } from "react";
-import { Editor } from "react-draft-wysiwyg";
-import { EditorState, convertToRaw, ContentState } from "draft-js";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import draftToHtml from "draftjs-to-html";
+import { LuPencil } from "react-icons/lu";
+import { useState } from "react";
+import toast from "react-hot-toast";
+// import { useRouter } from "next/navigation";
+import { Form } from "@/components/ui/form";
 import DOMPurify from "dompurify";
-import { useForm } from "react-hook-form";
+import parse from "html-react-parser";
+import { Button } from "@/components/ui/button";
 import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
-
+import { cn } from "@/lib/utils";
+import Editor from "@/components/ui/editor";
+import Preview from "@/components/ui/preview";
 
 export const DescriptionForm = ({ initialData, courseId }) => {
-	const [editorState, setEditorState] = useState(null);
-
+	const [isEditing, setIsEditing] = useState(false);
+	const toggleEdit = () => setIsEditing((current) => !current);
 	const [updateCourse, { isLoading, isError, isSuccess, error }] =
 		useUpdateCourseMutation();
+	const [value, setValue] = useState(initialData.description);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	// const router = useRouter();
 
-	const {
-		handleSubmit,
-		formState: { isSubmitting, isValid },
-	} = useForm();
+	// const form = useForm({
+	// 	resolver: zodResolver(formSchema),
+	// 	defaultValues: initialData,
+	// });
 
-	useEffect(() => {
-		if (initialData.description) {
-			const contentState = ContentState.createFromText(initialData.description);
-			setEditorState(EditorState.createWithContent(contentState));
-		} else {
-			setEditorState(EditorState.createEmpty());
-		}
-	}, [initialData]);
+	// const {
+	// 	handleSubmit,
+	// 	control,
+	// 	formState: { errors, isSubmitting, isValid },
+	// 	setValue,
+	// 	register,
+	// } = useForm({
+	// 	resolver: zodResolver(formSchema),
+	// });
 
-	const onEditorStateChange = (newEditorState) => {
-		setEditorState(newEditorState);
-	};
+	// const { isSubmitting, isValid } = form.formState;
 
-	const onSubmit = async (values) => {
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const sanitizedContent = DOMPurify.sanitize(value);
+
 		try {
-			const htmlContent = draftToHtml(
-				convertToRaw(editorState.getCurrentContent())
-			);
-			const sanitizedHTML = DOMPurify.sanitize(htmlContent);
-
-			await updateCourse({ id: courseId, description: sanitizedHTML }).unwrap();
-			toast.success("Course updated");
-			// You can add any further actions after submission here
+			setIsSubmitting(true);
+			await updateCourse({
+				id: courseId,
+				description: sanitizedContent,
+			});
+			toast.success("Course updated successfully");
+			setIsEditing(false);
+			setIsSubmitting(false);
+			// router.refresh();
 		} catch (error) {
-			toast.error("Something went wrong");
+			console.log(error);
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
+	return (
+		<div className="mt-6 border bg-slate-100 rounded-md p-4">
+			<div className="font-medium flex items-center justify-between">
+				Course description
+				<Button onClick={toggleEdit} variant="ghost">
+					{isEditing ? (
+						<>Cancel</>
+					) : (
+						<>
+							<LuPencil className="h-4 w-4 mr-2" />
+							Edit description
+						</>
+					)}
+				</Button>
+			</div>
+			{!isEditing && (
+				<div
+					className={cn(
+						"text-sm mt-2 no-tailwindcss-base max-h-50 overflow-y-hidden",
+						!initialData.description && "text-slate-500 italic"
+					)}
+				>
+					{!initialData.description && "No description"}
+					{initialData.description && parse(initialData.description)}
+				</div>
+			)}
+			{isEditing && (
+				<Form>
+					<form onSubmit={handleSubmit} className="space-y-4 mt-4">
+						<Editor
+							name="description"
+							value={initialData.description}
+							setValue={setValue}
+						/>
 
-	return (<>
-			<form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-				<div className="form-control">
-					<label htmlFor="description" className="label">
-						Description
-					</label>
-					<div className="editor-wrapper">
-						{editorState && (
-							 <Editor
-                             editorState={editorState}
-                             toolbarClassName="toolbarClassName"
-                             wrapperClassName="wrapperClassName"
-                             editorClassName="editorClassName"
-                             onEditorStateChange={onEditorStateChange}
-                             mention={{
-                               separator: " ",
-                               trigger: "@",
-                               suggestions: [
-                                 { text: "APPLE", value: "apple" },
-                                 { text: "BANANA", value: "banana", url: "banana" },
-                                 { text: "CHERRY", value: "cherry", url: "cherry" },
-                                 { text: "DURIAN", value: "durian", url: "durian" },
-                                 { text: "EGGFRUIT", value: "eggfruit", url: "eggfruit" },
-                                 { text: "FIG", value: "fig", url: "fig" },
-                                 { text: "GRAPEFRUIT", value: "grapefruit", url: "grapefruit" },
-                                 { text: "HONEYDEW", value: "honeydew", url: "honeydew" }
-                               ]
-                             }}
-                           />
-						)}
-					</div>
-				</div>
-				<div className="form-actions">
-					<Button disabled={!isValid || isSubmitting} type="submit">
-						Save
-					</Button>
-				</div>
-			</form>
-            </>
+						<div className="flex items-center gap-x-2">
+							<Button disabled={!value || isSubmitting} type="submit">
+								Save
+							</Button>
+						</div>
+					</form>
+				</Form>
+			)}
+		</div>
 	);
 };
-
-// export default DescriptionForm;
-
-// import * as z from "zod";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import {
-// 	Form,
-// 	FormControl,
-// 	FormField,
-// 	FormItem,
-// 	FormMessage,
-// } from "@/components/ui/form";
-// import { Button } from "@/components/ui/button";
-
-// import React, { useState } from 'react';
-// import { Editor } from 'react-draft-wysiwyg';
-// import { EditorState, convertToRaw } from 'draft-js';
-// import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-// import draftToHtml from 'draftjs-to-html';
-// import DOMPurify from 'dompurify';
-// // import axios from 'axios';
-// import { useForm } from 'react-hook-form';
-// import { useUpdateCourseMutation } from '@/features/courses/coursesApiSlice';
-
-// const formSchema = z.object({
-//   description: z.string().min(1, {
-//     message: 'Description is required',
-//   }),
-// });
-
-// export const DescriptionForm = ({ initialData, courseId }) => {
-//   const [editorState, setEditorState] = useState(
-//     initialData.description
-//       ? EditorState.createWithContent(initialData.description)
-//       : EditorState.createEmpty()
-//   );
-
-//   const [updateCourse, { isLoading, isError, isSuccess, error }] =
-// 		useUpdateCourseMutation();
-// 	// const router = useRouter();
-
-//   const { handleSubmit, formState: { isSubmitting, isValid } } = useForm({
-//     resolver: zodResolver(formSchema),
-//   });
-
-//   const onEditorStateChange = (newEditorState) => {
-//     setEditorState(newEditorState);
-//   };
-
-//   const onSubmit = async (values) => {
-//     try {
-//         // console.log(values);
-//         const htmlContent = draftToHtml(convertToRaw(editorState.getCurrentContent()));
-//         const sanitizedHTML = DOMPurify.sanitize(htmlContent);
-
-//         await updateCourse({ id: courseId, description: sanitizedHTML }).unwrap();
-//         // await axios.patch(`/api/courses/${courseId}`, values);
-//         toast.success("Course updated");
-//         toggleEdit();
-//         // router.refresh();
-//     } catch {
-//         toast.error("Something went wrong");
-//     }
-// };
-
-//   return (
-//     <Form >
-//       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-//         <div className="form-control">
-//           <label htmlFor="description" className="label">Description</label>
-//           <div className="editor-wrapper">
-//             <Editor
-//               editorState={editorState}
-//               onEditorStateChange={onEditorStateChange}
-//               toolbarClassName="toolbarClassName"
-//               wrapperClassName="wrapperClassName"
-//               editorClassName="editorClassName"
-//             />
-//           </div>
-//         </div>
-//         <div className="form-actions">
-//           <Button disabled={!isValid || isSubmitting} type="submit">
-//             Save
-//           </Button>
-//         </div>
-//       </form>
-//     </Form>
-//   );
-// };
