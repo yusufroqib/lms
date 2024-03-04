@@ -97,7 +97,7 @@ export const ImageForm = ({ initialData, courseId }) => {
 			setIsUploading(true);
 			const url = await uploadImage(img, values);
 			console.log(url);
-			await updateCourse({ id: courseId, courseImage: url });
+			await updateCourse({ id: courseId, courseImage: url }).unwrap();
 			toast.success("Course updated");
 			toggleEdit();
 			// router.refresh();
@@ -169,11 +169,6 @@ export const ImageForm = ({ initialData, courseId }) => {
 						onChange={(e) => setImg(e.target.files[0])}
 						className="file-input file-input-bordered w-full "
 					/>
-					{/* <FileUpload endpoint="courseImage" onChange={(url) => {
-                if (url) {
-                    onSubmit({ courseImage: url });
-                }
-            }}/> */}
 					<div className="text-xs text-muted-foreground mt-4">
 						16:9 aspect ratio recommended
 					</div>
@@ -183,7 +178,7 @@ export const ImageForm = ({ initialData, courseId }) => {
 								Upload Image
 							</Button>
 						)}
-						{isUploading &&  (
+						{isUploading && (
 							<Button
 								onClick={handleCancel}
 								variant="destructive"
@@ -193,9 +188,7 @@ export const ImageForm = ({ initialData, courseId }) => {
 							</Button>
 						)}
 					</div>
-					{isUploading && (
-						<Progress value={imgPerc} color="green" label=" " />
-					)}
+					{isUploading && <Progress value={imgPerc} color="green" label=" " />}
 				</div>
 			)}
 		</div>

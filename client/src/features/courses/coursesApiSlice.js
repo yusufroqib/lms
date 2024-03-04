@@ -109,6 +109,37 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				return queryFulfilled.catch(() => patchResult); // reset the query if the patch fails
 			},
 		}),
+		updateCategory: builder.mutation({
+			query: ({ id, ...data }) => ({
+				url: `/tutors/edit-course/${id}/category`,
+				method: "PUT",
+				body: { ...data },
+			}),
+			invalidatesTags: (result, error, arg) => [
+				{ type: "TutorCourse", id: arg.id },
+			],
+		}),
+		createChapter: builder.mutation({
+			query: ({id, ...data}) => ({
+				url: `/tutors/edit-course/${id}/create-chapter`,
+				method: "PUT",
+				body: { ...data },
+			}),
+			invalidatesTags: (result, error, arg) => [
+				{ type: "TutorCourse", id: arg.id },
+			],
+		}),
+		reorderChapters: builder.mutation({
+			query: ({id, ...data}) => ({
+				url: `/tutors/edit-course/${id}/reorder-chapters`,
+				method: "PUT",
+				body: { ...data },
+			}),
+			invalidatesTags: (result, error, arg) => [
+				{ type: "TutorCourse", id: arg.id },
+			],
+		}),	
+	
 	}),
 });
 
@@ -118,6 +149,9 @@ export const {
 	useGetTutorCoursesQuery,
 	useCreateCourseTitleMutation,
 	useUpdateCourseMutation,
+	useUpdateCategoryMutation,
+	useCreateChapterMutation,
+	useReorderChaptersMutation
 } = coursesApiSlice;
 
 // export const selectallCoursesResult = coursesApiSlice.endpoints.getCourses.select();

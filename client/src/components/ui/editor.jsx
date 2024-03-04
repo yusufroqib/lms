@@ -63,6 +63,7 @@ function Editor({ name, value, setValue }) {
 			className="z-[100] no-tailwindcss-base"
 			height={400}
 			value={value}
+			placeholder={`What you'll learn, Requirements, Description, Who is this course for, etc `}
 			change={handleChange}
 			toolbarSettings={toolbarSettings}
 			onKeyDown={handleKeyDown}

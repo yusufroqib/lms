@@ -18,12 +18,30 @@ const commentSchema = new Schema({
 	questionReplies: [Object],
 });
 
-const courseDataSchema = new Schema({
+const chapterSchema = new Schema({
 	videoUrl: String,
-	videoThumbnail: String,
+	// videoThumbnail: String,
 	title: String,
+	position: Number,
 	// videoSection: String,
 	description: String,
+	isPublished: Boolean,
+	isFree: Boolean,
+	attachments: [
+		{
+			name: String,
+			url: String,
+		},
+	],
+	userProgress: [
+		{
+			userId: {
+				type: Schema.Types.ObjectId,
+				ref: "User",
+			},
+			isCompleted: Boolean,
+		},
+	],
 	// videoLength: Number,
 	// videoPlayer: String,
 	// links: [linkSchema],
@@ -51,26 +69,21 @@ const courseSchema = new Schema(
 		},
 		price: {
 			type: Number,
+			default: 0
 			// required: true,
 		},
-		estimatePrice: {
-			type: String,
-		},
+		// estimatePrice: {
+		// 	type: String,
+		// },
 		courseImage: {
 			type: String,
 		},
-		// tags: {
-		// 	type: String,
-		// 	required: true,
-		// },
-		// demoUrl: {
-		// 	type: String,
-		// 	required: true,
-		// },
-		benefits: [{ title: String }],
-		prerequisites: [{ title: String }],
+		categoryId: {
+			type: Schema.Types.ObjectId,
+			ref: "Category",
+		},
 		reviews: [reviewSchema],
-		courseData: [courseDataSchema],
+		chapters: [chapterSchema],
 		ratings: {
 			type: Number,
 			default: 0,
@@ -81,6 +94,7 @@ const courseSchema = new Schema(
 					type: Schema.Types.ObjectId,
 					ref: "User",
 				},
+				amount: Number,
 				date: {
 					type: Date,
 					default: Date.now, // Optional: Set a default value to the current date and time

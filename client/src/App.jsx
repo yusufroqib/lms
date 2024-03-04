@@ -12,6 +12,7 @@ import CoursesIndex from "./pages/courses/CoursesIndex";
 import TutorCourses from "./pages/tutor/course/TutorCourses";
 import CreateCourse from "./pages/tutor/course/createCourse/CreateCourse";
 import EditCourse from "./pages/tutor/course/editCourse/EditCourse";
+import EditChapter from "./pages/tutor/course/editCourse/editChapter/EditChapter";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -33,7 +34,7 @@ function App() {
 								<Route path="my-courses" element={<TutorCourses />} />
 								<Route path="create-course" element={<CreateCourse />} />
 								<Route path="edit-course/:courseId" element={<EditCourse />} />
-								{/* <Route path="edit-course/:courseId" element={<Index />} /> */}
+								<Route path="edit-course/:courseId/chapter/:chapterId" element={<EditChapter />} />
 							</Route>
 						</Route>
 					</Route>

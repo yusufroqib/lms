@@ -46,7 +46,7 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 			await updateCourse({
 				id: courseId,
 				description: sanitizedContent,
-			});
+			}).unwrap()
 			toast.success("Course updated successfully");
 			setIsEditing(false);
 			setIsSubmitting(false);

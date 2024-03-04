@@ -1,4 +1,4 @@
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect } from "react";
 import useAuth from "@/hooks/useAuth";
 import {
@@ -12,36 +12,50 @@ import { LuLayoutDashboard } from "react-icons/lu";
 import { TitleForm } from "./components/TitleForm";
 import { DescriptionForm } from "./components/DescriptionForm";
 import { ImageForm } from "./components/ImageForm";
-import { CategoryForm } from "./components/CategoryForm";
+import CategoryForm from "./components/CategoryForm";
+import toast from "react-hot-toast";
+import { CircleDollarSign, File, ListChecks } from "lucide-react";
+import { PriceForm } from "./components/PriceForm";
+import { ChaptersForm } from "./components/ChaptersForm";
 // import { DescriptionForm } from "./components/DescForm";
 
 const EditCourse = () => {
 	const { courseId } = useParams();
+	const navigate = useNavigate();
 	const { username, isTutor, isAdmin, _id } = useAuth();
-	const { course, isLoading, isFetching, isSuccess } = useGetTutorCoursesQuery(
-		"tutorCourses",
-		{
-			selectFromResult: ({ data, isLoading, isSuccess, isFetching }) => ({
+	const { course, isLoading, isFetching, isSuccess, isError } =
+		useGetTutorCoursesQuery("tutorCourses", {
+			selectFromResult: ({
+				data,
+				isLoading,
+				isSuccess,
+				isFetching,
+				isError,
+				error,
+			}) => ({
 				course: data?.entities[courseId],
 				isLoading,
 				isSuccess,
 				isFetching,
+				error,
+				isError,
 			}),
-		}
-	);
+		});
 
-	const { data} =
-		useGetCourseCategoriesQuery("courseCategories");
+	const { data } = useGetCourseCategoriesQuery("courseCategories");
 
-        // console.log(categories)
+	// console.log(categories)
 
 	// console.log(import.meta.env.VITE_FIREBASE_API_KEY)
-
-	console.log(isFetching);
 	// console.log(isSuccess);
 	let requiredFields;
 	// useEffect(() => {}, []);
-	if (isSuccess) {
+	if (isError) {
+		toast.error("Something went wrong");
+		navigate("/tutors/my-courses");
+	}
+
+	if (isSuccess && course) {
 		requiredFields = [
 			course.title,
 			course.description,
@@ -66,7 +80,7 @@ const EditCourse = () => {
 	// return <div>{isSuccess && JSON.stringify(course)}</div>;
 
 	if (isSuccess && course && data) {
-        const categories = data?.ids.map((id) => data.entities[id])
+		const categories = data?.ids.map((id) => data.entities[id]);
 		return (
 			<>
 				{!course.isPublished && (
@@ -93,9 +107,6 @@ const EditCourse = () => {
 								<h2 className="text-xl">Customize your course</h2>
 							</div>
 							<TitleForm initialData={course} courseId={course.id} />
-							{/* <DescriptionForm initialData={course} courseId={course.id} /> */}
-							<DescriptionForm initialData={course} courseId={course.id} />
-							<ImageForm initialData={course} courseId={course.id} />
 							<CategoryForm
 								initialData={course}
 								courseId={course.id}
@@ -104,36 +115,33 @@ const EditCourse = () => {
 									value: category.id,
 								}))}
 							/>
+							<DescriptionForm initialData={course} courseId={course.id} />
+							<ImageForm initialData={course} courseId={course.id} />
 						</div>
-						{/* <div className="space-y-6">
-            <div>
-              <div className="flex items-center gap-x-2">
-                <IconBadge icon={ListChecks}/>
-                <h2 className="text-xl">
-                  Course chapters
-                </h2>
-              </div>
-              <ChaptersForm initialData={course} courseId={course.id}/>
-            </div>
-            <div>
-              <div className="flex items-center gap-x-2">
-                <IconBadge icon={CircleDollarSign}/>
-                <h2 className="text-xl">
-                  Sell your course
-                </h2>
-              </div>
-              <PriceForm initialData={course} courseId={course.id}/>
-            </div>
-            <div>
-              <div className="flex items-center gap-x-2">
-                <IconBadge icon={File}/>
-                <h2 className="text-xl">
-                  Resources & Attachments
-                </h2>
-              </div>
-              <AttachmentForm initialData={course} courseId={course.id}/>
-            </div>
-          </div> */}
+
+						<div className="space-y-6">
+							<div>
+								<div className="flex items-center gap-x-2">
+									<IconBadge icon={ListChecks} />
+									<h2 className="text-xl">Course chapters</h2>
+								</div>
+								<ChaptersForm initialData={course} courseId={course.id} />
+							</div>
+							<div>
+								<div className="flex items-center gap-x-2">
+									<IconBadge icon={CircleDollarSign} />
+									<h2 className="text-xl">Sell your course</h2>
+								</div>
+								<PriceForm initialData={course} courseId={course.id} />
+							</div>
+							{/* <div>
+								<div className="flex items-center gap-x-2">
+									<IconBadge icon={File} />
+									<h2 className="text-xl">Resources & Attachments</h2>
+								</div>
+								<AttachmentForm initialData={course} courseId={course.id} />
+							</div> */}
+						</div>
 					</div>
 				</div>
 			</>
