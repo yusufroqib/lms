@@ -208,6 +208,28 @@ const reorderChapters = async (req, res) => {
     }
 };
 
+//Update Course chapter
+const updateChapter = async (req, res) => {
+    try {
+        const { courseId, chapterId } = req.params;
+		const { userId } = req;
+		//update chapter in a course
+		const course = await Course.findOne({
+			_id: courseId,
+			tutor: userId
+		})
+		if (!course) return res.status(404).json({ msg: "Course not found" });
+		const chapter = course.chapters.id(chapterId);
+		if (!chapter) return res.status(404).json({ msg: "Chapter not found" });
+		chapter.set(req.body);
+		await course.save();
+		res.status(200).json( course );
+       
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 
 
 

@@ -6,6 +6,7 @@ const {
 	updateCourseCategory,
 	createChapter,
 	reorderChapters,
+    updateChapter
 } = require("../controllers/courseController");
 const express = require("express");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -45,5 +46,12 @@ router.put(
 	verifyRoles(Admin, Tutor),
 	reorderChapters
 );
+
+router.put(
+    "edit-course/:courseId/chapter/:chapterId",
+    verifyJWT,
+    verifyRoles(Admin, Tutor),
+    updateChapter
+)
 
 module.exports = router;
