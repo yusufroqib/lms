@@ -233,4 +233,4 @@ const updateChapter = async (req, res) => {
 
 
 
-module.exports = { createTitle, getAllTutorCourses, updateCourse, getCategories, updateCourseCategory, createChapter, reorderChapters };
+module.exports = { createTitle, getAllTutorCourses, updateCourse, getCategories, updateCourseCategory, createChapter, reorderChapters, updateChapter };
