@@ -31,14 +31,14 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		// console.log('value: ', value)
-		const sanitizedContent = DOMPurify.sanitize(value);
-		console.log("sanitizedContent: ", sanitizedContent)
+		// const sanitizedContent = DOMPurify.sanitize(value);
+		// console.log("sanitizedContent: ", sanitizedContent)
 
 		try {
 			setIsSubmitting(true);
 			await updateCourse({
 				id: courseId,
-				description: sanitizedContent,
+				description: value,
 			}).unwrap()
 			toast.success("Course updated successfully");
 			setIsEditing(false);
