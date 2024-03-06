@@ -1,5 +1,5 @@
 import { LuPencil } from "react-icons/lu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 // import { useRouter } from "next/navigation";
 import { Form } from "@/components/ui/form";
@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
 import { cn } from "@/lib/utils";
 import Editor from "@/components/ui/editor";
-import Preview from "@/components/ui/preview";
 
 export const DescriptionForm = ({ initialData, courseId }) => {
 	const [isEditing, setIsEditing] = useState(false);
@@ -18,28 +17,22 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 		useUpdateCourseMutation();
 	const [value, setValue] = useState(initialData.description);
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	// const router = useRouter();
 
-	// const form = useForm({
-	// 	resolver: zodResolver(formSchema),
-	// 	defaultValues: initialData,
-	// });
-
-	// const {
-	// 	handleSubmit,
-	// 	control,
-	// 	formState: { errors, isSubmitting, isValid },
-	// 	setValue,
-	// 	register,
-	// } = useForm({
-	// 	resolver: zodResolver(formSchema),
-	// });
-
-	// const { isSubmitting, isValid } = form.formState;
+	useEffect(() => {
+        // Define custom filter to allow blob URLs for <img> src attribute
+        DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+            if (node.nodeName.toLowerCase() === 'img' && node.hasAttribute('src') && node.getAttribute('src').startsWith('blob:')) {
+                // Allow the src attribute
+                node.setAttribute('src', node.getAttribute('src'));
+            }
+        });
+    }, []);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		// console.log('value: ', value)
 		const sanitizedContent = DOMPurify.sanitize(value);
+		console.log("sanitizedContent: ", sanitizedContent)
 
 		try {
 			setIsSubmitting(true);

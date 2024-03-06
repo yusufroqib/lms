@@ -176,7 +176,7 @@ const reorderChapters = async (req, res) => {
         }
 
         const { list } = req.body;
-		console.log(list)
+		// console.log(list)
 
         // Check if the user owns the course
         const ownCourse = await Course.findOne({

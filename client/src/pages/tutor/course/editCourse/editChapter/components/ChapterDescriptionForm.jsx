@@ -6,61 +6,42 @@ import { Form } from "@/components/ui/form";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { Button } from "@/components/ui/button";
-import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
+// import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
 import { cn } from "@/lib/utils";
 import Editor from "@/components/ui/editor";
-import Preview from "@/components/ui/preview";
 
-export const DescriptionForm = ({ initialData, courseId }) => {
+export const ChapterDescriptionForm = ({ initialData, courseId }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const toggleEdit = () => setIsEditing((current) => !current);
-	const [updateCourse, { isLoading, isError, isSuccess, error }] =
-		useUpdateCourseMutation();
+	// const [updateCourse, { isLoading, isError, isSuccess, error }] =
+	// 	useUpdateCourseMutation();
 	const [value, setValue] = useState(initialData.description);
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	// const router = useRouter();
-
-	// const form = useForm({
-	// 	resolver: zodResolver(formSchema),
-	// 	defaultValues: initialData,
-	// });
-
-	// const {
-	// 	handleSubmit,
-	// 	control,
-	// 	formState: { errors, isSubmitting, isValid },
-	// 	setValue,
-	// 	register,
-	// } = useForm({
-	// 	resolver: zodResolver(formSchema),
-	// });
-
-	// const { isSubmitting, isValid } = form.formState;
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		const sanitizedContent = DOMPurify.sanitize(value);
 
-		try {
-			setIsSubmitting(true);
-			await updateCourse({
-				id: courseId,
-				description: sanitizedContent,
-			}).unwrap();
-			toast.success("Course updated successfully");
-			setIsEditing(false);
-			setIsSubmitting(false);
-			// router.refresh();
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setIsSubmitting(false);
-		}
+		// try {
+		// 	setIsSubmitting(true);
+		// 	await updateCourse({
+		// 		id: courseId,
+		// 		description: sanitizedContent,
+		// 	}).unwrap()
+		// 	toast.success("Course updated successfully");
+		// 	setIsEditing(false);
+		// 	setIsSubmitting(false);
+		// 	// router.refresh();
+		// } catch (error) {
+		// 	console.log(error);
+		// } finally {
+		// 	setIsSubmitting(false);
+		// }
 	};
 	return (
 		<div className="mt-6 border bg-slate-100 rounded-md p-4">
 			<div className="font-medium flex items-center justify-between">
-				Course description
+				Chapter description
 				<Button onClick={toggleEdit} variant="ghost">
 					{isEditing ? (
 						<>Cancel</>

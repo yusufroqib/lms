@@ -7,6 +7,8 @@ import { IconBadge } from "@/components/ui/icon-badge";
 import { Banner } from "@/components/ui/banner";
 import { ChapterActions } from "./components/ChapterActions";
 import { ChapterTitleForm } from "./components/ChapterTitleForm";
+import { ChapterDescriptionForm } from "./components/ChapterDescriptionForm";
+import { ChapterAccessForm } from "./components/ChapterAccessForm";
 
 // import { ChapterTitleForm } from "./_components/chapter-title-form";
 // import { ChapterDescriptionForm } from "./_components/chapter-description-form";
@@ -109,22 +111,22 @@ const EditChapter = () => {
 									courseId={courseId}
 									chapterId={chapterId}
 								/>
-								{/* <ChapterDescriptionForm
+								<ChapterDescriptionForm
 									initialData={chapter}
-									courseId={params.courseId}
-									chapterId={params.chapterId}
-								/> */}
+									courseId={courseId}
+									chapterId={chapterId}
+								/>
 							</div>
 							<div>
 								<div className="flex items-center gap-x-2">
 									<IconBadge icon={Eye} />
 									<h2 className="text-xl">Access Settings</h2>
 								</div>
-								{/* <ChapterAccessForm
+								<ChapterAccessForm
 									initialData={chapter}
-									courseId={params.courseId}
-									chapterId={params.chapterId}
-								/> */}
+									courseId={courseId}
+									chapterId={chapterId}
+								/>
 							</div>
 						</div>
 						{/* <div>
