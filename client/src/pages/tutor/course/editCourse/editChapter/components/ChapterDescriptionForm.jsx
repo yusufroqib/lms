@@ -9,10 +9,13 @@ import { Button } from "@/components/ui/button";
 // import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
 import { cn } from "@/lib/utils";
 import Editor from "@/components/ui/editor";
+import { useUpdateChapterMutation } from "@/features/courses/coursesApiSlice";
 
-export const ChapterDescriptionForm = ({ initialData, courseId }) => {
+export const ChapterDescriptionForm = ({ initialData, courseId, chapterId }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const toggleEdit = () => setIsEditing((current) => !current);
+	const [updateChapter, { isLoading, isError, isSuccess, error }] =
+		useUpdateChapterMutation();
 	// const [updateCourse, { isLoading, isError, isSuccess, error }] =
 	// 	useUpdateCourseMutation();
 	const [value, setValue] = useState(initialData.description);
@@ -20,24 +23,26 @@ export const ChapterDescriptionForm = ({ initialData, courseId }) => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const sanitizedContent = DOMPurify.sanitize(value);
+		// const sanitizedContent = DOMPurify.sanitize(value);
 
-		// try {
-		// 	setIsSubmitting(true);
-		// 	await updateCourse({
-		// 		id: courseId,
-		// 		description: sanitizedContent,
-		// 	}).unwrap()
-		// 	toast.success("Course updated successfully");
-		// 	setIsEditing(false);
-		// 	setIsSubmitting(false);
-		// 	// router.refresh();
-		// } catch (error) {
-		// 	console.log(error);
-		// } finally {
-		// 	setIsSubmitting(false);
-		// }
+		try {
+			setIsSubmitting(true);
+			await updateChapter({
+				courseId: courseId,
+				chapterId: chapterId,
+				description: value,
+			}).unwrap();
+			toast.success("Course updated successfully");
+			setIsEditing(false);
+			setIsSubmitting(false);
+		} catch (error) {
+            console.log(error)
+			toast.error("Something went wrong");
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
+
 	return (
 		<div className="mt-6 border bg-slate-100 rounded-md p-4">
 			<div className="font-medium flex items-center justify-between">

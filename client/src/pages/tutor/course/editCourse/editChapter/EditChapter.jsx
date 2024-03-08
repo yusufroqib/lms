@@ -41,12 +41,12 @@ const EditChapter = () => {
 		});
 
 	useEffect(() => {
-		if (isSuccess) {
+		if (course) {
 			const allChapters = course.chapters;
 			const chapter = allChapters.find((chapter) => chapter._id === chapterId);
 			setChapter(chapter);
 		}
-	}, [isSuccess]);
+	}, [isSuccess, course]);
 
 	if (isLoading) {
 		return <div>Loading...</div>;
@@ -123,6 +123,7 @@ const EditChapter = () => {
 									<h2 className="text-xl">Access Settings</h2>
 								</div>
 								<ChapterAccessForm
+									coursePrice={course.price}
 									initialData={chapter}
 									courseId={courseId}
 									chapterId={chapterId}

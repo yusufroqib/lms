@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 // import { useRouter } from "next/navigation";
 import { Form } from "@/components/ui/form";
-import DOMPurify from "dompurify";
+// import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { Button } from "@/components/ui/button";
 import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
@@ -18,15 +18,15 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 	const [value, setValue] = useState(initialData.description);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	useEffect(() => {
-        // Define custom filter to allow blob URLs for <img> src attribute
-        DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-            if (node.nodeName.toLowerCase() === 'img' && node.hasAttribute('src') && node.getAttribute('src').startsWith('blob:')) {
-                // Allow the src attribute
-                node.setAttribute('src', node.getAttribute('src'));
-            }
-        });
-    }, []);
+	// useEffect(() => {
+    //     // Define custom filter to allow blob URLs for <img> src attribute
+    //     DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+    //         if (node.nodeName.toLowerCase() === 'img' && node.hasAttribute('src') && node.getAttribute('src').startsWith('blob:')) {
+    //             // Allow the src attribute
+    //             node.setAttribute('src', node.getAttribute('src'));
+    //         }
+    //     });
+    // }, []);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -45,7 +45,7 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 			setIsSubmitting(false);
 			// router.refresh();
 		} catch (error) {
-			console.log(error);
+			toast.error("Something went wrong");
 		} finally {
 			setIsSubmitting(false);
 		}

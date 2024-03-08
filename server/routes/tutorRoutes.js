@@ -48,10 +48,10 @@ router.put(
 );
 
 router.put(
-    "edit-course/:courseId/chapter/:chapterId",
+    "/edit-course/:courseId/chapter/:chapterId",
     verifyJWT,
     verifyRoles(Admin, Tutor),
     updateChapter
-)
+);
 
 module.exports = router;
