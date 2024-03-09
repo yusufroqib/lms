@@ -150,6 +150,17 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			],
 		}),
 	
+		updateChapterAttachment: builder.mutation({
+			query: ({courseId, chapterId, ...data}) => ({
+				url: `/tutors/edit-course/${courseId}/chapter/${chapterId}/attachment`,
+				method: "PUT",
+				body: { ...data },
+			}),
+			invalidatesTags: (result, error, arg) => [
+				{ type: "TutorCourse", id: arg.courseId },
+			],
+		}),
+	
 	}),
 });
 
@@ -163,6 +174,7 @@ export const {
 	useCreateChapterMutation,
 	useReorderChaptersMutation,
 	useUpdateChapterMutation,
+	useUpdateChapterAttachmentMutation
 } = coursesApiSlice;
 
 // export const selectallCoursesResult = coursesApiSlice.endpoints.getCourses.select();

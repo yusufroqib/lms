@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useGetTutorCoursesQuery } from "@/features/courses/coursesApiSlice";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { ArrowLeft, Eye, LayoutDashboard, Video } from "lucide-react";
+import { ArrowLeft, Eye, File, LayoutDashboard, Video } from "lucide-react";
 import { IconBadge } from "@/components/ui/icon-badge";
 import { Banner } from "@/components/ui/banner";
 import { ChapterActions } from "./components/ChapterActions";
 import { ChapterTitleForm } from "./components/ChapterTitleForm";
 import { ChapterDescriptionForm } from "./components/ChapterDescriptionForm";
 import { ChapterAccessForm } from "./components/ChapterAccessForm";
+import { AttachmentForm } from "./components/AttachmentForm";
 
 // import { ChapterTitleForm } from "./_components/chapter-title-form";
 // import { ChapterDescriptionForm } from "./_components/chapter-description-form";
@@ -141,6 +142,18 @@ const EditChapter = () => {
 								courseId={params.courseId}
 							/>
 						</div> */}
+
+						<div>
+							<div className="flex items-center gap-x-2">
+								<IconBadge icon={File} />
+								<h2 className="text-xl">Resources & Attachments</h2>
+							</div>
+							<AttachmentForm
+								initialData={chapter}
+								courseId={courseId}
+								chapterId={chapterId}
+							/>
+						</div>
 					</div>
 				</div>
 			</>

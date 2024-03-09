@@ -33,8 +33,8 @@ export const ImageForm = ({ initialData, courseId }) => {
 
 	const uploadImage = async (file, inputs) => {
 		const storage = getStorage(app);
-		const fileName = new Date().getTime() + file.name;
-		const folderPath = "courseImages";
+		const fileName = file.name;
+		const folderPath = `Courses/${courseId}/CourseImage`;
 
 		// Check if there is an existing image URL
 		const existingImageUrl = initialData.courseImage;
@@ -96,7 +96,7 @@ export const ImageForm = ({ initialData, courseId }) => {
 			// await axios.patch(`/api/courses/${courseId}`, values);
 			setIsUploading(true);
 			const url = await uploadImage(img, values);
-			console.log(url);
+			// console.log(url);
 			await updateCourse({ id: courseId, courseImage: url }).unwrap();
 			toast.success("Course updated");
 			toggleEdit();

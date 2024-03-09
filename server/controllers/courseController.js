@@ -266,6 +266,45 @@ const updateChapter = async (req, res) => {
 	}
 };
 
+const addAttachmentToChapter = async (req, res) => {
+    try {
+        const { userId } = req; // Assuming you have user information stored in req.user after authentication
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const { chapterId, courseId } = req.params;
+        const { attachment } = req.body;
+
+        // Check if the user owns the course
+        const ownCourse = await Course.findOne({
+            _id: courseId,
+            tutor: userId
+        });
+        if (!ownCourse) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        // Find the chapter by its ID
+        const chapterToUpdate = ownCourse.chapters.find(chapter => chapter._id.equals(chapterId));
+        if (!chapterToUpdate) {
+            return res.status(404).json({ message: "Chapter not found" });
+        }
+
+        // Add attachments to the chapter
+        chapterToUpdate.attachments.push(attachment);
+
+        // Save the updated course with added attachments
+        await ownCourse.save();
+
+        return res.status(200).json({ message: "Attachment added successfully" });
+    } catch (error) {
+        console.log("[ADD ATTACHMENTS]", error);
+        return res.status(500).json({ message: "Internal Error" });
+    }
+};
+
+
 module.exports = {
 	createTitle,
 	getAllTutorCourses,
@@ -275,4 +314,5 @@ module.exports = {
 	createChapter,
 	reorderChapters,
 	updateChapter,
+	addAttachmentToChapter
 };
