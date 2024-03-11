@@ -10,6 +10,7 @@ import { ChapterTitleForm } from "./components/ChapterTitleForm";
 import { ChapterDescriptionForm } from "./components/ChapterDescriptionForm";
 import { ChapterAccessForm } from "./components/ChapterAccessForm";
 import { AttachmentForm } from "./components/AttachmentForm";
+import { ChapterVideoForm } from "./components/ChapterVideoForm";
 
 // import { ChapterTitleForm } from "./_components/chapter-title-form";
 // import { ChapterDescriptionForm } from "./_components/chapter-description-form";
@@ -131,28 +132,31 @@ const EditChapter = () => {
 								/>
 							</div>
 						</div>
-						{/* <div>
-							<div className="flex items-center gap-x-2">
-								<IconBadge icon={Video} />
-								<h2 className="text-xl">Add a video</h2>
-							</div>
-							<ChapterVideoForm
-								initialData={chapter}
-								chapterId={params.chapterId}
-								courseId={params.courseId}
-							/>
-						</div> */}
 
-						<div>
-							<div className="flex items-center gap-x-2">
-								<IconBadge icon={File} />
-								<h2 className="text-xl">Resources & Attachments</h2>
+						<div className="space-y-4">
+							<div>
+								<div className="flex items-center gap-x-2">
+									<IconBadge icon={Video} />
+									<h2 className="text-xl">Add a video</h2>
+								</div>
+								<ChapterVideoForm
+									initialData={chapter}
+									courseId={courseId}
+									chapterId={chapterId}
+								/>
 							</div>
-							<AttachmentForm
-								initialData={chapter}
-								courseId={courseId}
-								chapterId={chapterId}
-							/>
+                            
+							<div>
+								<div className="flex items-center gap-x-2">
+									<IconBadge icon={File} />
+									<h2 className="text-xl">Resources & Attachments</h2>
+								</div>
+								<AttachmentForm
+									initialData={chapter}
+									courseId={courseId}
+									chapterId={chapterId}
+								/>
+							</div>
 						</div>
 					</div>
 				</div>

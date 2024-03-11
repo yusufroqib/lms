@@ -267,43 +267,222 @@ const updateChapter = async (req, res) => {
 };
 
 const addAttachmentToChapter = async (req, res) => {
-    try {
-        const { userId } = req; // Assuming you have user information stored in req.user after authentication
-        if (!userId) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
+	try {
+		const { userId } = req; // Assuming you have user information stored in req.user after authentication
+		if (!userId) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
 
-        const { chapterId, courseId } = req.params;
-        const { attachment } = req.body;
+		const { chapterId, courseId } = req.params;
+		const { attachment } = req.body;
 
-        // Check if the user owns the course
-        const ownCourse = await Course.findOne({
-            _id: courseId,
-            tutor: userId
-        });
-        if (!ownCourse) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
+		// Check if the user owns the course
+		const ownCourse = await Course.findOne({
+			_id: courseId,
+			tutor: userId,
+		});
+		if (!ownCourse) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
 
-        // Find the chapter by its ID
-        const chapterToUpdate = ownCourse.chapters.find(chapter => chapter._id.equals(chapterId));
-        if (!chapterToUpdate) {
-            return res.status(404).json({ message: "Chapter not found" });
-        }
+		// Find the chapter by its ID
+		const chapterToUpdate = ownCourse.chapters.find((chapter) =>
+			chapter._id.equals(chapterId)
+		);
+		if (!chapterToUpdate) {
+			return res.status(404).json({ message: "Chapter not found" });
+		}
 
-        // Add attachments to the chapter
-        chapterToUpdate.attachments.push(attachment);
+		// Add attachments to the chapter
+		chapterToUpdate.attachments.push(attachment);
 
-        // Save the updated course with added attachments
-        await ownCourse.save();
+		// Save the updated course with added attachments
+		await ownCourse.save();
 
-        return res.status(200).json({ message: "Attachment added successfully" });
-    } catch (error) {
-        console.log("[ADD ATTACHMENTS]", error);
-        return res.status(500).json({ message: "Internal Error" });
-    }
+		return res.status(200).json({ message: "Attachment added successfully" });
+	} catch (error) {
+		console.log("[ADD ATTACHMENTS]", error);
+		return res.status(500).json({ message: "Internal Error" });
+	}
 };
 
+const deleteAttachmentFromChapter = async (req, res) => {
+	try {
+		const { userId } = req; // Assuming you have user information stored in req.user after authentication
+		if (!userId) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		const { chapterId, courseId } = req.params;
+		const { attachmentId } = req.body;
+
+		// Check if the user owns the course
+		const ownCourse = await Course.findOne({
+			_id: courseId,
+			tutor: userId,
+		});
+		if (!ownCourse) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		// Find the chapter by its ID
+		const chapterToUpdate = ownCourse.chapters.find((chapter) =>
+			chapter._id.equals(chapterId)
+		);
+		if (!chapterToUpdate) {
+			return res.status(404).json({ message: "Chapter not found" });
+		}
+
+		// Find the index of the attachment to delete
+		const attachmentIndex = chapterToUpdate.attachments.findIndex(
+			(attachment) => attachment._id.equals(attachmentId)
+		);
+		if (attachmentIndex === -1) {
+			return res.status(404).json({ message: "Attachment not found" });
+		}
+
+		// Remove the attachment from the attachments array
+		chapterToUpdate.attachments.splice(attachmentIndex, 1);
+
+		// Save the updated course with deleted attachment
+		await ownCourse.save();
+
+		return res.status(200).json({ message: "Attachment deleted successfully" });
+	} catch (error) {
+		console.log("[DELETE ATTACHMENT]", error);
+		return res.status(500).json({ message: "Internal Error" });
+	}
+};
+
+const deleteChapter = async (req, res) => {
+	try {
+		const { userId } = req; // Assuming you have user information stored in req.user after authentication
+		if (!userId) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		const { chapterId, courseId } = req.params;
+
+		// Check if the user owns the course
+		const ownCourse = await Course.findOne({
+			_id: courseId,
+			tutor: userId,
+		});
+		if (!ownCourse) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		// Find the chapter index in the chapters array
+		const chapterIndex = ownCourse.chapters.findIndex((chapter) =>
+			chapter._id.equals(chapterId)
+		);
+		if (chapterIndex === -1) {
+			return res.status(404).json({ message: "Chapter not found" });
+		}
+
+		// Remove the chapter from the chapters array
+		ownCourse.chapters.splice(chapterIndex, 1);
+
+		// If the deleted chapter is the last chapter, unpublish the course
+		if (ownCourse.chapters.length === 0) {
+			ownCourse.isPublished = false;
+		}
+
+		// Save the updated course with deleted chapter
+		await ownCourse.save();
+
+		return res.status(200).json({ message: "Chapter deleted successfully" });
+	} catch (error) {
+		console.log("[DELETE CHAPTER]", error);
+		return res.status(500).json({ message: "Internal Error" });
+	}
+};
+
+const toggleChapterPublicationStatus = async (req, res) => {
+	try {
+		const { userId } = req; // Assuming you have user information stored in req.user after authentication
+		if (!userId) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		const { chapterId, courseId } = req.params;
+
+		// Check if the user owns the course
+		const ownCourse = await Course.findOne({
+			_id: courseId,
+			tutor: userId,
+		});
+		if (!ownCourse) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		// Find the chapter by its ID
+		const chapterToUpdate = ownCourse.chapters.find((chapter) =>
+			chapter._id.equals(chapterId)
+		);
+		if (!chapterToUpdate) {
+			return res.status(404).json({ message: "Chapter not found" });
+		}
+
+		// Toggle the chapter's publication status
+		chapterToUpdate.isPublished = !chapterToUpdate.isPublished;
+
+		// If the chapter unpublished is the only chapter, unpublish the course
+		if (!chapterToUpdate.isPublished && ownCourse.chapters.length === 1) {
+			ownCourse.isPublished = false;
+		}
+
+		// Save the updated course with toggled publication status of the chapter
+		await ownCourse.save();
+
+		return res
+			.status(200)
+			.json({ message: "Chapter publication status toggled successfully" });
+	} catch (error) {
+		console.log("[TOGGLE CHAPTER PUBLICATION STATUS]", error);
+		return res.status(500).json({ message: "Internal Error" });
+	}
+};
+
+const toggleCoursePublicationStatus = async (req, res) => {
+	try {
+		const { userId } = req; // Assuming you have user information stored in req.user after authentication
+		if (!userId) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		const { id: courseId } = req.params;
+
+		// Check if the user owns the course
+		const ownCourse = await Course.findOne({
+			_id: courseId,
+			tutor: userId,
+		});
+		if (!ownCourse) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		// Toggle the course's publication status
+		ownCourse.isPublished = !ownCourse.isPublished;
+
+		// If the course is being published and has no chapters, return error
+		if (ownCourse.isPublished && ownCourse.chapters.length === 0) {
+			return res
+				.status(400)
+				.json({ message: "Cannot publish course with no chapters" });
+		}
+
+		// Save the updated course with toggled publication status
+		await ownCourse.save();
+
+		return res
+			.status(200)
+			.json({ message: "Course publication status toggled successfully" });
+	} catch (error) {
+		console.log("[TOGGLE COURSE PUBLICATION STATUS]", error);
+		return res.status(500).json({ message: "Internal Error" });
+	}
+};
 
 module.exports = {
 	createTitle,
@@ -314,5 +493,9 @@ module.exports = {
 	createChapter,
 	reorderChapters,
 	updateChapter,
-	addAttachmentToChapter
+	addAttachmentToChapter,
+	deleteAttachmentFromChapter,
+	deleteChapter,
+	toggleChapterPublicationStatus,
+	toggleCoursePublicationStatus,
 };

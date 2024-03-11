@@ -1,7 +1,7 @@
 import * as z from "zod";
 // import axios from "axios";
 import { PlusCircle, File, Loader2, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
 	getStorage,
@@ -13,7 +13,10 @@ import {
 import app from "../../../../../../firebase";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@material-tailwind/react";
-import { useUpdateChapterAttachmentMutation } from "@/features/courses/coursesApiSlice";
+import {
+	useDeleteChapterAttachmentMutation,
+	useUpdateChapterAttachmentMutation,
+} from "@/features/courses/coursesApiSlice";
 // import { FileUpload } from "@/components/ui/file-upload";
 const formSchema = z.object({
 	url: z.string().min(1),
@@ -24,8 +27,11 @@ export const AttachmentForm = ({ initialData, courseId, chapterId }) => {
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadTask, setUploadTask] = useState(null);
-	const [updateChapterAttachment] = useUpdateChapterAttachmentMutation(); // Ensure you have the appropriate mutation hook
 	const [isEditing, setIsEditing] = useState(false);
+	const [delAttachId, setDelAttachId] = useState(null);
+	const [updateChapterAttachment] = useUpdateChapterAttachmentMutation(); // Ensure you have the appropriate mutation hook
+	const [deleteChapterAttachment] = useDeleteChapterAttachmentMutation(); // Ensure you have the appropriate mutation hook
+
 
 	const toggleEdit = () => {
 		setIsEditing((prevIsEditing) => !prevIsEditing);
@@ -41,7 +47,7 @@ export const AttachmentForm = ({ initialData, courseId, chapterId }) => {
 		if (!file) return;
 
 		const storage = getStorage(app);
-		const folderPath = `Courses/${courseId}/Attachments/${chapterId}`;
+		const folderPath = `Courses/${courseId}/Chapters/${chapterId}/Attachments`;
 		const fileName = file.name;
 
 		const storageRef = ref(storage, `${folderPath}/${fileName}`);
@@ -89,18 +95,22 @@ export const AttachmentForm = ({ initialData, courseId, chapterId }) => {
 	const onSubmit = async () => {
 		try {
 			setIsUploading(true);
-
 			const fileUrl = await uploadFile();
 			const attachment = {
 				name: fileName,
 				url: fileUrl,
 			};
-			await updateChapterAttachment({ courseId, chapterId, attachment });
+			await updateChapterAttachment({
+				courseId,
+				chapterId,
+				attachment,
+			}).unwrap();
 			toast.success("File uploaded successfully");
 			toggleEdit();
 		} catch (error) {
 			console.error("Error uploading file:", error);
 			if (error?.code === "storage/canceled") {
+                toggleEdit();
 				return toast.error("Upload Cancelled");
 			}
 			toast.error("Error uploading file");
@@ -112,18 +122,32 @@ export const AttachmentForm = ({ initialData, courseId, chapterId }) => {
 		}
 	};
 
-	const onDelete = async (id) => {
+	const onDelete = async (attachment) => {
+		// console.log(attachment);
 		try {
-			setDeletingId(id);
-			// await axios.delete(`/api/courses/${courseId}/attachments/${id}`);
+			setDelAttachId(attachment._id);
+			const storage = getStorage(app);
+			const fileRef = ref(storage, attachment.url);
+			await deleteObject(fileRef);
+
+			// console.log(delAttachId, id);
+			// console.log(id)
+			await deleteChapterAttachment({
+				courseId,
+				chapterId,
+				attachmentId: attachment._id,
+			}).unwrap();
+
 			toast.success("Attachment deleted");
-			router.refresh();
-		} catch {
+			// router.refresh();
+		} catch (error) {
+			console.log(error);
 			toast.error("Something went wrong");
 		} finally {
-			setDeletingId(null);
+			setDelAttachId(null);
 		}
 	};
+
 	return (
 		<div className="mt-6 border bg-slate-100 rounded-md p-4">
 			<div className="font-medium flex items-center justify-between">
@@ -160,14 +184,14 @@ export const AttachmentForm = ({ initialData, courseId, chapterId }) => {
 								>
 									<File className="h-4 w-4 mr-2 flex-shrink-0" />
 									<p className="text-xs line-clamp-1">{attachment.name}</p>
-									{deletingId === attachment._id && (
+									{delAttachId === attachment._id && (
 										<div>
 											<Loader2 className="h-4 w-4 animate-spin" />
 										</div>
 									)}
-									{deletingId !== attachment._id && (
+									{delAttachId !== attachment._id && (
 										<button
-											onClick={() => onDelete(attachment._id)}
+											onClick={() => onDelete(attachment)}
 											className="ml-auto hover:opacity-75 transition"
 										>
 											<X className="h-4 w-4" />

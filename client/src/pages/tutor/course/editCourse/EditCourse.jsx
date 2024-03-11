@@ -134,13 +134,7 @@ const EditCourse = () => {
 								</div>
 								<PriceForm initialData={course} courseId={course.id} />
 							</div>
-							{/* <div>
-								<div className="flex items-center gap-x-2">
-									<IconBadge icon={File} />
-									<h2 className="text-xl">Resources & Attachments</h2>
-								</div>
-								<AttachmentForm initialData={course} courseId={course.id} />
-							</div> */}
+						
 						</div>
 					</div>
 				</div>

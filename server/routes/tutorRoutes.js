@@ -7,7 +7,11 @@ const {
 	createChapter,
 	reorderChapters,
     updateChapter,
-    addAttachmentToChapter
+    addAttachmentToChapter,
+    deleteAttachmentFromChapter,
+    deleteChapter,
+    toggleChapterPublicationStatus,
+    toggleCoursePublicationStatus
 } = require("../controllers/courseController");
 const express = require("express");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -36,6 +40,12 @@ router.put(
 	updateCourseCategory
 );
 router.put(
+	"/edit-course/:id/toggle-publish",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	toggleCoursePublicationStatus
+);
+router.put(
 	"/edit-course/:id/create-chapter",
 	verifyJWT,
 	verifyRoles(Admin, Tutor),
@@ -55,11 +65,31 @@ router.put(
     updateChapter
 );
 
+router.delete(
+    "/edit-course/:courseId/chapter/:chapterId",
+    verifyJWT,
+    verifyRoles(Admin, Tutor),
+    deleteChapter
+);
+
+router.put(
+    "/edit-course/:courseId/chapter/:chapterId/toggle-publish",
+    verifyJWT,
+    verifyRoles(Admin, Tutor),
+    toggleChapterPublicationStatus
+);
+
 router.put(
     "/edit-course/:courseId/chapter/:chapterId/attachment",
     verifyJWT,
     verifyRoles(Admin, Tutor),
     addAttachmentToChapter
+);
+router.delete(
+    "/edit-course/:courseId/chapter/:chapterId/attachment",
+    verifyJWT,
+    verifyRoles(Admin, Tutor),
+    deleteAttachmentFromChapter
 );
 
 module.exports = router;

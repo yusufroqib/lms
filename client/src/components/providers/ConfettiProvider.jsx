@@ -10,7 +10,7 @@ export const ConfettiProvider = () => {
 
     if (!confettiIsOpen)
         return null;
-    return (<ReactConfetti className="pointer-events-none z-[100]" numberOfPieces={500} recycle={false} onConfettiComplete={() => {
+    return (<ReactConfetti className="pointer-events-none z-[100] " numberOfPieces={500} recycle={false} onConfettiComplete={() => {
             // confetti.onClose();
             dispatch(closeConfetti());
         }}/>);
