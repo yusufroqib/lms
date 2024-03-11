@@ -491,11 +491,11 @@ const deleteCourse = async (req, res) => {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        const { courseId } = req.params;
+        const { id } = req.params;
 
         // Check if the user owns the course
         const ownCourse = await Course.findOne({
-            _id: courseId,
+            _id: id,
             tutor: userId
         });
         if (!ownCourse) {
@@ -503,7 +503,7 @@ const deleteCourse = async (req, res) => {
         }
 
         // Delete the course
-        await Course.deleteOne({ _id: courseId });
+        await Course.deleteOne({ _id: id });
 
         return res.status(200).json({ message: "Course deleted successfully" });
     } catch (error) {
