@@ -484,6 +484,34 @@ const toggleCoursePublicationStatus = async (req, res) => {
 	}
 };
 
+const deleteCourse = async (req, res) => {
+    try {
+        const { userId } = req; // Assuming you have user information stored in req.user after authentication
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const { courseId } = req.params;
+
+        // Check if the user owns the course
+        const ownCourse = await Course.findOne({
+            _id: courseId,
+            tutor: userId
+        });
+        if (!ownCourse) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        // Delete the course
+        await Course.deleteOne({ _id: courseId });
+
+        return res.status(200).json({ message: "Course deleted successfully" });
+    } catch (error) {
+        console.log("[DELETE COURSE]", error);
+        return res.status(500).json({ message: "Internal Error" });
+    }
+};
+
 module.exports = {
 	createTitle,
 	getAllTutorCourses,
@@ -498,4 +526,5 @@ module.exports = {
 	deleteChapter,
 	toggleChapterPublicationStatus,
 	toggleCoursePublicationStatus,
+	deleteCourse
 };

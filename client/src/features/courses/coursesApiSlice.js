@@ -109,6 +109,15 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				return queryFulfilled.catch(() => patchResult); // reset the query if the patch fails
 			},
 		}),
+		deleteCourse: builder.mutation({
+			query: ({ id }) => ({
+				url: `/tutors/edit-course/${id}`,
+				method: "DELETE",
+			}),
+			invalidatesTags: (result, error, arg) => [
+				{ type: "TutorCourse", id: arg.id },
+			],
+		}),
 		updateCategory: builder.mutation({
 			query: ({ id, ...data }) => ({
 				url: `/tutors/edit-course/${id}/category`,
@@ -159,14 +168,14 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			],
 		}),
 		toggleChapterPublish: builder.mutation({
-			query: ({ courseId, chapterId,}) => ({
+			query: ({ courseId, chapterId }) => ({
 				url: `/tutors/edit-course/${courseId}/chapter/${chapterId}/toggle-publish`,
 				method: "PUT",
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "TutorCourse", id: arg.courseId },
 			],
-		}), 
+		}),
 		deleteChapter: builder.mutation({
 			query: ({ courseId, chapterId }) => ({
 				url: `/tutors/edit-course/${courseId}/chapter/${chapterId}`,
@@ -207,6 +216,7 @@ export const {
 	useGetTutorCoursesQuery,
 	useCreateCourseTitleMutation,
 	useUpdateCourseMutation,
+	useDeleteCourseMutation,
 	useUpdateCategoryMutation,
 	useToggleChapterPublishMutation,
 	useCreateChapterMutation,
@@ -215,7 +225,7 @@ export const {
 	useDeleteChapterMutation,
 	useUpdateChapterAttachmentMutation,
 	useDeleteChapterAttachmentMutation,
-	useToggleCoursePublishMutation
+	useToggleCoursePublishMutation,
 } = coursesApiSlice;
 
 // export const selectallCoursesResult = coursesApiSlice.endpoints.getCourses.select();

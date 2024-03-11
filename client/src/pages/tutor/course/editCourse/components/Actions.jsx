@@ -7,14 +7,13 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 // import { useConfettiStore } from "@/hooks/use-confetti-store";
-
+import { getStorage, ref, listAll, deleteObject } from "firebase/storage";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	openConfetti,
-	closeConfetti,
-	selectConfettiIsOpen,
 } from "@/features/confettiSlice";
-import { useToggleCoursePublishMutation } from "@/features/courses/coursesApiSlice";
+import { useDeleteCourseMutation, useToggleCoursePublishMutation } from "@/features/courses/coursesApiSlice";
+import { useNavigate } from "react-router-dom";
 
 export const Actions = ({ disabled, courseId, isPublished }) => {
 	// const router = useRouter();
@@ -22,6 +21,44 @@ export const Actions = ({ disabled, courseId, isPublished }) => {
 	const dispatch = useDispatch();
 	const [isLoading, setIsLoading] = useState(false);
 	const [toggleCoursePublish] = useToggleCoursePublishMutation(); // Ensure you have the appropriate mutation hook
+	const [deleteCourse] = useDeleteCourseMutation(); // Ensure you have the appropriate mutation hook
+	const navigate = useNavigate();
+
+	const deleteFolderAndContents = async (folderPath) => {
+		const storage = getStorage();
+		const folderRef = ref(storage, folderPath);
+
+		try {
+			// List all items in the folder
+			const { items, prefixes } = await listAll(folderRef);
+			// console.log(items)
+			// console.log(prefixes)
+
+			// Delete items in the folder if any
+			if (items.length > 0) {
+				await Promise.all(
+					items.map(async (itemRef) => {
+						// Delete individual file
+						await deleteObject(itemRef);
+					})
+				);
+			}
+
+			// Recursively delete subdirectories if any
+			if (prefixes.length > 0) {
+				await Promise.all(
+					prefixes.map(async (prefix) => {
+						await deleteFolderAndContents(prefix._location.path_);
+					})
+				);
+			}
+
+			console.log("Folder and its contents deleted successfully");
+		} catch (error) {
+			toast.error("Something went wrong");
+			console.error("Error deleting folder and its contents:", error);
+		}
+	};
 
 	const onClick = async () => {
 		try {
@@ -49,11 +86,17 @@ export const Actions = ({ disabled, courseId, isPublished }) => {
 	const onDelete = async () => {
 		try {
 			setIsLoading(true);
-			// await axios.delete(`/api/courses/${courseId}`);
+			const folderPath = `Courses/${courseId}`;
+			await deleteFolderAndContents(folderPath);
+
+			await deleteCourse({
+				id: courseId,
+			}).unwrap(); //     toast.success("Chapter deleted");
+
+			navigate(`/tutors/my-courses`);
 			toast.success("Course deleted");
-			// router.refresh();
-			// router.push(`/teacher/courses`);
-		} catch {
+		} catch (error){
+            console.log(error)
 			toast.error("Something went wrong");
 		} finally {
 			setIsLoading(false);

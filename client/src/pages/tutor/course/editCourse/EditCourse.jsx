@@ -60,7 +60,7 @@ const EditCourse = () => {
 			course.title,
 			course.description,
 			course.courseImage,
-			course.price,
+			// course.price,
 			course.categoryId,
 			course.chapters?.some((chapter) => chapter.isPublished),
 		];
@@ -91,7 +91,7 @@ const EditCourse = () => {
 						<div className="flex flex-col gap-y-2">
 							<h1 className="text-2xl font-medium">Course setup</h1>
 							<span className="text-sm text-slate-700">
-								Complete all fields {completionText}
+								Complete all required fields {completionText}
 							</span>
 						</div>
 						<Actions

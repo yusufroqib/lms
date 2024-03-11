@@ -11,7 +11,8 @@ const {
     deleteAttachmentFromChapter,
     deleteChapter,
     toggleChapterPublicationStatus,
-    toggleCoursePublicationStatus
+    toggleCoursePublicationStatus,
+    deleteCourse
 } = require("../controllers/courseController");
 const express = require("express");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -32,6 +33,12 @@ router.put(
 	verifyJWT,
 	verifyRoles(Admin, Tutor),
 	updateCourse
+);
+router.delete(
+	"/edit-course/:id",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	deleteCourse
 );
 router.put(
 	"/edit-course/:id/category",
