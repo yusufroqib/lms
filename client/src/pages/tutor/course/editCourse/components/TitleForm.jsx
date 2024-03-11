@@ -34,7 +34,7 @@ export const TitleForm = ({ initialData, courseId }) => {
 		resolver: zodResolver(formSchema),
 		defaultValues: initialData,
 	});
-	const { isSubmitting, isValid } = form.formState;
+	const { isSubmitting, isValid, } = form.formState.;
 
 	const onSubmit = async (values) => {
 		try {
@@ -43,6 +43,7 @@ export const TitleForm = ({ initialData, courseId }) => {
 			// await axios.patch(`/api/courses/${courseId}`, values);
 			toast.success("Course updated");
 			toggleEdit();
+			form.reset();
 			// router.refresh();
 		} catch {
 			toast.error("Something went wrong");
