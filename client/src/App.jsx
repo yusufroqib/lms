@@ -9,10 +9,10 @@ import RequireAuth from "./features/auth/RequireAuth";
 import PersistLogin from "./features/auth/PersistLogin";
 import Prefetch from "./features/auth/Prefetch";
 import CoursesIndex from "./pages/courses/CoursesIndex";
-import TutorCourses from "./pages/tutor/course/TutorCourses";
-import CreateCourse from "./pages/tutor/course/createCourse/CreateCourse";
-import EditCourse from "./pages/tutor/course/editCourse/EditCourse";
-import EditChapter from "./pages/tutor/course/editCourse/editChapter/EditChapter";
+import TutorCourses from "./pages/tutor/courses/TutorCourses";
+import CreateCourse from "./pages/tutor/courses/createCourse/CreateCourse";
+import EditCourse from "./pages/tutor/courses/editCourse/EditCourse";
+import EditChapter from "./pages/tutor/courses/editCourse/editChapter/EditChapter";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useGetTutorCoursesQuery } from "@/features/courses/coursesApiSlice";
 import { Link, useNavigate, useParams } from "react-router-dom";
-
 import { ArrowLeft, Eye, File, LayoutDashboard, Video } from "lucide-react";
 import { IconBadge } from "@/components/ui/icon-badge";
 import { Banner } from "@/components/ui/banner";
@@ -11,12 +10,6 @@ import { ChapterDescriptionForm } from "./components/ChapterDescriptionForm";
 import { ChapterAccessForm } from "./components/ChapterAccessForm";
 import { AttachmentForm } from "./components/AttachmentForm";
 import { ChapterVideoForm } from "./components/ChapterVideoForm";
-
-// import { ChapterTitleForm } from "./_components/chapter-title-form";
-// import { ChapterDescriptionForm } from "./_components/chapter-description-form";
-// import { ChapterAccessForm } from "./_components/chapter-access-form";
-// import { ChapterVideoForm } from "./_components/chapter-video-form";
-// import { ChapterActions } from "./_components/chapter-actions";
 
 const EditChapter = () => {
 	const { courseId, chapterId } = useParams();
@@ -145,7 +138,7 @@ const EditChapter = () => {
 									chapterId={chapterId}
 								/>
 							</div>
-                            
+
 							<div>
 								<div className="flex items-center gap-x-2">
 									<IconBadge icon={File} />
