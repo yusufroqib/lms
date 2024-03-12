@@ -16,9 +16,11 @@ const TutorCourses = () => {
 
 	if (isLoading) return <p>Fetching all tutor courses</p>;
 
+	const allTutorCourses = courses?.ids.map(id => courses?.entities[id]);
+
 	return (
 		<div className="p-6">
-			<DataTable columns={columns} data={courses} />
+			<DataTable columns={columns} data={allTutorCourses} />
 		</div>
 	);
 };

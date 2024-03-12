@@ -52,10 +52,13 @@ const RootLayout = () => {
 
 						{/* <!-- ===== Main Content Start ===== --> */}
 						<main className="flex flex-1">
-							<div className="mx-auto flex-grow max-w-screen-2xl p-4 md:p-6 2xl:p-10">
-								{/* {children} */}
+							<div className="w-full">
+
 								<Outlet /> {/* Render nested child routes */}
 							</div>
+							{/* <div className="mx-auto flex-grow max-w-screen-2xl p-4 md:p-6 2xl:p-10"> */}
+								{/* {children} */}
+							{/* </div> */}
 						</main>
 						{/* <!-- ===== Main Content End ===== --> */}
 					</div>
