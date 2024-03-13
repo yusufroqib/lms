@@ -13,6 +13,7 @@ import TutorCourses from "./pages/tutor/courses/TutorCourses";
 import CreateCourse from "./pages/tutor/courses/createCourse/CreateCourse";
 import EditCourse from "./pages/tutor/courses/editCourse/EditCourse";
 import EditChapter from "./pages/tutor/courses/editCourse/editChapter/EditChapter";
+import BrowseCourses from "./pages/courses/browseCourses/BrowseCourses";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
 							<Route path="dashboard" element={<Dashboard />} />
 							<Route path="courses">
 								<Route index element={<CoursesIndex />} />
+								<Route path="search" element={<BrowseCourses />} />
 							</Route>
 							<Route path="tutors">
 								<Route path="my-courses" element={<TutorCourses />} />

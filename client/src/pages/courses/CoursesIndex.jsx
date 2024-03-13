@@ -19,7 +19,7 @@ const CoursesIndex = () => {
 							Enrolled Courses
 						</h2>
 					</Link>
-					<Link to='/dashboard' className=" bg-slate-800 shadow-card-2 transition-all ease-in md:hover:bg-slate-700 md:hover:scale-110 duration-300 cursor-pointer  h-80 w-80 rounded-xl flex justify-center items-center">
+					<Link to='/courses/search' className=" bg-slate-800 shadow-card-2 transition-all ease-in md:hover:bg-slate-700 md:hover:scale-110 duration-300 cursor-pointer  h-80 w-80 rounded-xl flex justify-center items-center">
 						<h2 className="text-whiten text-3xl text-center">
 							Browse Courses Catalog
 						</h2>

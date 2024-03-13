@@ -1,11 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import LogoIcon from "../../images/logo/logo-icon.svg";
 import React from "react";
+import SearchInput from "@/components/SearchInput";
 // import DarkModeSwitcher from './DarkModeSwitcher';
 const Header = (props) => {
+	const location = useLocation();
+
+	const isSearchPage = location.pathname === "/courses/search";
+
 	return (
 		<header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
 			<div className="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
@@ -57,7 +62,12 @@ const Header = (props) => {
 						<img src={LogoIcon} alt="Logo" />
 					</Link>
 				</div>
-				<div></div>
+
+				{isSearchPage && (
+					<div className="hidden md:block">
+						<SearchInput />
+					</div>
+				)}
 
 				{/* <div className="hidden sm:block">
           <form action="https://formbold.com/s/unique_form_id" method="POST">
@@ -97,4 +107,4 @@ const Header = (props) => {
 		</header>
 	);
 };
-export default React.memo(Header)
+export default React.memo(Header);
