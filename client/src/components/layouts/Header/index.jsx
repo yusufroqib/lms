@@ -63,10 +63,12 @@ const Header = (props) => {
 					</Link>
 				</div>
 
-				{isSearchPage && (
+				{isSearchPage ? (
 					<div className="hidden md:block">
 						<SearchInput />
 					</div>
+				) : (
+					<div></div>
 				)}
 
 				{/* <div className="hidden sm:block">

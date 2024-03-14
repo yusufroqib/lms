@@ -12,12 +12,15 @@ const courseCategoriesInitialState = courseCategoriesAdapter.getInitialState();
 export const coursesApiSlice = apiSlice.injectEndpoints({
 	endpoints: (builder) => ({
 		getCourses: builder.query({
-			query: () => ({
-				url: "/courses",
-				validateStatus: (response, result) => {
-					return response.status === 200 && !result.isError;
-				},
-			}),
+			query: ({ searchParams }) => {
+				// console.log("searchQuery", searchParams);
+				return {
+					url: `/courses/search?${searchParams}`,
+					validateStatus: (response, result) => {
+						return response.status === 200 && !result.isError;
+					},
+				};
+			},
 			transformResponse: (responseData) => {
 				const allCourses = responseData.map((course) => {
 					course.id = course._id;

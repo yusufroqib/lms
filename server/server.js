@@ -12,6 +12,7 @@ const authRoutes = require("./routes/authRoutes");
 const refreshRoute = require("./routes/refresh");
 const userRoutes = require("./routes/userRoutes");
 const tutorRoutes = require("./routes/tutorRoutes");
+const courseRoutes = require("./routes/courseRoutes");
 require("./config/passport-setup");
 
 dotenv.config();
@@ -57,6 +58,7 @@ app.use("/auth", authRoutes);
 app.use("/refresh", refreshRoute);
 app.use("/users", userRoutes);
 app.use("/tutors", tutorRoutes);
+app.use('/courses', courseRoutes);
 
 mongoose
 	.connect(process.env.MONGO_URI)

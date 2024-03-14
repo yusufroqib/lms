@@ -13,7 +13,7 @@ const {
     toggleChapterPublicationStatus,
     toggleCoursePublicationStatus,
     deleteCourse
-} = require("../controllers/courseController");
+} = require("../controllers/tutorController");
 const express = require("express");
 const verifyJWT = require("../middleware/verifyJWT");
 const verifyRoles = require("../middleware/verifyRoles");
