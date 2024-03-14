@@ -9,11 +9,14 @@ export const CoursesList = ({ items }) => {
 						key={item.id}
 						id={item.id}
 						title={item.title}
-						imageUrl={item.imageUrl}
+                        tutor={item.tutor}
+						imageUrl={item.courseImage}
 						chaptersLength={item.chapters.length}
 						price={item.price}
 						progress={item.progress}
 						category={item?.category?.name}
+                        reviews={item.reviews}
+                        averageRating={item.averageRating}
 					/>
 				))}
 			</div>

@@ -27,6 +27,14 @@ body,
 	border-radius: 20px;
   }
 
+  .two-line-truncate {
+	-webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
 @layer base {
   .no-tailwindcss-base, .no-tailwindcss-base * , .no-tailwindcss-base > * {
       font-size: revert;

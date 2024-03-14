@@ -95,6 +95,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "TutorCourse", id: arg.id },
+				{ type: "Course", id: "LIST" },
 			],
 			onQueryStarted: (arg, { dispatch, queryFulfilled }) => {
 				const patchResult = dispatch(
@@ -119,6 +120,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "TutorCourse", id: arg.id },
+				{ type: "Course", id: "LIST" },
 			],
 		}),
 		updateCategory: builder.mutation({
@@ -129,6 +131,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "TutorCourse", id: arg.id },
+				{ type: "Course", id: "LIST" },
 			],
 		}),
 		toggleCoursePublish: builder.mutation({
@@ -138,6 +141,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "TutorCourse", id: arg.id },
+				{ type: "Course", id: "LIST" },
 			],
 		}),
 		createChapter: builder.mutation({
@@ -177,6 +181,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "TutorCourse", id: arg.courseId },
+				{ type: "Course", id: "LIST" },
 			],
 		}),
 		deleteChapter: builder.mutation({
@@ -187,6 +192,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "TutorCourse", id: arg.courseId },
+				{ type: "Course", id: "LIST" },
 			],
 		}),
 
