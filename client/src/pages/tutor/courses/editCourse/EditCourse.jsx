@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import { CircleDollarSign, File, ListChecks } from "lucide-react";
 import { PriceForm } from "./components/PriceForm";
 import { ChaptersForm } from "./components/ChaptersForm";
+import { PreviewVideoForm } from "./components/PreviewVideo";
 // import { DescriptionForm } from "./components/DescForm";
 
 const EditCourse = () => {
@@ -60,6 +61,7 @@ const EditCourse = () => {
 			course.title,
 			course.description,
 			course.courseImage,
+			course.previewVideoUrl,
 			// course.price,
 			course.categoryId,
 			course.chapters?.some((chapter) => chapter.isPublished),
@@ -134,6 +136,7 @@ const EditCourse = () => {
 								</div>
 								<PriceForm initialData={course} courseId={course.id} />
 							</div>
+							<PreviewVideoForm initialData={course} courseId={course.id}/>
 						
 						</div>
 					</div>

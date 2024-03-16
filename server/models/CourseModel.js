@@ -78,6 +78,9 @@ const courseSchema = new Schema(
 		courseImage: {
 			type: String,
 		},
+		previewVideoUrl: {
+			type:String
+		},
 		categoryId: {
 			type: Schema.Types.ObjectId,
 			ref: "Category",
