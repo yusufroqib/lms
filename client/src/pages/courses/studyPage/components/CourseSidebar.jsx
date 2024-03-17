@@ -4,9 +4,11 @@
 import useAuth from "@/hooks/useAuth";
 import { CourseProgress } from "./CourseProgress";
 import { CourseSidebarItem } from "./CourseSidebarItem";
+import React from "react";
 
-export const CourseSidebar = async ({ course, progressCount, purchase }) => {
-	const { username, isTutor, isAdmin, _id: userId } = useAuth();
+const CourseSidebar = ({ course, progressCount, purchase }) => {
+	// console.log("Course: ", course);
+	// const { username, isTutor, isAdmin, _id: userId } = useAuth();
 	// if (!userId) {
 	// 	return redirect("/");
 	// }
@@ -18,28 +20,32 @@ export const CourseSidebar = async ({ course, progressCount, purchase }) => {
 	// 		},
 	// 	},
 	// });
-	return (
-		<div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
-			<div className="p-8 flex flex-col border-b">
-				<h1 className="font-semibold">{course.title}</h1>
-				{purchase && (
-					<div className="mt-10">
-						<CourseProgress variant="success" value={progressCount} />
-					</div>
-				)}
-			</div>
-			<div className="flex flex-col w-full">
-				{course.chapters.map((chapter) => (
+	if (course) {
+		return (
+			<div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
+				<div className="p-8 flex flex-col border-b">
+					<h1 className="font-semibold">{course.title}</h1>
+					{purchase && (
+						<div className="mt-10">
+							<CourseProgress variant="success" value={progressCount} />
+						</div>
+					)}
+				</div>
+				<div className="flex flex-col w-full">
+					{course.chapters.map((chapter) => (
 					<CourseSidebarItem
-						key={chapter.id}
-						id={chapter.id}
+						key={chapter._id}
+						id={chapter._id}
 						label={chapter.title}
 						isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
 						courseId={course.id}
 						isLocked={!chapter.isFree && !purchase}
 					/>
 				))}
+				</div>
 			</div>
-		</div>
-	);
+		);
+	}
 };
+
+export default React.memo(CourseSidebar)

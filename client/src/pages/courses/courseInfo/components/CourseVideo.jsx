@@ -12,9 +12,9 @@ const CourseVideo = ({
 	courseImage,
 	courseId,
 	isPurchased,
-	firstChapter
+	firstChapter,
 }) => {
-	const navigate = useNavigate()
+	const navigate = useNavigate();
 	const [purchaseCourse, { isLoading, isError, isSuccess, error }] =
 		usePurchaseCourseMutation();
 
@@ -37,7 +37,7 @@ const CourseVideo = ({
 			// await purchaseCourse({ courseId }).unwrap();
 			// await axios.patch(`/api/courses/${courseId}`, values);
 			// toast.success("Course purchased successfully");
-			navigate(`/study/${courseId}/chapter/${firstChapter._id}`)
+			navigate(`/study/${courseId}/chapter/${firstChapter._id}`);
 
 			// router.refresh();
 		} catch {
@@ -48,8 +48,9 @@ const CourseVideo = ({
 		<div className="p-2 border border-gray-600 rounded-xl">
 			<div className="relative aspect-video">
 				<video
+					className="min-w-full"
 					poster={courseImage}
-					className="h-full w-full"
+					// className="h-full w-full"
 					controls
 					src={previewVideoUrl}
 				/>

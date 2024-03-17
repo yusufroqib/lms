@@ -4,9 +4,11 @@ import { apiSlice } from "@/app/api/apiSlice";
 const coursesAdapter = createEntityAdapter({});
 const tutorCoursesAdapter = createEntityAdapter({});
 const courseCategoriesAdapter = createEntityAdapter({});
+const enrolledCoursesAdapter = createEntityAdapter({});
 
 const initialState = coursesAdapter.getInitialState();
 const tutorInitialState = tutorCoursesAdapter.getInitialState();
+const enrolledInitialState = enrolledCoursesAdapter.getInitialState();
 const courseCategoriesInitialState = courseCategoriesAdapter.getInitialState();
 
 export const coursesApiSlice = apiSlice.injectEndpoints({
@@ -79,7 +81,32 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				} else return [{ type: "TutorCourse", id: "LIST" }];
 			},
 		}),
+		getEnrolledCourses: builder.query({
+			query: () => ({
+				url: `/courses/all-enrolled`,
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+			transformResponse: (responseData) => {
+				const enrolledCourses = responseData.enrolledCourses.map((course) => {
+					course.id = course._id;
+					return course;
+				});
+				return enrolledCoursesAdapter.setAll(enrolledInitialState, enrolledCourses);
+			},
+
+			providesTags: (result, error, arg) => {
+				if (result?.ids) {
+					return [
+						{ type: "EnrolledCourse", id: "LIST" },
+						...result.ids.map((id) => ({ type: "EnrolledCourse", id })),
+					];
+				} else return [{ type: "EnrolledCourse", id: "LIST" }];
+			},
+		}),
 		// getCourseWithProgress:
+
 		createCourseTitle: builder.mutation({
 			query: (data) => ({
 				url: "/tutors/create-title",
@@ -232,6 +259,7 @@ export const {
 	useGetCoursesQuery,
 	useGetCourseCategoriesQuery,
 	useGetTutorCoursesQuery,
+	useGetEnrolledCoursesQuery,
 	useCreateCourseTitleMutation,
 	useUpdateCourseMutation,
 	useDeleteCourseMutation,

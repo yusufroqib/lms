@@ -156,49 +156,50 @@ const updateCourseCategory = async (req, res) => {
 
 const createChapter = async (req, res) => {
 	try {
-		const userId = req.userId; // Assuming you have user information stored in req.user after authentication
-		const { title } = req.body;
-
-		// Check if userId exists
-		if (!userId) {
-			return res.status(401).json({ message: "Unauthorized" });
-		}
-
-		// Check if the course exists and the user is the owner
-		const courseOwner = await Course.findOne({
-			_id: req.params.id,
-			tutor: userId,
-		});
-		if (!courseOwner) {
-			return res.status(401).json({ message: "Unauthorized" });
-		}
-
-		// Find the last chapter and determine the position for the new chapter
-		const lastChapterPosition =
-			courseOwner.chapters.length > 0
-				? courseOwner.chapters[courseOwner.chapters.length - 1].position
-				: 0;
-		const newPosition = lastChapterPosition + 1;
-
-		const isFree = courseOwner.price ? false : true;
-
-		// Create the new chapter
-		const newChapter = {
-			title,
-			isFree,
-			position: newPosition,
-		};
-
-		// Add the newly created chapter to the course's chapters array
-		courseOwner.chapters.push(newChapter);
-		await courseOwner.save();
-
-		return res.json(newChapter);
+	  const userId = req.userId; // Assuming you have user information stored in req.user after authentication
+	  const { title } = req.body;
+  
+	  // Check if userId exists
+	  if (!userId) {
+		return res.status(401).json({ message: "Unauthorized" });
+	  }
+  
+	  // Check if the course exists and the user is the owner
+	  const courseOwner = await Course.findOne({
+		_id: req.params.id,
+		tutor: userId,
+	  });
+	  if (!courseOwner) {
+		return res.status(401).json({ message: "Unauthorized" });
+	  }
+  
+	  // Determine the position for the new chapter
+	  let newPosition = 0;
+	  if (courseOwner.chapters.length > 0) {
+		const lastChapterPosition = courseOwner.chapters[courseOwner.chapters.length - 1].position;
+		newPosition = lastChapterPosition + 1;
+	  }
+  
+	  const isFree = courseOwner.price ? false : true;
+  
+	  // Create the new chapter
+	  const newChapter = {
+		title,
+		isFree,
+		position: newPosition,
+	  };
+  
+	  // Add the newly created chapter to the course's chapters array
+	  courseOwner.chapters.push(newChapter);
+	  await courseOwner.save();
+  
+	  return res.json(newChapter);
 	} catch (error) {
-		console.log("[CHAPTERS]", error);
-		return res.status(500).json({ message: "Internal Error" });
+	  console.error("[CHAPTERS]", error);
+	  return res.status(500).json({ message: "Internal Error" });
 	}
-};
+  };
+  
 
 const reorderChapters = async (req, res) => {
 	try {
