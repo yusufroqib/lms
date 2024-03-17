@@ -79,6 +79,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				} else return [{ type: "TutorCourse", id: "LIST" }];
 			},
 		}),
+		// getCourseWithProgress:
 		createCourseTitle: builder.mutation({
 			query: (data) => ({
 				url: "/tutors/create-title",
@@ -216,6 +217,14 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				{ type: "TutorCourse", id: arg.courseId },
 			],
 		}),
+		purchaseCourse: builder.mutation({
+			query: ({courseId}) => ({
+				url: `/courses/${courseId}/purchase`,
+				method: "POST",
+				
+			}),
+			invalidatesTags: [{ type: "Course", id: "LIST" }],
+		}),
 	}),
 });
 
@@ -235,6 +244,7 @@ export const {
 	useUpdateChapterAttachmentMutation,
 	useDeleteChapterAttachmentMutation,
 	useToggleCoursePublishMutation,
+	usePurchaseCourseMutation,
 } = coursesApiSlice;
 
 // export const selectallCoursesResult = coursesApiSlice.endpoints.getCourses.select();

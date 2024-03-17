@@ -12,6 +12,7 @@ import {
 	Tab,
 	TabPanel,
 } from "@material-tailwind/react";
+import PreviewChaptersList from "./components/PreviewChaptersList";
 
 const data = [
 	{
@@ -25,7 +26,7 @@ const data = [
 	{
 		label: "Reviews",
 		value: "reviews",
-    }
+	},
 ];
 
 const CourseInfo = () => {
@@ -72,6 +73,7 @@ const CourseInfo = () => {
 		return <Navigate to={"/dashboard"} />;
 	}
 	if (isSuccess && course) {
+        const isPurchased= course.purchasedBy.some(item => item.user === _id)
 		return (
 			<div className=" flex overflow-hidden">
 				<div className="w-full xl:w-3/5 h-full overflow-y-auto   p-6 pr-8 z-9">
@@ -106,11 +108,14 @@ const CourseInfo = () => {
 						<hr className="border-gray-400 mb-8" />
 
 						{windowWidth < 1280 && (
-							<div class="w-full sm:w-[90%] md:w-[75%] mx-auto mb-8 ">
+							<div className="w-full sm:w-[90%] md:w-[75%] mx-auto mb-8 ">
 								<CourseVideo
 									courseImage={course.courseImage}
 									price={course.price}
 									previewVideoUrl={course.previewVideoUrl}
+                                    courseId={course._id}
+                                    isPurchased={isPurchased}
+                                    firstChapter={course.chapters[0]}
 								/>
 							</div>
 						)}
@@ -137,17 +142,37 @@ const CourseInfo = () => {
 											{parse(course.description)}
 										</div>
 									</TabPanel>
+									
+									<TabPanel key={"chapters"} value={"chapters"}>
+										<div className="">
+											<div>
+                                                <h4>These chapters have been published within this course. Only those marked as 'free' are accessible without purchase. To gain access to all chapters, purchase the course.</h4>
+                                                <div>
+                                                    <PreviewChaptersList chapters={course.chapters} isPurchased={isPurchased}/>
+                                                </div>
+                                                </div>
+										</div>
+									</TabPanel>
+                                    <TabPanel key={"reviews"} value={"reviews"}>
+										<div className="">
+											{/* {parse(course.description)} */}
+										</div>
+									</TabPanel>
 								</TabsBody>
 							</Tabs>
 						</div>
 					</div>
 				</div>
 				{windowWidth >= 1280 && (
-					<div class="w-2/5 h-screen fixed lg:pl-30 top-26 right-7  ">
+					<div className="w-2/5 h-screen fixed lg:pl-30 top-26 right-7  ">
 						<CourseVideo
 							courseImage={course.courseImage}
 							price={course.price}
 							previewVideoUrl={course.previewVideoUrl}
+                            courseId={course._id}
+                            isPurchased={isPurchased}
+                            firstChapter={course.chapters[0]}
+
 						/>
 					</div>
 				)}

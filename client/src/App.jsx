@@ -15,6 +15,7 @@ import EditCourse from "./pages/tutor/courses/editCourse/EditCourse";
 import EditChapter from "./pages/tutor/courses/editCourse/editChapter/EditChapter";
 import BrowseCourses from "./pages/courses/browseCourses/BrowseCourses";
 import CourseInfo from "./pages/courses/courseInfo/CourseInfo";
+import StudyPage from "./pages/courses/studyPage/StudyPage";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -38,9 +39,16 @@ function App() {
 								<Route path="my-courses" element={<TutorCourses />} />
 								<Route path="create-course" element={<CreateCourse />} />
 								<Route path="edit-course/:courseId" element={<EditCourse />} />
-								<Route path="edit-course/:courseId/chapter/:chapterId" element={<EditChapter />} />
+								<Route
+									path="edit-course/:courseId/chapter/:chapterId"
+									element={<EditChapter />}
+								/>
 							</Route>
 						</Route>
+						<Route
+							path="/study/:courseId/chapter/:chapterId"
+							element={<StudyPage />}
+						/>
 					</Route>
 				</Route>
 			</Route>
