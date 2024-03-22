@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { downvoteAnswer, upvoteAnswer } from "@/lib/actions/answer.action";
-import { viewQuestion } from "@/lib/actions/interaction.action";
-import { downvoteQuestion, upvoteQuestion } from "@/lib/actions/question.action";
-import { toggleSaveQuestion } from "@/lib/actions/user.action";
+import { downvoteReply, upvoteReply } from "@/lib/actions/reply.action";
+import { viewPost } from "@/lib/actions/interaction.action";
+import { downvotePost, upvotePost } from "@/lib/actions/post.action";
+import { toggleSavePost } from "@/lib/actions/user.action";
 import { formatAndDivideNumber } from "@/lib/utils";
 import { toast } from "../ui/use-toast";
 
@@ -12,13 +12,13 @@ const Votes = ({ type, itemId, userId, upvotes, hasupVoted, downvotes, hasdownVo
     const pathname = location.pathname;
 
     const handleSave = async () => {
-        await toggleSaveQuestion({
+        await toggleSavePost({
             userId: JSON.parse(userId),
-            questionId: JSON.parse(itemId),
+            postId: JSON.parse(itemId),
             path: pathname,
         });
         return toast({
-            title: `Question ${!hasupVoted ? "Saved in" : "Removed from"} your collection`,
+            title: `Post ${!hasupVoted ? "Saved in" : "Removed from"} your collection`,
             variant: !hasSaved ? "default" : "destructive",
         });
     };
@@ -31,17 +31,17 @@ const Votes = ({ type, itemId, userId, upvotes, hasupVoted, downvotes, hasdownVo
             });
         }
         if (action === "upvote") {
-            if (type === "Question") {
-                await upvoteQuestion({
-                    questionId: JSON.parse(itemId),
+            if (type === "Post") {
+                await upvotePost({
+                    postId: JSON.parse(itemId),
                     userId: JSON.parse(userId),
                     hasupVoted,
                     hasdownVoted,
                     path: pathname,
                 });
-            } else if (type === "Answer") {
-                await upvoteAnswer({
-                    answerId: JSON.parse(itemId),
+            } else if (type === "Reply") {
+                await upvoteReply({
+                    replyId: JSON.parse(itemId),
                     userId: JSON.parse(userId),
                     hasupVoted,
                     hasdownVoted,
@@ -54,17 +54,17 @@ const Votes = ({ type, itemId, userId, upvotes, hasupVoted, downvotes, hasdownVo
             });
         }
         if (action === "downvote") {
-            if (type === "Question") {
-                await downvoteQuestion({
-                    questionId: JSON.parse(itemId),
+            if (type === "Post") {
+                await downvotePost({
+                    postId: JSON.parse(itemId),
                     userId: JSON.parse(userId),
                     hasupVoted,
                     hasdownVoted,
                     path: pathname,
                 });
-            } else if (type === "Answer") {
-                await downvoteAnswer({
-                    answerId: JSON.parse(itemId),
+            } else if (type === "Reply") {
+                await downvoteReply({
+                    replyId: JSON.parse(itemId),
                     userId: JSON.parse(userId),
                     hasupVoted,
                     hasdownVoted,
@@ -79,8 +79,8 @@ const Votes = ({ type, itemId, userId, upvotes, hasupVoted, downvotes, hasdownVo
     };
 
     useEffect(() => {
-        viewQuestion({
-            questionId: JSON.parse(itemId),
+        viewPost({
+            postId: JSON.parse(itemId),
             userId: userId ? JSON.parse(userId) : undefined,
         });
     }, [itemId, userId, pathname]);
@@ -105,7 +105,7 @@ const Votes = ({ type, itemId, userId, upvotes, hasupVoted, downvotes, hasdownVo
                     </div>
                 </div>
             </div>
-            {type === "Question" && (
+            {type === "Post" && (
                 <img src={hasSaved ? "/assets/icons/star-filled.svg" : "/assets/icons/star-red.svg"} width={18} height={18} alt="star" className="cursor-pointer" onClick={handleSave} />
             )}
         </div>

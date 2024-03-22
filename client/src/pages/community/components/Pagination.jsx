@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { formUrlQuery } from "@/lib/utils";
 
 const Pagination = ({ pageNumber, isNext }) => {

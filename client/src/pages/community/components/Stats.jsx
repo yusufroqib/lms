@@ -13,7 +13,7 @@ const StatsCard = ({ imgUrl, value, title }) => {
     );
 };
 
-const Stats = ({ reputation, totalQuestions, totalAnswers, badges }) => {
+const Stats = ({ reputation, totalPosts, totalReplies, badges }) => {
     return (
         <div className="mt-10">
             <h4 className="h3-semibold text-dark200_light900">Stats- {reputation}</h4>
@@ -21,15 +21,15 @@ const Stats = ({ reputation, totalQuestions, totalAnswers, badges }) => {
                 <div className="light-border background-light900_dark300 flex flex-wrap items-center justify-evenly gap-4 rounded-md border p-6 shadow-light-300 dark:shadow-dark-200">
                     <div>
                         <p className="paragraph-semibold text-dark200_light900">
-                            {formatAndDivideNumber(totalQuestions)}
+                            {formatAndDivideNumber(totalPosts)}
                         </p>
-                        <p className="body-medium text-dark400_light700">Questions</p>
+                        <p className="body-medium text-dark400_light700">Posts</p>
                     </div>
                     <div>
                         <p className="paragraph-semibold text-dark200_light900">
-                            {formatAndDivideNumber(totalAnswers)}
+                            {formatAndDivideNumber(totalReplies)}
                         </p>
-                        <p className="body-medium text-dark400_light700">Answers</p>
+                        <p className="body-medium text-dark400_light700">Replies</p>
                     </div>
                 </div>
                 <StatsCard imgUrl="../assets/icons/gold-medal.svg" value={badges.GOLD} title="Gold Badges" />

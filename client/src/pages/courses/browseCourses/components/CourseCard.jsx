@@ -28,8 +28,8 @@ const CourseCard = ({
 	category,
 	averageRating,
 }) => {
-	console.log(reviews);
-	console.log(averageRating);
+	// console.log(reviews);
+	// console.log(averageRating);
 	return (
 		<Card className=" hover:bg-gray-100 transition overflow-hidden">
 			<CardHeader

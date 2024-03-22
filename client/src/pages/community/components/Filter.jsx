@@ -1,54 +1,42 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { deleteAnswer } from "@/lib/actions/answer.action";
-import { deleteQuestion } from "@/lib/actions/question.action";
+import { Select, SelectContent, SelectItem, SelectGroup, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formUrlQuery } from "@/lib/utils";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
-const EditDeleteAction = ({ type, itemId }) => {
+const Filter = ({ filters, otherClasses, containerClasses }) => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
+    const paramFilter = searchParams.get("filter");
 
-    const handleEdit = () => {
-        navigate(`/question/edit/${JSON.parse(itemId)}`);
-    };
-
-    const handleDelete = async () => {
-        if (type === "Question") {
-            // Delete question
-            await deleteQuestion({
-                questionId: JSON.parse(itemId),
-                path: window.location.pathname,
-            });
-        } else if (type === "Answer") {
-            // Delete answer
-            await deleteAnswer({
-                answerId: JSON.parse(itemId),
-                path: window.location.pathname,
-            });
-        }
+    const handleUpdateParams = (value) => {
+        const newUrl = formUrlQuery({
+            params: searchParams.toString(),
+            key: "filter",
+            value,
+        });
+        navigate(newUrl, { replace: true });
     };
 
     return (
-        <div className="flex items-center justify-end gap-3 max-sm:w-full">
-            {type === "Question" && (
-                <img
-                    src="/assets/icons/edit.svg"
-                    alt="Edit"
-                    width={14}
-                    height={14}
-                    className="cursor-pointer object-contain"
-                    onClick={handleEdit}
-                />
-            )}
-
-            <img
-                src="/assets/icons/trash.svg"
-                alt="Delete"
-                width={14}
-                height={14}
-                className="cursor-pointer object-contain"
-                onClick={handleDelete}
-            />
+        <div className={`relative ${containerClasses}`}>
+            <Select onValueChange={handleUpdateParams} defaultValue={paramFilter || undefined}>
+                <SelectTrigger className={`${otherClasses} body-regular light-border background-light800_dark300 text-dark500_light700 border px-5 py-2.5`}>
+                    <div className="line-clamp-1 flex-1 text-left">
+                        <SelectValue placeholder="Select a Filter"/>
+                    </div>
+                </SelectTrigger>
+                <SelectContent className="text-dark500_light700 small-regular border-none bg-light-900 dark:bg-dark-300">
+                    <SelectGroup>
+                        {filters.map((item) => (
+                            <SelectItem key={item.value} value={item.value} className="cursor-pointer focus:bg-light-800 dark:focus:bg-dark-400">
+                                {item.name}
+                            </SelectItem>
+                        ))}
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
         </div>
     );
 };
 
-export default EditDeleteAction;
+export default Filter;

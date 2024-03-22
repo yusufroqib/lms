@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getTopInteractedTags } from "@/lib/actions/tag.actions";
-import Image from "next/image";
-import { Badge } from "../ui/badge";
-import RenderTag from "../shared/RenderTag";
+// import Image from "next/image";
+import RenderTag from "../RenderTag";
+import { Badge } from "@/components/ui/badge";
 
 const UserCard = ({ user }) => {
     const [interactedTags, setInteractedTags] = useState([]);
@@ -20,7 +20,7 @@ const UserCard = ({ user }) => {
     return (
         <Link to={`/profile/${user.clerkId}`} className="shadow-light100_darknone w-full max-xs:min-w-full xs:w-[260px]">
             <article className="background-light900_dark200 light-border flex w-full flex-col items-center justify-center rounded-2xl border p-8">
-                <Image src={user.picture} alt="user profile picture" width={100} height={100} className="rounded-full"/>
+                <img src={user.picture} alt="user profile picture" width={100} height={100} className="rounded-full"/>
                 <div className="mt-4 text-center">
                     <h3 className="h3-bold text-dark200_light900 line-clamp-1">
                         {user.name}
