@@ -16,6 +16,10 @@ import EditChapter from "./pages/tutor/courses/editCourse/editChapter/EditChapte
 import BrowseCourses from "./pages/courses/browseCourses/BrowseCourses";
 import CourseInfo from "./pages/courses/courseInfo/CourseInfo";
 import StudyPage from "./pages/courses/studyPage/StudyPage";
+import StudyIndex from "./pages/courses/studyPage/StudyIndex";
+import EnrolledCourses from "./pages/courses/enrolledCourses/EnrolledCourses";
+import Feeds from "./pages/community/feeds/Feeds";
+import CommunityLayout from "./pages/community/CommunityLayout";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -34,6 +38,7 @@ function App() {
 								<Route index element={<CoursesIndex />} />
 								<Route path="search" element={<BrowseCourses />} />
 								<Route path=":courseId/info" element={<CourseInfo />} />
+								<Route path="enrolled-courses" element={<EnrolledCourses />} />
 							</Route>
 							<Route path="tutors">
 								<Route path="my-courses" element={<TutorCourses />} />
@@ -44,11 +49,21 @@ function App() {
 									element={<EditChapter />}
 								/>
 							</Route>
+							<Route path="community" element={<CommunityLayout/>}>
+								<Route path="feeds" element={<Feeds />} />
+								{/* <Route path="create-course" element={<CreateCourse />} />
+								<Route path="edit-course/:courseId" element={<EditCourse />} />
+								<Route
+									path="edit-course/:courseId/chapter/:chapterId"
+									element={<EditChapter />}
+								/> */}
+							</Route>
 						</Route>
-						<Route
-							path="/study/:courseId/chapter/:chapterId"
-							element={<StudyPage />}
-						/>
+						<Route path="study/:courseId">
+							<Route index element={<StudyIndex />} />
+
+							<Route path="chapter/:chapterId" element={<StudyPage />} />
+						</Route>
 					</Route>
 				</Route>
 			</Route>

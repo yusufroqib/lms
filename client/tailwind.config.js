@@ -7,15 +7,19 @@ export default withMT({
 	darkMode: "class",
 	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 	theme: {
-		screens: {
-			"2xsm": "375px",
-			xsm: "425px",
-			"3xl": "2000px",
-			...defaultTheme.screens,
-		},
 		extend: {
+			screens: {
+				"2xsm": "375px",
+				xsm: "425px",
+				...defaultTheme.screens,
+				"3xl": "2000px",
+				'max-sm': { max: '639px' }, // Add custom max-sm breakpoint
+				'max-md': { max: '767px' }, // Add custom max-md breakpoint
+				'max-lg': { max: '1023px' }, // Add custom max-lg breakpoint
+				'max-xl': { max: '1279px' }, // Add custom max-xl breakpoint
+				'max-2xl': { max: '1535px' }, // Add custom max-2xl breakpoint
+			},
 			// colors: {
-			// 	//just add this below and your all other tailwind colors willwork
 			// 	...colors,
 			// },
 			colors: {
@@ -62,6 +66,8 @@ export default withMT({
 				primary: {
 					DEFAULT: "hsl(var(--primary))",
 					foreground: "hsl(var(--primary-foreground))",
+					500: "#FF7000",
+					100: "#FFF1E6",
 				},
 				secondary: {
 					DEFAULT: "hsl(var(--secondary))",
@@ -87,6 +93,22 @@ export default withMT({
 					DEFAULT: "hsl(var(--card))",
 					foreground: "hsl(var(--card-foreground))",
 				},
+				dark: {
+					100: "#000000",
+					200: "#0F1117",
+					300: "#151821",
+					400: "#212734",
+					500: "#101012",
+				},
+				light: {
+					900: "#FFFFFF",
+					800: "#F4F6F8",
+					850: "#FDFDFD",
+					700: "#DCE3F1",
+					500: "#7B8EC8",
+					400: "#858EAD",
+				},
+				"accent-blue": "#1DA1F2",
 			},
 			borderRadius: {
 				lg: "var(--radius)",
@@ -271,6 +293,12 @@ export default withMT({
 				6: "0px 3px 15px rgba(0, 0, 0, 0.1)",
 				7: "-5px 0 0 #313D4A, 5px 0 0 #313D4A",
 				8: "1px 0 0 #313D4A, -1px 0 0 #313D4A, 0 1px 0 #313D4A, 0 -1px 0 #313D4A, 0 3px 13px rgb(0 0 0 / 8%)",
+				"light-100":
+					"0px 12px 20px 0px rgba(184, 184, 184, 0.03), 0px 6px 12px 0px rgba(184, 184, 184, 0.02), 0px 2px 4px 0px rgba(184, 184, 184, 0.03)",
+				"light-200": "10px 10px 20px 0px rgba(218, 213, 213, 0.10)",
+				"light-300": "-10px 10px 20px 0px rgba(218, 213, 213, 0.10)",
+				"dark-100": "0px 2px 10px 0px rgba(46, 52, 56, 0.10)",
+				"dark-200": "2px 0px 20px 0px rgba(39, 36, 36, 0.04)",
 			},
 			dropShadow: {
 				1: "0px 1px 0px #E2E8F0",
@@ -301,5 +329,5 @@ export default withMT({
 			},
 		},
 	},
-	plugins: [require("daisyui"), require("tailwindcss-animate")],
+	plugins: [require("daisyui"), require("tailwindcss-animate"), require("@tailwindcss/typography")],
 });

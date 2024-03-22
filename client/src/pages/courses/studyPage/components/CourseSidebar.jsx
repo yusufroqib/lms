@@ -2,7 +2,7 @@
 // import { redirect } from "next/navigation";
 // import { db } from "@/lib/db";
 import useAuth from "@/hooks/useAuth";
-import { CourseProgress } from "./CourseProgress";
+import { CourseProgress } from "@/components/ui/CourseProgress";
 import { CourseSidebarItem } from "./CourseSidebarItem";
 import React from "react";
 

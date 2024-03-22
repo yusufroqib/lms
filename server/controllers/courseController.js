@@ -1,6 +1,8 @@
 const Course = require("../models/CourseModel");
 const Category = require("../models/CategoryModel");
 const User = require("../models/userModel");
+const StripeCustomer = require("../models/StripeCustomerModel");
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const browseAllCourses = async (req, res) => {
 	try {
@@ -87,20 +89,119 @@ const purchaseCourse = async (req, res) => {
 				.json({ message: "User is already enrolled in this course" });
 		}
 
-		// Mark the course as purchased for the user
-		course.purchasedBy.push({ user: userId, amount: course.price });
-		await course.save();
+		const line_items = [
+			{
+				price_data: {
+					currency: "USD",
+					product_data: {
+						name: course.title,
+					},
+					unit_amount: Math.round(course.price * 100),
+				},
+				quantity: 1,
+			},
+		];
 
-		// Add the course to the enrolledCourses array in the user model
-		user.enrolledCourses.push(courseId);
-		await user.save();
+		let stripeCustomer = await StripeCustomer.findOne({ userId });
+		if (!stripeCustomer) {
+			const customer = await stripe.customers.create({
+				email: user.email,
+			});
+			stripeCustomer = await StripeCustomer.create({
+				userId,
+				stripeCustomerId: customer.id,
+			});
+		}
 
-		res
-			.status(200)
-			.json({ message: "Course purchased and enrolled successfully" });
+		// Create checkout session
+		const session = await stripe.checkout.sessions.create({
+			customer: stripeCustomer.stripeCustomerId,
+			line_items,
+			mode: "payment",
+			success_url: `http://localhost:5173/study/${courseId}?success=1`,
+			cancel_url: `http://localhost:5173/courses/${courseId}/info?canceled=1`,
+			metadata: {
+				courseId,
+				userId,
+			},
+		});
+
+		// console.log(session)
+
+		// res.json({ url: session.url });
+		res.json({ url: session.url });
+
+		// // Mark the course as purchased for the user
+		// course.purchasedBy.push({ user: userId, amount: course.price });
+		// await course.save();
+
+		// // Add the course to the enrolledCourses array in the user model
+		// user.enrolledCourses.push(courseId);
+		// await user.save();
+
+		// res
+		// 	.status(200)
+		// 	.json({ message: "Course purchased and enrolled successfully" });
 	} catch (error) {
 		console.error("[PURCHASE_COURSE]", error);
 		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const handleStripeWebhook = async (req, res, next) => {
+	try {
+		// console.log(req)
+		const { body, headers } = req;
+		const signature = headers["stripe-signature"];
+		//   console.log('body', body)
+		//   console.log('headers', headers)
+		//   console.log('signature', signature)
+
+		let event;
+		try {
+			event = stripe.webhooks.constructEvent(
+				body,
+				signature,
+				process.env.STRIPE_WEBHOOK_SECRET
+			);
+			// console.log(event)
+		} catch (error) {
+			// console.log('error', error)
+			return res.status(400).send(`Webhook Error: ${error.message}`);
+		}
+
+		const session = event.data.object;
+		const userId = session?.metadata?.userId;
+		const courseId = session?.metadata?.courseId;
+		//   console.log(session)
+		//   console.log(userId)
+		//   console.log(courseId)
+
+		const course = await Course.findById(courseId);
+		const user = await User.findById(userId);
+
+		if (event.type === "checkout.session.completed") {
+			if (!userId || !courseId) {
+				return res.status(400).send("Webhook Error: Missing metadata");
+			}
+			course.purchasedBy.push({ user: userId, amount: course.price });
+			await course.save();
+
+			// Add the course to the enrolledCourses array in the user model
+			user.enrolledCourses.push(courseId);
+			await user.save();
+
+			// await Purchase.create({ courseId, userId });
+		} else {
+			return res
+				.status(200)
+				.send(`Webhook Error: Unhandled event type ${event.type}`);
+		}
+
+		res.status(200).send();
+	} catch (error) {
+		console.error("[HANDLE_STRIPE_WEBHOOK]", error);
+		res.status(500).send("Internal server error");
 	}
 };
 
@@ -109,7 +210,13 @@ const getEnrolledCoursesWithProgress = async (req, res) => {
 		const userId = req.userId; // Assuming you have user information stored in req.user after authentication
 
 		// Find the user by their ID and populate the enrolledCourses field
-		const user = await User.findById(userId).populate("enrolledCourses");
+		const user = await User.findById(userId).populate({
+			path: "enrolledCourses",
+			populate: {
+				path: "tutor",
+				select: "name avatar", // Populate tutor field with name and avatar
+			},
+		});
 
 		if (!user) {
 			return res.status(404).json({ message: "User not found" });
@@ -180,4 +287,5 @@ module.exports = {
 	browseAllCourses,
 	purchaseCourse,
 	getEnrolledCoursesWithProgress,
+	handleStripeWebhook,
 };

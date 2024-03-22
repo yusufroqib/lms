@@ -5,6 +5,8 @@ import React from "react";
 import { usePurchaseCourseMutation } from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+// import {loadStripe} from '@stripe/stripe-js';
+
 
 const CourseVideo = ({
 	previewVideoUrl,
@@ -18,13 +20,22 @@ const CourseVideo = ({
 	const [purchaseCourse, { isLoading, isError, isSuccess, error }] =
 		usePurchaseCourseMutation();
 
-	console.log(courseId);
+	// console.log(courseId);
 	const handlePurchase = async () => {
 		try {
+
 			// console.log(values);
-			await purchaseCourse({ courseId }).unwrap();
+			const response = await purchaseCourse({ courseId }).unwrap();
+			// console.log(sessionId)
+
+			// const result = stripe.redirectToCheckout({
+			// 	sessionId: sessionId.id,
+			// });
+
+			window.location.assign(response.url);
+
 			// await axios.patch(`/api/courses/${courseId}`, values);
-			toast.success("Course purchased successfully");
+			// toast.success("Course purchased successfully");
 
 			// router.refresh();
 		} catch {
@@ -46,10 +57,10 @@ const CourseVideo = ({
 	};
 	return (
 		<div className="p-2 border border-gray-600 rounded-xl">
-			<div className="relative aspect-video">
+			<div className="relative min-w-full aspect-video">
 				<video
-					className="min-w-full"
-					poster={courseImage}
+					className="w-full"
+					// poster={courseImage}
 					// className="h-full w-full"
 					controls
 					src={previewVideoUrl}

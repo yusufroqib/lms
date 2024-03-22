@@ -87,7 +87,7 @@ const PreviewDialog = ({
 				<DialogBody className=" overflow-scroll max-h-[42rem] ">
 					<div className="flex flex-col  mx-auto">
 						<div className="p-4">
-							<video controls src={chapter.videoUrl} />
+							<video className='min-w-full' controls src={chapter.videoUrl} />
 						</div>
 						<div>
 							<div className="p-4 flex flex-col md:flex-row items-center justify-between">
@@ -96,7 +96,7 @@ const PreviewDialog = ({
 							</div>
 							<Separator />
 							<div className="mt-5">{parse(chapter.description)} </div>
-							{!!chapter.attachments.length && (
+							{/* {!!chapter.attachments.length && (
 								<>
 									<Separator />
 									<div className="p-4">
@@ -116,7 +116,7 @@ const PreviewDialog = ({
 										))}
 									</div>
 								</>
-							)}
+							)} */}
 						</div>
 					</div>
 				</DialogBody>

@@ -8,11 +8,13 @@ const credentials = require("./middleware/credentials");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const cookieParser = require("cookie-parser");
+// const bodyParser = require('body-parser');
 const authRoutes = require("./routes/authRoutes");
 const refreshRoute = require("./routes/refresh");
 const userRoutes = require("./routes/userRoutes");
 const tutorRoutes = require("./routes/tutorRoutes");
 const courseRoutes = require("./routes/courseRoutes");
+const webhookRoute = require("./routes/webhookRoute");
 require("./config/passport-setup");
 
 dotenv.config();
@@ -43,6 +45,7 @@ app.use(
 // and fetch cookies credentials requirement
 app.use(credentials);
 
+app.use('/api', express.raw({ type: 'application/json' }));
 // Middleware to initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
@@ -52,9 +55,12 @@ app.use(express.urlencoded({ extended: true })); // parse form data inside the r
 // Cross Origin Resource Sharing
 app.use(cors(corsOptions));
 app.use(cookieParser());
+// app.use(bodyParser.raw({ type: 'application/json' }));
+
 
 
 app.use("/auth", authRoutes);
+app.use("/api", webhookRoute);
 app.use("/refresh", refreshRoute);
 app.use("/users", userRoutes);
 app.use("/tutors", tutorRoutes);

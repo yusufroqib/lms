@@ -14,7 +14,7 @@ const CoursesIndex = () => {
 			</div>
 			<div className=" h-full flex-col flex w-full justify-center items-center">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-12 ">
-					<Link to='/dashboard' className=" bg-slate-800 transition-all ease-in md:hover:bg-slate-700 md:hover:scale-110 duration-300 cursor-pointer  h-80 w-80 rounded-xl flex justify-center items-center">
+					<Link to='/courses/enrolled-courses' className=" bg-slate-800 transition-all ease-in md:hover:bg-slate-700 md:hover:scale-110 duration-300 cursor-pointer  h-80 w-80 rounded-xl flex justify-center items-center">
 						<h2 className="text-whiten text-3xl text-center">
 							Enrolled Courses
 						</h2>

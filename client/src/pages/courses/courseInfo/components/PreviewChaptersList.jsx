@@ -12,7 +12,7 @@ const PreviewChaptersList = ({ chapters, isPurchased }) => {
 	const [open, setOpen] = useState(false);
 
 	const handleClick = (chapter) => {
-		if (!chapter.isFree) {
+		if (!chapter.isFree && !isPurchased) {
 			return toast.error("This chapter is not free for preview");
 		}
 		setClickedId(chapter._id);
@@ -44,7 +44,7 @@ const PreviewChaptersList = ({ chapters, isPurchased }) => {
 							/>
 						</div>
 					)}
-					{chapter.isFree && (
+					{chapter.isFree && !isPurchased && (
 						<div className="ml-auto pr-2 flex items-center gap-x-2">
 							<Badge>Free</Badge>
 						</div>

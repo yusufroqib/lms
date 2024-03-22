@@ -32,6 +32,8 @@ const userSchema = new Schema(
 			Tutor: String,
 			Admin: String,
 		},
+		reputation: { type: Number, default: 0 },
+		saved: [{ type: Schema.Types.ObjectId, ref: "Post" }],
 		enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 		createdCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 		refreshToken: [String],

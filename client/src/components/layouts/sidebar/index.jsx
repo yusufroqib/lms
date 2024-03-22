@@ -169,7 +169,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
 							<SidebarLinkGroup
 								activeCondition={
-									pathname === "/forms" || pathname.includes("forms")
+									pathname === "/tutors/" || pathname.includes("tutors")
 								}
 							>
 								{(handleClick, open) => {
@@ -307,7 +307,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 							{/* <!-- Menu Item Forms --> */}
 							<SidebarLinkGroup
 								activeCondition={
-									pathname === "/forms" || pathname.includes("forms")
+									pathname === "/community" || pathname.includes("community")
 								}
 							>
 								{(handleClick, open) => {
@@ -316,8 +316,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 											<NavLink
 												to="#"
 												className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-													(pathname === "/forms" ||
-														pathname.includes("forms")) &&
+													(pathname === "/community" ||
+														pathname.includes("community")) &&
 													"bg-graydark dark:bg-meta-4"
 												}`}
 												onClick={(e) => {
@@ -356,7 +356,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 														fill="white"
 													/>
 												</svg>
-												Forms
+												Community
 												<svg
 													className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
 														open && "rotate-180"
@@ -384,24 +384,24 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 												<ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
 													<li>
 														<NavLink
-															to="/forms/form-elements"
+															to="/community/feeds"
 															className={({ isActive }) =>
 																"group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
 																(isActive && "!text-white")
 															}
 														>
-															Form Elements
+															Feeds
 														</NavLink>
 													</li>
 													<li>
 														<NavLink
-															to="/forms/form-layout"
+															to="/community/users"
 															className={({ isActive }) =>
 																"group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
 																(isActive && "!text-white")
 															}
 														>
-															Form Layout
+															Users
 														</NavLink>
 													</li>
 												</ul>
