@@ -14,6 +14,7 @@ const refreshRoute = require("./routes/refresh");
 const userRoutes = require("./routes/userRoutes");
 const tutorRoutes = require("./routes/tutorRoutes");
 const courseRoutes = require("./routes/courseRoutes");
+const communityRoutes = require("./routes/communityRoutes");
 const webhookRoute = require("./routes/webhookRoute");
 require("./config/passport-setup");
 
@@ -65,6 +66,7 @@ app.use("/refresh", refreshRoute);
 app.use("/users", userRoutes);
 app.use("/tutors", tutorRoutes);
 app.use('/courses', courseRoutes);
+app.use('/community', communityRoutes);
 
 mongoose
 	.connect(process.env.MONGO_URI)

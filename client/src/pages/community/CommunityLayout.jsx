@@ -12,7 +12,7 @@ const CommunityLayout = () => {
 			{/* <Navbar /> */}
 			<div className="flex">
 				{/* <LeftSidebar /> */}
-				<section className="flex min-h-screen flex-1 flex-col xl:pr-[350px] pb-6 max-md:pb-14">
+				<section className="flex min-h-screen flex-1 flex-col  xl:pr-[350px] pb-6 max-md:pb-14">
 					<div className="mx-auto p-8 w-full">
 						<Outlet />
 					</div>

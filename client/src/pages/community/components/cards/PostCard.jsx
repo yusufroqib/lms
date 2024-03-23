@@ -8,6 +8,7 @@ import EditDeleteAction from "../EditDeleteAction";
 import useAuth from "@/hooks/useAuth";
 
 const PostCard = ({   title, tags, author, upvotes, views, replies, createdAt }) => {
+    console.log(createdAt)
   const { username, isTutor, isAdmin, _id } = useAuth();
 
     const showActionButtons = _id && _id === author._id;
@@ -35,7 +36,7 @@ const PostCard = ({   title, tags, author, upvotes, views, replies, createdAt })
             </div>
 
             <div className="flex-between mt-6 w-full flex-wrap gap-3">
-                <Metric imgUrl={author.picture} alt="user" value={author.name} title={` - asked ${getTimestamp(createdAt)}`} href={`/profile/${author._id}`} isAuthor textStyles="body-medium text-dark400_light700"/>
+                <Metric imgUrl={author.avatar} alt="user" value={author.name} title={` - posted ${getTimestamp(createdAt)}`} href={`/profile/${author._id}`} isAuthor textStyles="body-medium text-dark400_light700"/>
 
                 <div className="flex items-center gap-3 max-sm:flex-wrap max-sm:justify-start">
                     <Metric imgUrl="/assets/icons/like.svg" alt="Upvotes" value={formatAndDivideNumber(upvotes.length)} title=" Votes" textStyles="small-medium text-dark400_light800"/>

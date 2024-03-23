@@ -9,6 +9,7 @@ export function cn(...inputs) {
 
 export const getTimestamp = (createdAt) => {
   const now = new Date();
+  createdAt = new Date(createdAt);
   const timeDifference = now.getTime() - createdAt.getTime();
   // Define time intervals in milliseconds
   const minute = 60 * 1000;

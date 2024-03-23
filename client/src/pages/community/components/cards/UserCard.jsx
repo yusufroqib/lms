@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getTopInteractedTags } from "@/lib/actions/tag.actions";
+// import { getTopInteractedTags } from "@/lib/actions/tag.actions";
 // import Image from "next/image";
 import RenderTag from "../RenderTag";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +10,8 @@ const UserCard = ({ user }) => {
 
     useEffect(() => {
         const fetchTags = async () => {
-            const tags = await getTopInteractedTags({ userId: user._id });
-            setInteractedTags(tags);
+            // const tags = await getTopInteractedTags({ userId: user._id });
+            // setInteractedTags(tags);
         };
 
         fetchTags();

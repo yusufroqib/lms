@@ -27,7 +27,7 @@ const LocalSearchBar = ({ route, iconPosition, imgSrc, placeholder, otherClasses
                     navigate(newUrl, { replace: true });
                 }
             }
-        }, 300);
+        }, 600);
         return () => clearTimeout(delayDebounceFn);
     }, [search, route, navigate, searchParams, query]);
 

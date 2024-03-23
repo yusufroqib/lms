@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import GlobalFilters from "./GlobalFilters";
-import { globalSearch } from "@/lib/actions/general.action";
+// import { globalSearch } from "@/lib/actions/general.action";
 
 const GlobalResult = () => {
     const [searchParams] = useSearchParams();
@@ -21,8 +21,8 @@ const GlobalResult = () => {
             setResult([]);
             setIsLoading(true);
             try {
-                const res = await globalSearch({ query: global, type });
-                setResult(JSON.parse(res));
+                // const res = await globalSearch({ query: global, type });
+                // setResult(JSON.parse(res));
             } catch (error) {
                 console.error(error);
                 throw error;

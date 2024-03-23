@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Filter from "./Filter";
 import { ReplyFilters } from "@/lib/filters";
-import { getReplies } from "@/lib/actions/reply.action";
+// import { getReplies } from "@/lib/actions/reply.action";
 import { Link } from "react-router-dom";
 import { getTimestamp } from "@/lib/utils";
 // import ParseHTML from "./ParseHTML";
@@ -13,12 +13,12 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 
     useEffect(() => {
         const fetchReplies = async () => {
-            const repliesResult = await getReplies({
-                postId,
-                page: page ? +page : 1,
-                sortBy: filter,
-            });
-            setResult(repliesResult);
+            // const repliesResult = await getReplies({
+            //     postId,
+            //     page: page ? +page : 1,
+            //     sortBy: filter,
+            // });
+            // setResult(repliesResult);
         };
 
         fetchReplies();

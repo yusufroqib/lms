@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getUserPosts } from "@/lib/actions/user.action";
+// import { getUserPosts } from "@/lib/actions/user.action";
 import PostCard from "../cards/PostCard";
 import Pagination from "./Pagination";
 
@@ -9,12 +9,12 @@ const PostTab = ({ searchParams, userId, clerkId }) => {
 
     useEffect(() => {
         const fetchPosts = async () => {
-            const result = await getUserPosts({
-                userId,
-                page: searchParams.page ? +searchParams.page : 1,
-            });
-            setPosts(result.posts);
-            setIsNextPosts(result.isNextPosts);
+            // const result = await getUserPosts({
+            //     userId,
+            //     page: searchParams.page ? +searchParams.page : 1,
+            // });
+            // setPosts(result.posts);
+            // setIsNextPosts(result.isNextPosts);
         };
 
         fetchPosts();

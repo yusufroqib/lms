@@ -7,10 +7,11 @@ import {
 	RichTextEditorComponent,
 	Toolbar,
 } from "@syncfusion/ej2-react-richtexteditor";
-import React from "react";
+import React, {Suspense} from "react";
 // import * as React from 'react';
 
-function Editor({ name, value, setValue }) {
+function Editor({ name, value, setValue, field }) {
+	
 	const toolbarSettings = {
 		items: [
 			"Bold",
@@ -51,6 +52,7 @@ function Editor({ name, value, setValue }) {
 
 	const handleChange = (e) => {
 		setValue(e.value);
+		field.onChange(e.value);
 
 		// console.log(name, e.value)
 	};
@@ -69,7 +71,7 @@ function Editor({ name, value, setValue }) {
 
 	return (
 		<RichTextEditorComponent
-			className="z-[100] no-tailwindcss-base"
+			className="z-[100] relative w-auto no-tailwindcss-base"
 			// height={400}
 			value={value}
 			placeholder={`What you'll learn, Requirements, Description, Who is this course for, etc `}

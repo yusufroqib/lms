@@ -18,15 +18,6 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 	const [value, setValue] = useState(initialData.description);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	// useEffect(() => {
-    //     // Define custom filter to allow blob URLs for <img> src attribute
-    //     DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-    //         if (node.nodeName.toLowerCase() === 'img' && node.hasAttribute('src') && node.getAttribute('src').startsWith('blob:')) {
-    //             // Allow the src attribute
-    //             node.setAttribute('src', node.getAttribute('src'));
-    //         }
-    //     });
-    // }, []);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();

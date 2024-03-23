@@ -3,39 +3,48 @@ const Reply = require("../models/ReplyModel");
 const Post = require("../models/PostModel");
 const Interaction = require("../models/InteractionModel");
 const Tag = require("../models/TagModel");
+const mongoose = require('mongoose');
 
 
-// Controller method for creating a post
 const createPost = async (req, res) => {
 	try {
-		// connectToDatabase();
-		const { title, content, tags, author, path } = req.body;
-		const post = await Post.create({ title, content, author });
-		const tagDocuments = [];
-		for (const tag of tags) {
-			const existingTag = await Tag.findOneAndUpdate(
-				{ name: { $regex: new RegExp(`^${tag}$`, "i") } },
-				{ $setOnInsert: { name: tag }, $push: { posts: post._id } },
-				{ upsert: true, new: true }
-			);
-			tagDocuments.push(existingTag._id);
-		}
-		await Post.findByIdAndUpdate(post._id, {
-			$push: { tags: { $each: tagDocuments } },
-		});
-		await Interaction.create({
-			user: author,
-			post: post._id,
-			action: "create_post",
-			tags: tagDocuments,
-		});
-		await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
-		res.status(201).send("Post created successfully");
+	  const { title, content, tags, author } = req.body;
+  
+	  const post = await Post.create({ title, content, author });
+  
+	  const tagDocuments = [];
+	  for (const tag of tags) {
+		const existingTag = await Tag.findOneAndUpdate(
+		  { name: { $regex: new RegExp(`^${tag}$`, "i") } },
+		  { $setOnInsert: { name: tag }, $push: { posts: post._id } },
+		  { upsert: true, new: true }
+		);
+		tagDocuments.push(existingTag._id);
+	  }
+  
+	  // Convert tagDocuments to ObjectId instances
+	  const tagObjectIds = tagDocuments.map(id =>  new mongoose.Types.ObjectId(id));
+  
+	  // Update the Post document with tagObjectIds
+	  await Post.findByIdAndUpdate(post._id, {
+		$push: { tags: { $each: tagObjectIds } },
+	  });
+  
+	  await Interaction.create({
+		user: author,
+		post: post._id,
+		action: "create_post",
+		tags: tagObjectIds, // Assign tagObjectIds instead of tagDocuments
+	  });
+  
+	  await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
+  
+	  res.status(201).json({ message: "Post created successfully" });
 	} catch (error) {
-		console.log(error);
-		res.status(500).send("Internal server error");
+	  console.log(error);
+	  res.status(500).send("Internal server error");
 	}
-};
+  };
 
 // Controller method for getting a post by ID
 const getPostById = async (req, res) => {
@@ -164,6 +173,48 @@ const editPost = async (req, res) => {
 	}
 };
 
+// Controller method for getting posts
+const getPosts = async (req, res) => {
+	try {
+		// connectToDatabase();
+		const { searchQuery, filter, page = 1, pageSize = 20 } = req.query;
+		const skipAmount = (page - 1) * pageSize;
+		const query = {};
+		if (searchQuery) {
+			query.$or = [
+				{ title: { $regex: new RegExp(searchQuery, "i") } },
+				{ content: { $regex: new RegExp(searchQuery, "i") } },
+			];
+		}
+		let sortOptions = {};
+		switch (filter) {
+			case "newest":
+				sortOptions = { createdAt: -1 };
+				break;
+			case "frequent":
+				sortOptions = { views: -1 };
+				break;
+			case "unreplyed":
+				query.replies = { $size: 0 };
+				break;
+			default:
+				break;
+		}
+		const posts = await Post.find(query)
+			.populate({ path: "tags", model: Tag })
+			.populate({ path: "author", model: User })
+			.skip(skipAmount)
+			.limit(pageSize)
+			.sort(sortOptions);
+		const totalPosts = await Post.countDocuments(query);
+		const isNext = totalPosts > skipAmount + posts.length;
+		res.status(200).json({ posts, isNext });
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("Internal server error");
+	}
+};
+
 // Controller method for getting hot posts
 const getHotPosts = async (req, res) => {
 	try {
@@ -182,8 +233,9 @@ const getHotPosts = async (req, res) => {
 const getRecommendedPosts = async (req, res) => {
 	try {
 		// await connectToDatabase();
-		const { userId, page = 1, pageSize = 20, searchQuery } = req.query;
-		const user = await User.findOne({ clerkId: userId });
+        const userId = req.userId
+		const {  page = 1, pageSize = 20, searchQuery } = req.query;
+		const user = await User.findById(userId);
 		if (!user) {
 			throw new Error("User not found");
 		}
@@ -375,47 +427,7 @@ const deleteReply = async (req, res) => {
 	}
 };
 
-// Controller method for getting posts
-const getPosts = async (req, res) => {
-	try {
-		// connectToDatabase();
-		const { searchQuery, filter, page = 1, pageSize = 20 } = req.query;
-		const skipAmount = (page - 1) * pageSize;
-		const query = {};
-		if (searchQuery) {
-			query.$or = [
-				{ title: { $regex: new RegExp(searchQuery, "i") } },
-				{ content: { $regex: new RegExp(searchQuery, "i") } },
-			];
-		}
-		let sortOptions = {};
-		switch (filter) {
-			case "newest":
-				sortOptions = { createdAt: -1 };
-				break;
-			case "frequent":
-				sortOptions = { views: -1 };
-				break;
-			case "unreplyed":
-				query.replies = { $size: 0 };
-				break;
-			default:
-				break;
-		}
-		const posts = await Post.find(query)
-			.populate({ path: "tags", model: Tag })
-			.populate({ path: "author", model: User })
-			.skip(skipAmount)
-			.limit(pageSize)
-			.sort(sortOptions);
-		const totalPosts = await Post.countDocuments(query);
-		const isNext = totalPosts > skipAmount + posts.length;
-		res.status(200).json({ posts, isNext });
-	} catch (error) {
-		console.log(error);
-		res.status(500).send("Internal server error");
-	}
-};
+
 
 
 // Controller method for getting top interacted tags

@@ -20,6 +20,7 @@ import StudyIndex from "./pages/courses/studyPage/StudyIndex";
 import EnrolledCourses from "./pages/courses/enrolledCourses/EnrolledCourses";
 import Feeds from "./pages/community/feeds/Feeds";
 import CommunityLayout from "./pages/community/CommunityLayout";
+import CreatePost from "./pages/community/posts/createPost/CreatePost";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -49,8 +50,11 @@ function App() {
 									element={<EditChapter />}
 								/>
 							</Route>
-							<Route path="community" element={<CommunityLayout/>}>
+							<Route path="community" element={<CommunityLayout />}>
 								<Route path="feeds" element={<Feeds />} />
+								<Route path="posts">
+									<Route path="create-post" element={<CreatePost />} />
+								</Route>
 								{/* <Route path="create-course" element={<CreateCourse />} />
 								<Route path="edit-course/:courseId" element={<EditCourse />} />
 								<Route

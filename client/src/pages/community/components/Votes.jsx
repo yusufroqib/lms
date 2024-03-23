@@ -1,88 +1,89 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { downvoteReply, upvoteReply } from "@/lib/actions/reply.action";
-import { viewPost } from "@/lib/actions/interaction.action";
-import { downvotePost, upvotePost } from "@/lib/actions/post.action";
-import { toggleSavePost } from "@/lib/actions/user.action";
+// import { downvoteReply, upvoteReply } from "@/lib/actions/reply.action";
+// import { viewPost } from "@/lib/actions/interaction.action";
+// import { downvotePost, upvotePost } from "@/lib/actions/post.action";
+// import { toggleSavePost } from "@/lib/actions/user.action";
 import { formatAndDivideNumber } from "@/lib/utils";
-import { toast } from "../ui/use-toast";
+// import { toast } from "../ui/use-toast";
 
 const Votes = ({ type, itemId, userId, upvotes, hasupVoted, downvotes, hasdownVoted, hasSaved }) => {
     const location = useLocation();
     const pathname = location.pathname;
 
     const handleSave = async () => {
-        await toggleSavePost({
-            userId: JSON.parse(userId),
-            postId: JSON.parse(itemId),
-            path: pathname,
-        });
-        return toast({
-            title: `Post ${!hasupVoted ? "Saved in" : "Removed from"} your collection`,
-            variant: !hasSaved ? "default" : "destructive",
-        });
+        // await toggleSavePost({
+        //     userId: JSON.parse(userId),
+        //     postId: JSON.parse(itemId),
+        //     path: pathname,
+        // });
+        
+        // return toast({
+        //     title: `Post ${!hasupVoted ? "Saved in" : "Removed from"} your collection`,
+        //     variant: !hasSaved ? "default" : "destructive",
+        // });
     };
 
     const handleVote = async (action) => {
-        if (!userId) {
-            return toast({
-                title: "Please log in",
-                description: "You need to log in to perform this action",
-            });
-        }
+        // if (!userId) {
+        //     return toast({
+        //         title: "Please log in",
+        //         description: "You need to log in to perform this action",
+        //     });
+        // }
         if (action === "upvote") {
             if (type === "Post") {
-                await upvotePost({
-                    postId: JSON.parse(itemId),
-                    userId: JSON.parse(userId),
-                    hasupVoted,
-                    hasdownVoted,
-                    path: pathname,
-                });
+                // await upvotePost({
+                //     postId: JSON.parse(itemId),
+                //     userId: JSON.parse(userId),
+                //     hasupVoted,
+                //     hasdownVoted,
+                //     path: pathname,
+                // });
             } else if (type === "Reply") {
-                await upvoteReply({
-                    replyId: JSON.parse(itemId),
-                    userId: JSON.parse(userId),
-                    hasupVoted,
-                    hasdownVoted,
-                    path: pathname,
-                });
+                // await upvoteReply({
+                //     replyId: JSON.parse(itemId),
+                //     userId: JSON.parse(userId),
+                //     hasupVoted,
+                //     hasdownVoted,
+                //     path: pathname,
+                // });
             }
-            return toast({
-                title: `Upvote ${!hasupVoted ? "Successful" : "Removed"}`,
-                variant: !hasupVoted ? "default" : "destructive",
-            });
+            // return toast({
+            //     title: `Upvote ${!hasupVoted ? "Successful" : "Removed"}`,
+            //     variant: !hasupVoted ? "default" : "destructive",
+            // });
         }
         if (action === "downvote") {
             if (type === "Post") {
-                await downvotePost({
-                    postId: JSON.parse(itemId),
-                    userId: JSON.parse(userId),
-                    hasupVoted,
-                    hasdownVoted,
-                    path: pathname,
-                });
+                // await downvotePost({
+                //     postId: JSON.parse(itemId),
+                //     userId: JSON.parse(userId),
+                //     hasupVoted,
+                //     hasdownVoted,
+                //     path: pathname,
+                // });
             } else if (type === "Reply") {
-                await downvoteReply({
-                    replyId: JSON.parse(itemId),
-                    userId: JSON.parse(userId),
-                    hasupVoted,
-                    hasdownVoted,
-                    path: pathname,
-                });
+                // await downvoteReply({
+                //     replyId: JSON.parse(itemId),
+                //     userId: JSON.parse(userId),
+                //     hasupVoted,
+                //     hasdownVoted,
+                //     path: pathname,
+                // });
             }
-            return toast({
-                title: `Downvote ${!hasupVoted ? "Removed" : "Successful"}`,
-                variant: !hasupVoted ? "default" : "destructive",
-            });
+            // return toast({
+            //     title: `Downvote ${!hasupVoted ? "Removed" : "Successful"}`,
+            //     variant: !hasupVoted ? "default" : "destructive",
+            // });
         }
     };
 
     useEffect(() => {
-        viewPost({
-            postId: JSON.parse(itemId),
-            userId: userId ? JSON.parse(userId) : undefined,
-        });
+        // viewPost({
+        //     postId: JSON.parse(itemId),
+        //     userId: userId ? JSON.parse(userId) : undefined,
+        // });
     }, [itemId, userId, pathname]);
 
     return (

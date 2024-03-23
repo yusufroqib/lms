@@ -1,16 +1,42 @@
-import { getUserReplies } from "@/lib/actions/user.action";
+// import { getUserReplies } from "@/lib/actions/user.action";
 // import { Link, useSearchParams } from "react-router-dom";
 import ReplyCard from "../cards/ReplyCard";
 import Pagination from "./Pagination";
 const RepliesTab = async ({ searchParams, userId }) => {
   // const [searchParams, setSearchParams] = useSearchParams();
 
-    const result = await getUserReplies({
+    // const result = await getUserReplies({
+      const result ={
+        replies: [
+          {
+            _id: "1",
+            post: "1",
+            author: "1",
+            upvotes: ["1"],
+            createdAt: "1",
+          },
+          {
+            _id: "2",
+            post: "2",
+            author: "2",
+            upvotes: ["2"],
+            createdAt: "2",
+          },
+          {
+            _id: "3",
+            post: "3",
+            author: "3",
+            upvotes: ["3"],
+            createdAt: "3",
+          },
+        ],
+        isNextReply: true,
+      }
 
-        userId,
-        page: searchParams.page ? +searchParams.page : 1,
-    });
-    console.log(result.replies);
+    //     userId,
+    //     page: searchParams.page ? +searchParams.page : 1,
+    // });
+    // console.log(result.replies);
     return (<>
       {result.replies.map((item) => (<ReplyCard key={item._id}  _id={item._id} post={item.post} author={item.author} upvotes={item.upvotes.length} createdAt={item.createdAt}/>))}
       <div className="mt-10">
