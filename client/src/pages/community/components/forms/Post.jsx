@@ -18,15 +18,18 @@ import { Badge } from "@/components/ui/badge";
 // import Image from "next/image";
 // import { createPost, editPost } from "@/lib/actions/post.action";
 import { useNavigate } from "react-router-dom";
-import Editor from "@/components/ui/editor";
+// import Editor from "@/components/ui/editor";
 import { useCreatePostMutation } from "@/features/posts/postsApiSlice";
 import toast from "react-hot-toast";
+// import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import Editor from "ckeditor5-custom-build";
+import RTEditor from "@/components/ui/editor";
 
 
 const Post = ({ type, mongoUserId, postDetails }) => {
 	// const editorRef = useRef(null);
 	const [createPost, { isLoading, isError, isSuccess, error }] =
-	useCreatePostMutation();
+		useCreatePostMutation();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const navigate = useNavigate();
 	const [value, setValue] = useState(postDetails?.content);
@@ -68,7 +71,7 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 				navigate("/community/feeds");
 			}
 		} catch (error) {
-			console.log(error)
+			console.log(error);
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -104,7 +107,10 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)}  className="flex  flex-col gap-10">
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className="flex  flex-col gap-10"
+			>
 				<FormField
 					control={form.control}
 					name="title"
@@ -136,13 +142,39 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 								Detailed explanation of your problem{" "}
 								<span className="text-primary-500">*</span>
 							</FormLabel>
-							<FormControl className="mt-3.5  ">
-								<Editor
+							<FormControl className="mt-3.5">
+								{/* <Editor
 									name="description"
 									value={value}
 									setValue={setValue}
 									field={field}
+								/> */}
+
+								<RTEditor
+									value={value}
+									field={field}
+
+									// className='prose'
+									// editor={Editor}
+									// data="<p>Hello from CKEditor&nbsp;5!</p>"
+									// onReady={(editor) => {
+									// 	// You can store the "editor" and use when it is needed.
+									// 	console.log("Editor is ready to use!", editor);
+									// }}
+									// onChange={(event, editor) => {
+									// 	const data = editor.getData();
+									// 	console.log({ event, editor, data });
+									// 	// setValue(data);
+									// 	console.log(event);
+									// }}
+									// onBlur={(event, editor) => {
+									// 	console.log("Blur.", editor);
+									// }}
+									// onFocus={(event, editor) => {
+									// 	console.log("Focus.", editor);
+									// }}
 								/>
+
 								{/* <Editor apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY} onInit={(evt, editor) => {
                 // @ts-ignore
                 editorRef.current = editor;

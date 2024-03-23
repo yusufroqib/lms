@@ -1,44 +1,60 @@
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { LuPencil } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 // import { useRouter } from "next/navigation";
-import { Form } from "@/components/ui/form";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormMessage,
+} from "@/components/ui/form";
 // import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { Button } from "@/components/ui/button";
 import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
 import { cn } from "@/lib/utils";
-import Editor from "@/components/ui/editor";
+import RTEditor from "@/components/ui/editor";
 
+const formSchema = z.object({
+	description: z.string().min(1),
+});
 export const DescriptionForm = ({ initialData, courseId }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const toggleEdit = () => setIsEditing((current) => !current);
 	const [updateCourse, { isLoading, isError, isSuccess, error }] =
 		useUpdateCourseMutation();
-	const [value, setValue] = useState(initialData.description);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	// const [value, setValue] = useState(initialData.description);
+	// const [isSubmitting, setIsSubmitting] = useState(false);
 
+	const form = useForm({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			description: initialData?.description || "",
+		},
+	});
+	const { isSubmitting, isValid } = form.formState;
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		// console.log('value: ', value)
-		// const sanitizedContent = DOMPurify.sanitize(value);
-		// console.log("sanitizedContent: ", sanitizedContent)
+	const onSubmit = async (values) => {
+	
 
 		try {
-			setIsSubmitting(true);
+			// setIsSubmitting(true);
 			await updateCourse({
 				id: courseId,
-				description: value,
-			}).unwrap()
+				...values,
+			}).unwrap();
 			toast.success("Course updated successfully");
 			setIsEditing(false);
-			setIsSubmitting(false);
+			// setIsSubmitting(false);
 			// router.refresh();
 		} catch (error) {
 			toast.error("Something went wrong");
 		} finally {
-			setIsSubmitting(false);
+			// setIsSubmitting(false);
 		}
 	};
 	return (
@@ -68,16 +84,32 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 				</div>
 			)}
 			{isEditing && (
-				<Form>
-					<form onSubmit={handleSubmit} className="space-y-4 mt-4">
-						<Editor
+				// <Form>
+				// 	<form onSubmit={handleSubmit} className="space-y-4 mt-4">
+				// 		<RTEditor
+				// 			name="description"
+				// 			value={initialData.description}
+				// 			// setValue={setValue}
+				// 		/>
+				<Form {...form}>
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="space-y-4 mt-4"
+					>
+						<FormField
+							control={form.control}
 							name="description"
-							value={initialData.description}
-							setValue={setValue}
+							render={({ field }) => (
+								<FormItem>
+									<FormControl>
+										<RTEditor value={initialData.description} field={field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-
 						<div className="flex items-center gap-x-2">
-							<Button disabled={!value || isSubmitting} type="submit">
+							<Button disabled={!isValid || isSubmitting} type="submit">
 								Save
 							</Button>
 						</div>

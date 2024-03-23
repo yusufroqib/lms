@@ -7,44 +7,43 @@ const mongoose = require('mongoose');
 
 
 const createPost = async (req, res) => {
-	try {
-	  const { title, content, tags, author } = req.body;
-  
-	  const post = await Post.create({ title, content, author });
-  
-	  const tagDocuments = [];
-	  for (const tag of tags) {
-		const existingTag = await Tag.findOneAndUpdate(
-		  { name: { $regex: new RegExp(`^${tag}$`, "i") } },
-		  { $setOnInsert: { name: tag }, $push: { posts: post._id } },
-		  { upsert: true, new: true }
-		);
-		tagDocuments.push(existingTag._id);
-	  }
-  
-	  // Convert tagDocuments to ObjectId instances
-	  const tagObjectIds = tagDocuments.map(id =>  new mongoose.Types.ObjectId(id));
-  
-	  // Update the Post document with tagObjectIds
-	  await Post.findByIdAndUpdate(post._id, {
-		$push: { tags: { $each: tagObjectIds } },
-	  });
-  
-	  await Interaction.create({
-		user: author,
-		post: post._id,
-		action: "create_post",
-		tags: tagObjectIds, // Assign tagObjectIds instead of tagDocuments
-	  });
-  
-	  await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
-  
-	  res.status(201).json({ message: "Post created successfully" });
-	} catch (error) {
-	  console.log(error);
-	  res.status(500).send("Internal server error");
-	}
-  };
+    try {
+        const { title, content, tags, author } = req.body;
+        console.log(req.body);
+
+        const post = await Post.create({ title, content, author });
+
+        const tagIds = [];
+        for (const tag of tags) {
+            // Use findOneAndUpdate with upsert: true and new: true
+            let existingTag = await Tag.findOneAndUpdate(
+                { name: tag }, // Filter to find the tag by name
+                { $push: { posts: post._id } }, // Update to add the post ID to the tag's posts array
+                { upsert: true, new: true } // Options to create a new tag if it doesn't exist
+            );
+            tagIds.push(existingTag._id.toString());
+        }
+
+        // Update the Post document with tagIds
+        await Post.findByIdAndUpdate(post._id, {
+            $push: { tags: { $each: tagIds } },
+        });
+
+        await Interaction.create({
+            user: author,
+            post: post._id,
+            action: "create_post",
+            tags: tagIds,
+        });
+
+        await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
+
+        res.status(201).json({ message: "Post created successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Internal server error");
+    }
+};
 
 // Controller method for getting a post by ID
 const getPostById = async (req, res) => {

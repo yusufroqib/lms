@@ -1,58 +1,64 @@
-import {
-	HtmlEditor,
-	Image,
-	Inject,
-	Link,
-	QuickToolbar,
-	RichTextEditorComponent,
-	Toolbar,
-} from "@syncfusion/ej2-react-richtexteditor";
-import React, {Suspense} from "react";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import Editor from "ckeditor5-custom-build";
+
+// import {
+// 	HtmlEditor,
+// 	Image,
+// 	Inject,
+// 	Link,
+// 	QuickToolbar,
+// 	RichTextEditorComponent,
+// 	Toolbar,
+// } from "@syncfusion/ej2-react-richtexteditor";
+import React from "react";
 // import * as React from 'react';
 
-function Editor({ name, value, setValue, field }) {
+function RTEditor({ name, value, setValue, field }) {
 	
-	const toolbarSettings = {
-		items: [
-			"Bold",
-			"Italic",
-			"Underline",
-			"StrikeThrough",
-			"FontName",
-			"FontSize",
-			"FontColor",
-			"BackgroundColor",
-			"LowerCase",
-			"UpperCase",
-			"|",
-			"Formats",
-			"Alignments",
-			"OrderedList",
-			"UnorderedList",
-			"Outdent",
-			"Indent",
-			"|",
-			"Image",
-			"CreateLink",
-			"InsertCode",
-			"|",
-			"ClearFormat",
-			"FullScreen",
-			"SourceCode",
-			"|",
-			"Undo",
-			"Redo",
-		],
-	};
+	// const toolbarSettings = {
+	// 	items: [
+	// 		"Bold",
+	// 		"Italic",
+	// 		"Underline",
+	// 		"StrikeThrough",
+	// 		"FontName",
+	// 		"FontSize",
+	// 		"FontColor",
+	// 		"BackgroundColor",
+	// 		"LowerCase",
+	// 		"UpperCase",
+	// 		"|",
+	// 		"Formats",
+	// 		"Alignments",
+	// 		"OrderedList",
+	// 		"UnorderedList",
+	// 		"Outdent",
+	// 		"Indent",
+	// 		"|",
+	// 		"Image",
+	// 		"CreateLink",
+	// 		"InsertCode",
+	// 		"|",
+	// 		"ClearFormat",
+	// 		"FullScreen",
+	// 		"SourceCode",
+	// 		"|",
+	// 		"Undo",
+	// 		"Redo",
+	// 	],
+	// };
 
-	const insertImageSettings = {
-		saveUrl: "https://ej2.syncfusion.com/services/api/uploadbox/Save",
-		removeUrl: "https://ej2.syncfusion.com/services/api/uploadbox/Remove",
-	};
+	// const insertImageSettings = {
+	// 	saveUrl: "https://ej2.syncfusion.com/services/api/uploadbox/Save",
+	// 	removeUrl: "https://ej2.syncfusion.com/services/api/uploadbox/Remove",
+	// };
 
-	const handleChange = (e) => {
-		setValue(e.value);
-		field.onChange(e.value);
+	const handleChange = (event, editor) => {
+		const data = editor.getData();
+		console.log(data)
+		// setValue(data);
+
+		field.onChange(data);
 
 		// console.log(name, e.value)
 	};
@@ -70,19 +76,47 @@ function Editor({ name, value, setValue, field }) {
 	};
 
 	return (
-		<RichTextEditorComponent
-			className="z-[100] relative w-auto no-tailwindcss-base"
-			// height={400}
-			value={value}
-			placeholder={`What you'll learn, Requirements, Description, Who is this course for, etc `}
-			change={handleChange}
-			toolbarSettings={toolbarSettings}
-			onKeyDown={handleKeyDown}
-			insertImageSettings={insertImageSettings}
-		>
-			{/* {value} */}
-			<Inject services={[Toolbar, Image, Link, HtmlEditor, QuickToolbar]} />
-		</RichTextEditorComponent>
+
+		<CKEditor
+		// className='prose'
+		editor={Editor}
+		data={value}
+		// onReady={(editor) => {
+		// 	// You can store the "editor" and use when it is needed.
+		// 	console.log("Editor is ready to use!", editor);
+		// }}
+		onChange={(event, editor) => {
+			const data = editor.getData();
+			console.log(data)
+			// setValue(data);
+
+			field.onChange(data);
+
+			console.log("Editor change:", editor, event);
+			
+		}}
+		// onBlur={(event, editor) => {
+		// 	console.log("Blur.", editor);
+		// }}
+		// onFocus={(event, editor) => {
+		// 	console.log("Focus.", editor);
+		// }}
+	/>
+		// <RichTextEditorComponent
+		// 	className="z-[100] relative w-auto no-tailwindcss-base"
+		// 	// height={400}
+		// 	value={value}
+		// 	placeholder={`What you'll learn, Requirements, Description, Who is this course for, etc `}
+		// 	change={handleChange}
+		// 	toolbarSettings={toolbarSettings}
+		// 	onKeyDown={handleKeyDown}
+		// 	insertImageSettings={insertImageSettings}
+		// >
+		// 	{/* {value} */}
+		// 	<Inject services={[Toolbar, Image, Link, HtmlEditor, QuickToolbar]} />
+		// </RichTextEditorComponent>
+
+
 	);
 }
-export default React.memo(Editor)
+export default React.memo(RTEditor)
