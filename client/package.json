@@ -33,7 +33,7 @@
     "axios": "^1.6.7",
     "body-parser": "^1.20.2",
     "ckeditor-tailwind-reset": "^1.0.5",
-    "ckeditor5-custom-build": "file:cKEditor5",
+    "ckeditor5-custom-build": "file:ckeditor5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^0.2.1",
@@ -76,6 +76,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.33",
+    "postcss-nesting": "^12.1.0",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.8"
   }

@@ -39,7 +39,7 @@ const Feeds = () => {
 		error,
 		isError,
 	} = useGetPostsQuery({ searchParams: stringifyQuery });
-	console.log(postsResult);
+	// console.log(postsResult);
 
 	// console.log(stringifyQuery); 
 
@@ -120,7 +120,7 @@ const Feeds = () => {
 	return (
 		<>
 			<div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
-				<h1 className="h1-bold text-dark100_light900">All Posts</h1>
+				<h1 className="h1-bold text-dark100_light900">Community Feed</h1>
 
 				<Link to="/community/posts/create-post" className="flex justify-end max-sm:w-full">
 					<Button className="primary-gradient min-h-[46px] px-4 py-3 !text-light-900">
@@ -173,7 +173,7 @@ const Feeds = () => {
 			</div>
 			<div className="mt-10">
 				<Pagination
-					pageNumber={searchParams?.page ? +searchParams.page : 1}
+					pageNumber={page_search ? +page_search : 1}
 					isNext={postsResult?.isNext}
 				/>
 			</div>

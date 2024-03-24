@@ -8,6 +8,10 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+.ck-editor__editable {
+  min-height: 200px
+}
+
 @layer utilities {
   .flex-center {
     @apply flex justify-center items-center;

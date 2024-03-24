@@ -5,5 +5,5 @@ export const PostsSchema = z.object({
     tags: z.array(z.string().min(1).max(15)).min(1).max(3),
 });
 export const ReplySchema = z.object({
-    answer: z.string().min(10),
+    reply: z.string().min(10),
 });

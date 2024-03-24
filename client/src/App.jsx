@@ -21,6 +21,7 @@ import EnrolledCourses from "./pages/courses/enrolledCourses/EnrolledCourses";
 import Feeds from "./pages/community/feeds/Feeds";
 import CommunityLayout from "./pages/community/CommunityLayout";
 import CreatePost from "./pages/community/posts/createPost/CreatePost";
+import PostPage from "./pages/community/posts/viewPost/PostPage";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -54,6 +55,7 @@ function App() {
 								<Route path="feeds" element={<Feeds />} />
 								<Route path="posts">
 									<Route path="create-post" element={<CreatePost />} />
+									<Route path=":postId" element={<PostPage />} />
 								</Route>
 								{/* <Route path="create-course" element={<CreateCourse />} />
 								<Route path="edit-course/:courseId" element={<EditCourse />} />

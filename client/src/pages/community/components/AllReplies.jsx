@@ -2,61 +2,100 @@ import React, { useState, useEffect } from "react";
 import Filter from "./Filter";
 import { ReplyFilters } from "@/lib/filters";
 // import { getReplies } from "@/lib/actions/reply.action";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getTimestamp } from "@/lib/utils";
 // import ParseHTML from "./ParseHTML";
 import Votes from "./Votes";
+import qs from "query-string";
+import parse from "html-react-parser";
+import { useGetRepliesQuery } from "@/features/posts/postsApiSlice";
 
 const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
-    
-    const [result, setResult] = useState({ replies: [] });
+	// const [result, setResult] = useState({ replies: [] });
+	const location = useLocation();
+	const url = qs.stringifyUrl(
+		{
+			url: location.pathname,
+			query: {
+				postId,
+				sortBy: filter,
+				page: page ? Number(page) : 1,
+			},
+		},
+		{ skipEmptyString: true, skipNull: true }
+	);
 
-    useEffect(() => {
-        const fetchReplies = async () => {
-            // const repliesResult = await getReplies({
-            //     postId,
-            //     page: page ? +page : 1,
-            //     sortBy: filter,
-            // });
-            // setResult(repliesResult);
-        };
+	// console.log(url);
+	const queryString = url.split("?")[1];
+	// console.log(queryString);
 
-        fetchReplies();
-    }, [postId, page, filter]);
+	const {
+		data: result = {},
+		isLoading,
+		isSuccess,
+		error,
+		isError,
+	} = useGetRepliesQuery(queryString);
 
-    return (
-        <div className="mt-11">
-            <div className="flex items-center justify-between">
-                <h3 className="primary-text-gradient">{totalReplies} Replies</h3>
-                <Filter filters={ReplyFilters} />
-            </div>
+    // console.log(result)
+    // console.log(error)
 
-            <div>
-                {result.replies.map((reply) => (
-                    <article key={reply._id} className="text-dark100_light900 light-border border-b py-10">
-                        <div className="mb-8 flex flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
-                            <Link to={`/profile/${reply.author.clerkId}`} className="flex flex-1 items-start gap-1 sm:items-center">
-                                <img src={reply.author.picture} width={18} height={18} alt="profile" className="rounded-full object-cover max-sm:mt-0.5"/>
-                                <div className="flex flex-col sm:flex-row sm:items-center">
-                                    <p className="body-semibold text-dark300_light700">
-                                        {reply.author.name}
-                                    </p>
-                                    <p className="small-regular text-light400_light500 ml-0.5 mt-0.5 line-clamp-1">
-                                        replyed {getTimestamp(reply.createdAt)}
-                                    </p>
-                                </div>
-                            </Link>
-                            <div className="flex justify-end">
-                                <Votes type="Reply" itemId={JSON.stringify(reply.id)} userId={JSON.stringify(userId)} upvotes={reply.upvotes.length} hasupVoted={reply.upvotes.includes(userId)} downvotes={reply.downvotes.length} hasdownVoted={reply.downvotes.includes(userId)}/>
-                            </div>
-                        </div>
-                        {/* <ParseHTML data={reply.content} /> */}
-                        {JSON.stringify(reply.content)}
-                    </article>
-                ))}
-            </div>
-        </div>
-    );
+    if (isLoading) return <div>Loading</div>;
+    // if (isError) return <div>{error.message}</div>;
+
+	return (
+		<div className="mt-11">
+			<div className="flex items-center justify-between">
+				<h3 className="primary-text-gradient">{totalReplies} Replies</h3>
+				<Filter filters={ReplyFilters} />
+			</div>
+
+			<div>
+				{result.replies.map((reply) => (
+					<article
+						key={reply._id}
+						className="text-dark100_light900 light-border border-b py-10"
+					>
+						<div className="mb-8 flex flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
+							<Link
+								to={`/community/profile/${reply.author._id}`}
+								className="flex flex-1 items-start gap-1  sm:max-w-fit sm:items-center"
+							>
+								<img
+									src={reply.author.avatar}
+									width={18}
+									height={18}
+									alt="profile"
+									className="rounded-full object-cover max-sm:mt-0.5"
+								/>
+								<div className="flex flex-col sm:gap-2 sm:flex-row sm:items-center">
+									<p className="body-semibold text-dark300_light700">
+										{reply.author.name}
+									</p>
+									<p className="small-regular text-light400_light500 ml-0.5 mt-0.5 line-clamp-1">
+										replied {getTimestamp(reply.createdAt)}
+									</p>
+								</div>
+							</Link>
+							<div className="flex justify-end">
+								<Votes
+									type="Reply"
+									itemId={JSON.stringify(reply._id)}
+									userId={JSON.stringify(userId)}
+									upvotes={reply.upvotes.length}
+									hasupVoted={reply.upvotes.includes(userId)}
+									downvotes={reply.downvotes.length}
+									hasdownVoted={reply.downvotes.includes(userId)}
+								/>
+							</div>
+						</div>
+						{/* <ParseHTML data={reply.content} /> */}
+						{parse(reply.content)}
+					</article>
+				))}
+			</div>
+		</div>
+	);
 };
 
 export default AllReplies;

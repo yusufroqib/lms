@@ -7,19 +7,19 @@ import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
 import EditDeleteAction from "../EditDeleteAction";
 import useAuth from "@/hooks/useAuth";
 
-const PostCard = ({   title, tags, author, upvotes, views, replies, createdAt }) => {
-    console.log(createdAt)
-  const { username, isTutor, isAdmin, _id } = useAuth();
+const PostCard = ({  _id, title, tags, author, upvotes, views, replies, createdAt }) => {
+    // console.log(createdAt)
+  const { username, isTutor, isAdmin, _id:userId } = useAuth();
 
-    const showActionButtons = _id && _id === author._id;
+    const showActionButtons = userId && userId === author._id;
     return (
-        <div className="card-wrapper rounded-[10px] p-9 sm:px-11">
+        <div className="shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-[10px] p-9 sm:px-11">
             <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
                 <div>
                     <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
                         {getTimestamp(createdAt)}
                     </span>
-                    <Link to={`community/post/${_id}`}>
+                    <Link to={`/community/posts/${_id}`}>
                         <h3 className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1">
                             {title}
                         </h3>

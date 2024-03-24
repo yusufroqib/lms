@@ -13,11 +13,11 @@ export default withMT({
 				xsm: "425px",
 				...defaultTheme.screens,
 				"3xl": "2000px",
-				'max-sm': { max: '639px' }, // Add custom max-sm breakpoint
-				'max-md': { max: '767px' }, // Add custom max-md breakpoint
-				'max-lg': { max: '1023px' }, // Add custom max-lg breakpoint
-				'max-xl': { max: '1279px' }, // Add custom max-xl breakpoint
-				'max-2xl': { max: '1535px' }, // Add custom max-2xl breakpoint
+				"max-sm": { max: "639px" }, // Add custom max-sm breakpoint
+				"max-md": { max: "767px" }, // Add custom max-md breakpoint
+				"max-lg": { max: "1023px" }, // Add custom max-lg breakpoint
+				"max-xl": { max: "1279px" }, // Add custom max-xl breakpoint
+				"max-2xl": { max: "1535px" }, // Add custom max-2xl breakpoint
 			},
 			// colors: {
 			// 	...colors,
@@ -92,7 +92,7 @@ export default withMT({
 				card: {
 					DEFAULT: "hsl(var(--card))",
 					foreground: "hsl(var(--card-foreground))",
-				},
+				}, 
 				dark: {
 					100: "#000000",
 					200: "#0F1117",
@@ -329,5 +329,9 @@ export default withMT({
 			},
 		},
 	},
-	plugins: [require("daisyui"), require("tailwindcss-animate"), require("@tailwindcss/typography")],
+	plugins: [
+		require("daisyui"),
+		require("tailwindcss-animate"),
+		require("@tailwindcss/typography"),
+	],
 });

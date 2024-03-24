@@ -68,6 +68,11 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
 		}),
+		getUserById: builder.query({
+            query: (userId) => `/community/users/${userId}`,
+            transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
+            providesTags: (result, error, userId) => [{ type: "User", id: userId }],
+        }),
 	}),
 });
 
@@ -77,6 +82,7 @@ export const {
 	useAddNewUserMutation,
 	useUpdateUserMutation,
 	useDeleteUserMutation,
+	useGetUserByIdQuery 
 } = usersApiSlice;
 
 

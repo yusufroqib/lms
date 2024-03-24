@@ -1,5 +1,6 @@
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "ckeditor5-custom-build";
+// import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
 
 // import {
 // 	HtmlEditor,
@@ -13,95 +14,188 @@ import Editor from "ckeditor5-custom-build";
 import React from "react";
 // import * as React from 'react';
 
-function RTEditor({ name, value, setValue, field }) {
-	
-	// const toolbarSettings = {
-	// 	items: [
-	// 		"Bold",
-	// 		"Italic",
-	// 		"Underline",
-	// 		"StrikeThrough",
-	// 		"FontName",
-	// 		"FontSize",
-	// 		"FontColor",
-	// 		"BackgroundColor",
-	// 		"LowerCase",
-	// 		"UpperCase",
-	// 		"|",
-	// 		"Formats",
-	// 		"Alignments",
-	// 		"OrderedList",
-	// 		"UnorderedList",
-	// 		"Outdent",
-	// 		"Indent",
-	// 		"|",
-	// 		"Image",
-	// 		"CreateLink",
-	// 		"InsertCode",
-	// 		"|",
-	// 		"ClearFormat",
-	// 		"FullScreen",
-	// 		"SourceCode",
-	// 		"|",
-	// 		"Undo",
-	// 		"Redo",
-	// 	],
-	// };
+function RTEditor({ name, value, setValue, editorRef, field }) {
+	const pathname = window.location.pathname;
 
-	// const insertImageSettings = {
-	// 	saveUrl: "https://ej2.syncfusion.com/services/api/uploadbox/Save",
-	// 	removeUrl: "https://ej2.syncfusion.com/services/api/uploadbox/Remove",
-	// };
+	let placeholder;
+	if (pathname.includes("edit-course")) {
+		placeholder = `What you'll learn, Requirements, Description, Who is this course for, etc `;
+	} else {
+		placeholder = ``;
+	}
 
-	const handleChange = (event, editor) => {
-		const data = editor.getData();
-		console.log(data)
-		// setValue(data);
+	const editorConfig = {
+		placeholder: placeholder,
+		extraPlugins: [MentionLinks],
 
-		field.onChange(data);
+		toolbar: {
+			items: [
+				"heading",
+				"|",
+				"findAndReplace",
+				"bold",
+				"italic",
+				"strikethrough",
+				"underline",
+				"fontColor",
+				"fontFamily",
+				"subscript",
+				"superscript",
+				"link",
+				"|",
+				"bulletedList",
+				"numberedList",
+				"|",
+				"alignment",
+				"outdent",
+				"indent",
+				"|",
+				"blockQuote",
+				"codeBlock",
 
-		// console.log(name, e.value)
+				"|",
+				"horizontalLine",
+				"insertTable",
+				"imageInsert",
+				"mediaEmbed",
+				"|",
+				"undo",
+				"redo",
+			],
+			shouldNotGroupWhenFull: true,
+		},
+		// Include the Paragraph plugin in the configuration
+		mention: {
+			feeds: [
+				{
+					marker: "@",
+					feed: [
+						{ id: "@cflores", avatar: "m_1", name: "Charles Flores" },
+						{ id: "@gjackson", avatar: "m_2", name: "Gerald Jackson" },
+						{ id: "@wreed", avatar: "m_3", name: "Wayne Reed" },
+						{ id: "@lgarcia", avatar: "m_4", name: "Louis Garcia" },
+						{ id: "@rwilson", avatar: "m_5", name: "Roy Wilson" },
+						{ id: "@mnelson", avatar: "m_6", name: "Matthew Nelson" },
+						{ id: "@rwilliams", avatar: "m_7", name: "Randy Williams" },
+						{ id: "@ajohnson", avatar: "m_8", name: "Albert Johnson" },
+						{ id: "@sroberts", avatar: "m_9", name: "Steve Roberts" },
+						{ id: "@kevans", avatar: "m_10", name: "Kevin Evans" },
+						{ id: "@mwilson", avatar: "w_1", name: "Mildred Wilson" },
+						{ id: "@mnelson", avatar: "w_2", name: "Melissa Nelson" },
+						{ id: "@kallen", avatar: "w_3", name: "Kathleen Allen" },
+						{ id: "@myoung", avatar: "w_4", name: "Mary Young" },
+						{ id: "@arogers", avatar: "w_5", name: "Ashley Rogers" },
+						{ id: "@dgriffin", avatar: "w_6", name: "Debra Griffin" },
+						{ id: "@dwilliams", avatar: "w_7", name: "Denise Williams" },
+						{ id: "@ajames", avatar: "w_8", name: "Amy James" },
+						{ id: "@randerson", avatar: "w_9", name: "Ruby Anderson" },
+						{ id: "@wlee", avatar: "w_10", name: "Wanda Lee" },
+					],
+					itemRenderer: customItemRenderer,
+				},
+				{
+					marker: "#",
+					feed: [
+						"#american",
+						"#asian",
+						"#baking",
+						"#breakfast",
+						"#cake",
+						"#caribbean",
+						"#chinese",
+						"#chocolate",
+						"#cooking",
+						"#dairy",
+						"#delicious",
+						"#delish",
+						"#dessert",
+						"#desserts",
+						"#dinner",
+						"#eat",
+						"#eating",
+						"#eggs",
+						"#fish",
+						"#food",
+						"#foodgasm",
+						"#foodie",
+						"#foodporn",
+						"#foods",
+						"#french",
+						"#fresh",
+						"#fusion",
+						"#glutenfree",
+						"#greek",
+						"#grilling",
+						"#halal",
+						"#homemade",
+						"#hot",
+						"#hungry",
+						"#icecream",
+						"#indian",
+						"#italian",
+						"#japanese",
+						"#keto",
+						"#korean",
+						"#lactosefree",
+						"#lunch",
+						"#meat",
+						"#mediterranean",
+						"#mexican",
+						"#moroccan",
+						"#nom",
+						"#nomnom",
+						"#paleo",
+						"#poultry",
+						"#snack",
+						"#spanish",
+						"#sugarfree",
+						"#sweet",
+						"#sweettooth",
+						"#tasty",
+						"#thai",
+						"#vegan",
+						"#vegetarian",
+						"#vietnamese",
+						"#yum",
+						"#yummy",
+					],
+				},
+			],
+		},
 	};
 
-	const handleKeyDown = (e) => {
-		if (e.key === "Tab") {
-			e.preventDefault(); // Prevent default tab behavior
-			const editor = richTextEditorRef.current.getInstance(); // Get a reference to the Syncfusion text editor instance
-			const range = editor.getDocument().getSelection().getRangeAt(0); // Get current selection range
-			const tabNode = document.createTextNode("\t"); // Create a text node with tab character
-			range.insertNode(tabNode); // Insert tab character at the current selection position
-			range.collapse(false); // Collapse range after the inserted tab character
-			e.stopPropagation(); // Stop propagation to prevent other event handlers from handling the event
-		}
-	};
+	// const handleChange = (event, editor) => {
+	// 	const data = editor.getData();
+	// 	console.log(data)
+	// 	// setValue(data);
+
+	// 	field.onChange(data);
+
+	// 	// console.log(name, e.value)
+	// };
 
 	return (
-
 		<CKEditor
-		// className='prose'
-		editor={Editor}
-		data={value}
-		// onReady={(editor) => {
-		// 	// You can store the "editor" and use when it is needed.
-		// 	console.log("Editor is ready to use!", editor);
-		// }}
-		onChange={(event, editor) => {
-			const data = editor.getData();
-			console.log(data)
-			// setValue(data);
+			className="min-h-200"
+			editor={Editor}
+			data={value}
+			config={editorConfig}
+			onReady={(editor) => {
+				editorRef.current = editor;
+				// You can store the "editor" and use when it is needed.
+				console.log("Editor is ready to use!", editor);
+			}}
+			onBlur={field.onBlur}
+			onChange={(event, editor) => {
+				const data = editor.getData();
+				// console.log(data);
+				// setValue(data);
 
-			field.onChange(data);
+				field.onChange(data);
 
-			console.log("Editor change:", editor, event);
-			
-		}}
-		// onBlur={(event, editor) => {
-		// 	console.log("Blur.", editor);
-		// }}
-		// onFocus={(event, editor) => {
-		// 	console.log("Focus.", editor);
-		// }}
-	/>
+				// console.log("Editor change:", editor, data);
+			}}
+		/>
 		// <RichTextEditorComponent
 		// 	className="z-[100] relative w-auto no-tailwindcss-base"
 		// 	// height={400}
@@ -115,8 +209,78 @@ function RTEditor({ name, value, setValue, field }) {
 		// 	{/* {value} */}
 		// 	<Inject services={[Toolbar, Image, Link, HtmlEditor, QuickToolbar]} />
 		// </RichTextEditorComponent>
-
-
 	);
 }
-export default React.memo(RTEditor)
+export default React.memo(RTEditor);
+
+function customItemRenderer(item) {
+	const itemElement = document.createElement("span");
+	const avatar = document.createElement("img");
+	const userNameElement = document.createElement("span");
+	const fullNameElement = document.createElement("span");
+
+	itemElement.classList.add("mention__item");
+
+	avatar.src = `https://example.com/avatars/${item.avatar}.jpg`;
+
+	userNameElement.classList.add("mention__item__user-name");
+	userNameElement.textContent = item.id;
+
+	fullNameElement.classList.add("mention__item__full-name");
+	fullNameElement.textContent = item.name;
+
+	itemElement.appendChild(avatar);
+	itemElement.appendChild(userNameElement);
+	itemElement.appendChild(fullNameElement);
+
+	return itemElement;
+}
+
+function MentionLinks(editor) {
+	editor.conversion.for("upcast").elementToAttribute({
+		view: {
+			name: "a",
+			key: "data-mention",
+			classes: "mention",
+			attributes: {
+				href: true,
+			},
+		},
+		model: {
+			key: "mention",
+			value: (viewItem) =>
+				editor.plugins.get("Mention").toMentionAttribute(viewItem),
+		},
+		converterPriority: "high",
+	});
+
+	editor.conversion.for("downcast").attributeToElement({
+		model: "mention",
+		view: (modelAttributeValue, { writer }) => {
+			if (!modelAttributeValue) {
+				return;
+			}
+
+			let href;
+			if (modelAttributeValue.id[0] === "@") {
+				href = `mailto:${modelAttributeValue.id.slice(1)}@example.com`;
+			} else {
+				href = `https://example.com/social/${modelAttributeValue.id.slice(1)}`;
+			}
+
+			return writer.createAttributeElement(
+				"a",
+				{
+					class: "mention",
+					"data-mention": modelAttributeValue.id,
+					href,
+				},
+				{
+					priority: 20,
+					id: modelAttributeValue.uid,
+				}
+			);
+		},
+		converterPriority: "high",
+	});
+}
