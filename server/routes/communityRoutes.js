@@ -9,7 +9,7 @@ const {
 	getPostById,
 	getUserById,
 	getUserInfo,
-    getUserPosts,
+	getUserPosts,
 	createReply,
 	viewPost,
 	upvotePost,
@@ -24,7 +24,8 @@ const {
 	deletePost,
 	getAllUsers,
 	getTopInteractedTags,
-    getUserReplies
+	getUserReplies,
+	globalSearch,
 } = require("../controllers/communityController");
 // const { browseAllCourses, purchaseCourse, getEnrolledCoursesWithProgress } = require("../controllers/courseController");
 
@@ -56,6 +57,7 @@ router.post("/posts/downvote", verifyJWT, downvotePost);
 router.post("/replies/upvote", verifyJWT, upvoteReply);
 router.post("/replies/downvote", verifyJWT, downvoteReply);
 router.post("/posts/toggle-save", verifyJWT, toggleSavePost);
+router.get("/global-search", verifyJWT, globalSearch);
 router.delete("/posts/:postId", verifyJWT, deletePost);
 // router.get("/all-enrolled", verifyJWT, getEnrolledCoursesWithProgress);
 // router.post("/:courseId/purchase", verifyJWT, purchaseCourse);

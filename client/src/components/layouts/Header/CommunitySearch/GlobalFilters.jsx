@@ -1,32 +1,30 @@
-import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; // Adjusted for React Router v6
 import { GlobalSearchFilters } from "@/lib/filters";
 import { formUrlQuery } from "@/lib/utils";
 
 const GlobalFilters = () => {
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
     const typeParams = searchParams.get("type");
     const [active, setActive] = useState(typeParams || "");
 
     const handleTypeClick = (item) => {
+        let newUrl;
         if (active === item) {
             setActive("");
-            const newUrl = formUrlQuery({
-                params: searchParams.toString(),
-                key: "type",
-                value: null,
-            });
-            navigate(newUrl, { replace: true });
+            searchParams.delete("type");
         } else {
             setActive(item);
-            const newUrl = formUrlQuery({
-                params: searchParams.toString(),
-                key: "type",
-                value: item.toLowerCase(),
-            });
-            navigate(newUrl, { replace: true });
+            searchParams.set("type", item.toLowerCase());
         }
+        newUrl = formUrlQuery({
+            params: searchParams.toString(),
+            key: "type",
+            value: item.toLowerCase(),
+        });
+        navigate(newUrl, { replace: true }); // Using navigate with replace option to update the URL without adding a new entry to the history stack
     };
 
     return (

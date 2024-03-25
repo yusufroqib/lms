@@ -890,6 +890,71 @@ const getUserReplies = async (req, res) => {
 	}
 };
 
+
+const SearchableTypes = ["post", "reply", "user", "tag"];
+
+const globalSearch = async (req, res) => {
+    const { query, type } = req.query;
+	console.log(query)
+    try {
+        const regexQuery = { $regex: query, $options: "i" };
+        let results = [];
+        const modelsAndTypes = [
+            { model: Post, searchField: "title", type: "post" },
+            { model: User, searchField: "name", type: "user" },
+            { model: Reply, searchField: "content", type: "reply" },
+            { model: Tag, searchField: "name", type: "tag" },
+        ];
+        const typeLower = type?.toLowerCase();
+        if (!typeLower || !SearchableTypes.includes(typeLower)) {
+            // SEARCH ACROSS EVERYTHING
+            for (const { model, searchField, type } of modelsAndTypes) {
+                const queryResults = await model
+                    .find({ [searchField]: regexQuery })
+                    .limit(2);
+                results.push(...queryResults.map((item) => ({
+                    title: type === "reply"
+                        ? `Replies containing ${query}`
+                        : item[searchField],
+                    type,
+                    id: type === "user"
+                        ? item._id
+                        : type === "reply"
+                            ? item.post
+                            : item._id,
+                })));
+            }
+        }
+        else {
+            // SEARCH IN THE SPECIFIED MODEL TYPE
+            const modelInfo = modelsAndTypes.find((item) => item.type === type);
+            if (!modelInfo) {
+                return res.status(400).json({ error: "Invalid search type" });
+            }
+            const queryResults = await modelInfo.model
+                .find({ [modelInfo.searchField]: regexQuery })
+                .limit(8);
+            results = queryResults.map((item) => ({
+                title: type === "reply"
+                    ? `Replies containing ${query}`
+                    : item[modelInfo.searchField],
+                type,
+                id: type === "user"
+                    ? item._id
+                    : type === "reply"
+                        ? item.post
+                        : item._id,
+            }));
+        }
+        res.status(200).json(results);
+    } catch (error) {
+        console.log(`Error fetching global results, ${error}`);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
+
 module.exports = {
 	createReply,
 	getReplies,
@@ -919,5 +984,5 @@ module.exports = {
 	getSavedPosts,
 	getUserInfo,
 	getUserPosts,
-	getUserReplies,
+	getUserReplies,globalSearch
 };

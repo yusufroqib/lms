@@ -5,11 +5,13 @@ import DropdownUser from "./DropdownUser";
 import LogoIcon from "../../images/logo/logo-icon.svg";
 import React from "react";
 import SearchInput from "@/components/SearchInput";
+import GlobalSearch from "./CommunitySearch/GlobalSearch";
 // import DarkModeSwitcher from './DarkModeSwitcher';
 const Header = (props) => {
 	const location = useLocation();
 
 	const isSearchPage = location.pathname === "/courses/search";
+	const isCommunityPage = location.pathname.includes('community')
 
 	return (
 		<header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
@@ -67,10 +69,11 @@ const Header = (props) => {
 					<div className="hidden md:block">
 						<SearchInput />
 					</div>
+				) : isCommunityPage ? (
+					<GlobalSearch />
 				) : (
 					<div></div>
 				)}
-
 
 				<div className="flex items-center gap-3 2xsm:gap-7">
 					<ul className="flex items-center gap-2 2xsm:gap-4">

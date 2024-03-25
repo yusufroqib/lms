@@ -10,6 +10,15 @@ const initialState = postsAdapter.getInitialState({
 
 export const postsApiSlice = apiSlice.injectEndpoints({
 	endpoints: (builder) => ({
+		globalSearch: builder.query({
+			query: ({ searchParams }) => `/community/global-search?${searchParams}`,
+
+			transformResponse: (responseData) => {
+				// Extract posts and isNext from responseData
+				
+				return  responseData;
+			},
+		}),
 		getPosts: builder.query({
 			query: ({ searchParams }) => `/community/posts/search?${searchParams}`,
 
@@ -386,6 +395,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
+	useGlobalSearchQuery,
 	useGetPostsQuery,
 	useGetUserPostsQuery,
 	useGetUserRepliesQuery,
