@@ -66,7 +66,8 @@ const Reply = ({ post, postId, authorId }) => {
 
 	return (
 		<div>
-			<div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
+            <div className="border-light-2 border-b mt-1"></div>
+			<div className="flex flex-col justify-between gap-5 my-3 sm:flex-row sm:items-center sm:gap-2">
 				<h4 className="paragraph-semibold text-dark400_light800">
 					Write your reply here
 				</h4>

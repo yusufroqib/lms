@@ -32,7 +32,7 @@ function RTEditor({ name, value, setValue, editorRef, field }) {
 			items: [
 				"heading",
 				"|",
-				"findAndReplace",
+				// "findAndReplace",
 				"bold",
 				"italic",
 				"strikethrough",

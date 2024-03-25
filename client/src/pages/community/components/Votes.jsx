@@ -5,7 +5,15 @@ import { useLocation } from "react-router-dom";
 // import { downvotePost, upvotePost } from "@/lib/actions/post.action";
 // import { toggleSavePost } from "@/lib/actions/user.action";
 import { formatAndDivideNumber } from "@/lib/utils";
-import { useViewPostMutation } from "@/features/posts/postsApiSlice";
+import {
+	useDownvotePostMutation,
+	useDownvoteReplyMutation,
+	useToggleSavePostMutation,
+	useUpvotePostMutation,
+	useUpvoteReplyMutation,
+	useViewPostMutation,
+} from "@/features/posts/postsApiSlice";
+import toast from "react-hot-toast";
 // import { toast } from "../ui/use-toast";
 
 const Votes = ({
@@ -17,76 +25,87 @@ const Votes = ({
 	downvotes,
 	hasdownVoted,
 	hasSaved,
+    refetch
 }) => {
 	const location = useLocation();
-	const pathname = location.pathname;
-	const [viewPost, { isLoading, isError, isSuccess, error }] =
-		useViewPostMutation();
+	// const pathname = location.pathname;
+	const [viewPost, { isLoading, isSuccess }] = useViewPostMutation();
+
+	const [upvotePost, { isError, error }] = useUpvotePostMutation();
+	const [downvotePost] = useDownvotePostMutation();
+	const [upvoteReply] = useUpvoteReplyMutation();
+	const [downvoteReply] = useDownvoteReplyMutation();
+	const [toggleSavePost] = useToggleSavePostMutation();
+	// console.log(error)
 
 	const handleSave = async () => {
-		// await toggleSavePost({
-		//     userId: JSON.parse(userId),
-		//     postId: JSON.parse(itemId),
-		//     path: pathname,
-		// });
-		// return toast({
-		//     title: `Post ${!hasupVoted ? "Saved in" : "Removed from"} your collection`,
-		//     variant: !hasSaved ? "default" : "destructive",
-		// });
+		try {
+			await toggleSavePost({
+				userId,
+				postId: itemId,
+			}).unwrap();
+
+			const title = `Post ${
+				!hasSaved ? "saved in" : "removed from"
+			} your collection`;
+            refetch()
+			toast.success(title);
+
+			// return toast({
+			//     title: `Post ${!hasupVoted ? "Saved in" : "Removed from"} your collection`,
+			//     variant: !hasSaved ? "default" : "destructive",
+			// });
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	const handleVote = async (action) => {
-		// if (!userId) {
-		//     return toast({
-		//         title: "Please log in",
-		//         description: "You need to log in to perform this action",
-		//     });
-		// }
-		if (action === "upvote") {
-			if (type === "Post") {
-				// await upvotePost({
-				//     postId: JSON.parse(itemId),
-				//     userId: JSON.parse(userId),
-				//     hasupVoted,
-				//     hasdownVoted,
-				//     path: pathname,
-				// });
-			} else if (type === "Reply") {
-				// await upvoteReply({
-				//     replyId: JSON.parse(itemId),
-				//     userId: JSON.parse(userId),
-				//     hasupVoted,
-				//     hasdownVoted,
-				//     path: pathname,
+		// console.log(action);
+		try {
+			if (action === "upvote") {
+				// console.log('running')
+				if (type === "Post") {
+					await upvotePost({
+						postId: itemId,
+						userId: userId,
+						hasupVoted,
+						hasdownVoted,
+					}).unwrap();
+				} else if (type === "Reply") {
+					await upvoteReply({
+						replyId: itemId,
+						userId: userId,
+						hasupVoted,
+						hasdownVoted,
+					}).unwrap();
+				}
+			}
+			if (action === "downvote") {
+				// console.log('running')
+
+				if (type === "Post") {
+					await downvotePost({
+						postId: itemId,
+						userId: userId,
+						hasupVoted,
+						hasdownVoted,
+					}).unwrap();
+				} else if (type === "Reply") {
+					await downvoteReply({
+						replyId: itemId,
+						userId: userId,
+						hasupVoted,
+						hasdownVoted,
+					}).unwrap();
+				}
+				// return toast({
+				//     title: `Downvote ${!hasupVoted ? "Removed" : "Successful"}`,
+				//     variant: !hasupVoted ? "default" : "destructive",
 				// });
 			}
-			// return toast({
-			//     title: `Upvote ${!hasupVoted ? "Successful" : "Removed"}`,
-			//     variant: !hasupVoted ? "default" : "destructive",
-			// });
-		}
-		if (action === "downvote") {
-			if (type === "Post") {
-				// await downvotePost({
-				//     postId: JSON.parse(itemId),
-				//     userId: JSON.parse(userId),
-				//     hasupVoted,
-				//     hasdownVoted,
-				//     path: pathname,
-				// });
-			} else if (type === "Reply") {
-				// await downvoteReply({
-				//     replyId: JSON.parse(itemId),
-				//     userId: JSON.parse(userId),
-				//     hasupVoted,
-				//     hasdownVoted,
-				//     path: pathname,
-				// });
-			}
-			// return toast({
-			//     title: `Downvote ${!hasupVoted ? "Removed" : "Successful"}`,
-			//     variant: !hasupVoted ? "default" : "destructive",
-			// });
+		} catch (error) {
+			console.log(error);
 		}
 	};
 
@@ -97,16 +116,18 @@ const Votes = ({
 		// });
 		const viewPostData = async () => {
 			try {
-				viewPost({
-					postId: JSON.parse(itemId),
-					userId: userId ? JSON.parse(userId) : undefined,
-				});
+				// console.log(itemId)
+				// console.log(userId)
+				await viewPost({
+					postId: itemId,
+					userId: userId ? userId : undefined,
+				}).unwrap();
 			} catch (error) {
 				console.log(error);
 			}
 		};
 		viewPostData();
-	}, [itemId, pathname]);
+	}, []);
 
 	return (
 		<div className="flex gap-5">
@@ -168,4 +189,4 @@ const Votes = ({
 	);
 };
 
-export default Votes;
+export default React.memo(Votes);

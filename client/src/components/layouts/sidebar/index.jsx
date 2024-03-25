@@ -91,8 +91,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 						</h3>
 
 						<ul className="mb-6 flex flex-col gap-1.5">
-						
-
 							{/* <!-- Menu Item Calendar --> */}
 							<li>
 								<NavLink
@@ -137,11 +135,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 								<NavLink
 									to="/courses"
 									className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-										pathname.includes("/courses") && "bg-graydark dark:bg-meta-4"
+										pathname.includes("/courses") &&
+										"bg-graydark dark:bg-meta-4"
 									}`}
 								>
 									<svg
-									className="fill-current"
+										className="fill-current"
 										width="18"
 										height="18"
 										viewBox="0 0 24 24"
@@ -395,6 +394,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 													</li>
 													<li>
 														<NavLink
+															to="/community/my-collection"
+															className={({ isActive }) =>
+																"group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
+																(isActive && "!text-white")
+															}
+														>
+															My Collection
+														</NavLink>
+													</li>
+													<li>
+														<NavLink
 															to="/community/users"
 															className={({ isActive }) =>
 																"group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
@@ -402,6 +412,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 															}
 														>
 															Users
+														</NavLink>
+													</li>
+													<li>
+														<NavLink
+															to="/community/all-tags"
+															className={({ isActive }) =>
+																"group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
+																(isActive && "!text-white")
+															}
+														>
+															Tags
 														</NavLink>
 													</li>
 												</ul>
@@ -413,7 +434,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 							</SidebarLinkGroup>
 							{/* <!-- Menu Item Forms --> */}
 
-							{/* <!-- Menu Item Tables --> */} 
+							{/* <!-- Menu Item Tables --> */}
 							{/* <li>
 								<NavLink
 									to="/tables"
@@ -770,4 +791,4 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 		</aside>
 	);
 };
-export default React.memo(Sidebar)
+export default React.memo(Sidebar);

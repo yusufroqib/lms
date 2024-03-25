@@ -5,51 +5,51 @@ import { useNavigate } from "react-router-dom";
 // import { getTimestamp } from "@/lib/utils";
 
 const EditDeleteAction = ({ type, itemId }) => {
-    const navigate = useNavigate();
+	const navigate = useNavigate();
 
-    const handleEdit = () => {
-        navigate(`/post/edit/${JSON.parse(itemId)}`);
-    };
+	const handleEdit = () => {
+		navigate(`/community/posts/edit-post/${itemId}`);
+	};
 
-    const handleDelete = async () => {
-        // if (type === "Post") {
-        //     // Delete post
-        //     await deletePost({
-        //         postId: JSON.parse(itemId),
-        //         path: window.location.pathname,
-        //     });
-        // } else if (type === "Reply") {
-        //     // Delete reply
-        //     await deleteReply({
-        //         replyId: JSON.parse(itemId),
-        //         path: window.location.pathname,
-        //     });
-        // }
-    };
+	const handleDelete = async () => {
+		// if (type === "Post") {
+		//     // Delete post
+		//     await deletePost({
+		//         postId: JSON.parse(itemId),
+		//         path: window.location.pathname,
+		//     });
+		// } else if (type === "Reply") {
+		//     // Delete reply
+		//     await deleteReply({
+		//         replyId: JSON.parse(itemId),
+		//         path: window.location.pathname,
+		//     });
+		// }
+	};
 
-    return (
-        <div className="flex items-center justify-end gap-3 max-sm:w-full">
-            {type === "Post" && (
-                <img
-                    src="/assets/icons/edit.svg"
-                    alt="Edit"
-                    width={14}
-                    height={14}
-                    className="cursor-pointer object-contain"
-                    onClick={handleEdit}
-                />
-            )}
+	return (
+		<div className="flex items-center justify-end gap-3 max-sm:w-full">
+			{type === "Post" && (
+				<img
+					src="/assets/icons/edit.svg"
+					alt="Edit"
+					width={14}
+					height={14}
+					className="cursor-pointer object-contain"
+					onClick={handleEdit}
+				/>
+			)}
 
-            <img
-                src="/assets/icons/trash.svg"
-                alt="Delete"
-                width={14}
-                height={14}
-                className="cursor-pointer object-contain"
-                onClick={handleDelete}
-            />
-        </div>
-    );
+			<img
+				src="/assets/icons/trash.svg"
+				alt="Delete"
+				width={14}
+				height={14}
+				className="cursor-pointer object-contain"
+				onClick={handleDelete}
+			/>
+		</div>
+	);
 };
 
 export default EditDeleteAction;

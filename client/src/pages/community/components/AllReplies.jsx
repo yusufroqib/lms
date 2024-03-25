@@ -45,7 +45,7 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 
 	return (
 		<div className="mt-11">
-			<div className="flex items-center justify-between">
+			<div className="flex items-center border-light-2 border-b pb-1 justify-between">
 				<h3 className="primary-text-gradient">{totalReplies} Replies</h3>
 				<Filter filters={ReplyFilters} />
 			</div>
@@ -54,7 +54,7 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 				{result.replies.map((reply) => (
 					<article
 						key={reply._id}
-						className="text-dark100_light900 light-border border-b py-10"
+						className="text-dark100_light900 light-border-2 border-b py-10"
 					>
 						<div className="mb-8 flex flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
 							<Link
@@ -80,8 +80,8 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 							<div className="flex justify-end">
 								<Votes
 									type="Reply"
-									itemId={JSON.stringify(reply._id)}
-									userId={JSON.stringify(userId)}
+									itemId={(reply?._id)}
+									userId={(userId)}
 									upvotes={reply.upvotes.length}
 									hasupVoted={reply.upvotes.includes(userId)}
 									downvotes={reply.downvotes.length}

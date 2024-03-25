@@ -22,6 +22,10 @@ import Feeds from "./pages/community/feeds/Feeds";
 import CommunityLayout from "./pages/community/CommunityLayout";
 import CreatePost from "./pages/community/posts/createPost/CreatePost";
 import PostPage from "./pages/community/posts/viewPost/PostPage";
+import MyCollection from "./pages/community/myCollection/MyCollection";
+import AllTags from "./pages/community/tags/allTags/AllTags";
+import TagPosts from "./pages/community/tags/tagPosts/TagPosts";
+import EditPost from "./pages/community/posts/editPost/EditPost";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -53,16 +57,15 @@ function App() {
 							</Route>
 							<Route path="community" element={<CommunityLayout />}>
 								<Route path="feeds" element={<Feeds />} />
+								<Route path="my-collection" element={<MyCollection />} />
+								<Route path="all-tags" element={<AllTags />} />
+								<Route path="tags/:tagId" element={<TagPosts />} />
 								<Route path="posts">
 									<Route path="create-post" element={<CreatePost />} />
 									<Route path=":postId" element={<PostPage />} />
+									<Route path="edit-post/:postId" element={<EditPost />} />
 								</Route>
-								{/* <Route path="create-course" element={<CreateCourse />} />
-								<Route path="edit-course/:courseId" element={<EditCourse />} />
-								<Route
-									path="edit-course/:courseId/chapter/:chapterId"
-									element={<EditChapter />}
-								/> */}
+							
 							</Route>
 						</Route>
 						<Route path="study/:courseId">

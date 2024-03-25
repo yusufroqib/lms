@@ -10,11 +10,22 @@ const {
 	getUserById,
 	createReply,
 	viewPost,
+	upvotePost,
+	upvoteReply,
+	downvotePost,
+	downvoteReply,
+	toggleSavePost,
+	getSavedPosts,
+	getAllTags,
+    getPostByTagId
 } = require("../controllers/communityController");
 // const { browseAllCourses, purchaseCourse, getEnrolledCoursesWithProgress } = require("../controllers/courseController");
 
 const router = express.Router();
 router.get("/posts/search", verifyJWT, getPosts);
+router.get("/posts/saved-posts", verifyJWT, getSavedPosts);
+router.get("/tags/all-tags", verifyJWT, getAllTags);
+router.get("/tags/get/:tagId", verifyJWT, getPostByTagId);
 router.get("/posts/hot", verifyJWT, getHotPosts);
 router.get("/posts/:postId", verifyJWT, getPostById);
 router.get("/replies/search", verifyJWT, getReplies);
@@ -23,6 +34,11 @@ router.get("/tags/popular", verifyJWT, getTopPopularTags);
 router.post("/posts/create-post", verifyJWT, createPost);
 router.post("/posts/create-reply", verifyJWT, createReply);
 router.post("/posts/view", verifyJWT, viewPost);
+router.post("/posts/upvote", verifyJWT, upvotePost);
+router.post("/posts/downvote", verifyJWT, downvotePost);
+router.post("/replies/upvote", verifyJWT, upvoteReply);
+router.post("/replies/downvote", verifyJWT, downvoteReply);
+router.post("/posts/toggle-save", verifyJWT, toggleSavePost);
 // router.get("/all-enrolled", verifyJWT, getEnrolledCoursesWithProgress);
 // router.post("/:courseId/purchase", verifyJWT, purchaseCourse);
 

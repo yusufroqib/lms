@@ -41,10 +41,10 @@ const PostPage = () => {
 		isError,
 	} = useGetPostByIdQuery({ postId });
 
-	const { data: mongoUser = {}, isLoading: isLoadingUser, error: userError } = useGetUserByIdQuery(userId);
+	const { data: mongoUser = {}, isLoading: isLoadingUser, error: userError, refetch } = useGetUserByIdQuery(userId);
     // console.log(userError)
 
-    console.log(result)
+    // console.log(result._id)
 
 	// useEffect(() => {
 	//     const fetchData = async () => {
@@ -67,7 +67,7 @@ const PostPage = () => {
 			<div className="flex-start w-full flex-col">
 				<div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
 					<Link
-						to={`/profile/${result.author._id}`}
+						to={`/profile/${result?.author?._id}`}
 						className="flex items-center justify-start gap-1"
 					>
 						<img
@@ -78,19 +78,20 @@ const PostPage = () => {
 							alt="profile"
 						/>
 						<p className="paragraph-semibold text-dark300_light700">
-							{result.author.name}
+							{result?.author?.name}
 						</p>
 					</Link>
 					<div className="flex justify-end">
 						<Votes
 							type="Post"
-							itemId={JSON.stringify(result._id)}
-							userId={JSON.stringify(userId)}
-							upvotes={result.upvotes.length}
-							hasupVoted={result.upvotes.includes(userId)}
-							downvotes={result.downvotes.length}
-							hasdownVoted={result.downvotes.includes(userId)}
+							itemId={(result?._id)}
+							userId={(userId)}
+							upvotes={result?.upvotes?.length}
+							hasupVoted={result.upvotes?.includes(userId)}
+							downvotes={result?.downvotes?.length}
+							hasdownVoted={result?.downvotes?.includes(userId)}
 							hasSaved={mongoUser?.saved.includes(result._id)}
+                            refetch={refetch}
 						/>
 					</div>
 				</div>
@@ -102,8 +103,8 @@ const PostPage = () => {
 				<Metric
 					imgUrl="/assets/icons/clock.svg"
 					alt="clock icon"
-					value={` asked ${getTimestamp(result.createdAt)}`}
-					title=" Asked"
+					value={` posted ${getTimestamp(result.createdAt)}`}
+					title=""
 					textStyles="small-medium text-dark400_light800"
 				/>
 				<Metric

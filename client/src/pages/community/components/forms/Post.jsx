@@ -35,7 +35,10 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 	const [value, setValue] = useState(postDetails?.content);
 	// const parsedPostDetails = postDetails && JSON.parse(postDetails || "");
 	// const groupedTags = parsedPostDetails?.tags.map((tag) => tag.name);
-	const groupedTags = postDetails?.tags.map((tag) => tag.name);
+	const groupedTags = postDetails?.tags?.map((tag) => tag.name);
+	const editorRef = useRef(null);
+	console.log(postDetails?.title)
+
 
 	const form = useForm({
 		resolver: zodResolver(PostsSchema),
@@ -63,7 +66,7 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 					title: values.title,
 					content: values.explanation,
 					tags: values.tags,
-					author: JSON.parse(mongoUserId),
+					author: mongoUserId,
 					path: window.location.pathname,
 				}).unwrap();
 				toast.success("Post created successfully");
@@ -151,9 +154,9 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 								/> */}
 
 								<RTEditor
-									value={value}
+									value={postDetails?.content}
 									field={field}
-
+									editorRef={editorRef}
 									// className='prose'
 									// editor={Editor}
 									// data="<p>Hello from CKEditor&nbsp;5!</p>"

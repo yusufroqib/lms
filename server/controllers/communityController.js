@@ -89,7 +89,7 @@ const upvotePost = async (req, res) => {
 		await User.findByIdAndUpdate(post.author, {
 			$inc: { reputation: hasupVoted ? -10 : 10 },
 		});
-		res.status(200).send("Post upvoted successfully");
+		res.status(200).send({ message: "Post upvoted successfully" });
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -123,7 +123,7 @@ const downvotePost = async (req, res) => {
 		await User.findByIdAndUpdate(post.author, {
 			$inc: { reputation: hasdownVoted ? -10 : 10 },
 		});
-		res.status(200).send("Post downvoted successfully");
+		res.status(200).send({ message: "Post downvoted successfully" });
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -351,7 +351,7 @@ const upvoteReply = async (req, res) => {
 		await User.findByIdAndUpdate(reply.author, {
 			$inc: { reputation: hasupVoted ? -10 : 10 },
 		});
-		res.status(200).send("Reply upvoted successfully");
+		res.status(200).send({ message: "Reply upvoted successfully" });
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -385,7 +385,7 @@ const downvoteReply = async (req, res) => {
 		await User.findByIdAndUpdate(reply.author, {
 			$inc: { reputation: hasdownVoted ? -10 : 10 },
 		});
-		res.status(200).send("Reply downvoted successfully");
+		res.status(200).send({ message: "Reply downvoted successfully" });
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -473,7 +473,8 @@ const getAllTags = async (req, res) => {
 // Controller method for getting posts by tag ID
 const getPostByTagId = async (req, res) => {
 	try {
-		const { tagId, searchQuery, page = 1, pageSize = 10 } = req.params;
+		const {tagId} = req.params
+		const {  searchQuery, page = 1, pageSize = 10 } = req.query;
 		const skipAmount = (page - 1) * pageSize;
 		const tagFilter = { _id: tagId };
 		const tag = await Tag.findOne(tagFilter).populate({
@@ -524,7 +525,9 @@ const viewPost = async (req, res) => {
 	try {
 		// awa
 		const { postId, userId } = req.body;
+		// console.log("ViewPost", req.body);
 		// Update view count for the post
+
 		await Post.findByIdAndUpdate(postId, { $inc: { views: 1 } });
 
 		if (userId) {
@@ -535,7 +538,7 @@ const viewPost = async (req, res) => {
 			});
 
 			if (existingInteraction) {
-				console.log("User has already viewed.");
+				// console.log("User has already viewed.");
 				return res.status(200).send({ message: "User has already viewed." });
 			}
 
@@ -646,7 +649,8 @@ const getAllUsers = async (req, res) => {
 
 const toggleSavePost = async (req, res) => {
 	try {
-		const { userId, postId } = req.params;
+		const userId = req.userId
+		const {  postId } = req.body;
 		const user = await User.findById(userId);
 		if (!user) {
 			res.status(404).send("User not found");
@@ -654,20 +658,22 @@ const toggleSavePost = async (req, res) => {
 		}
 		const isPostSaved = user.saved.includes(postId);
 		if (isPostSaved) {
-			await User.findByIdAndUpdate(
+			 await User.findByIdAndUpdate(
 				userId,
 				{ $pull: { saved: postId } },
 				{ new: true }
 			);
+			// console.log(testing)
 		} else {
-			await User.findByIdAndUpdate(
+			 await User.findByIdAndUpdate(
 				userId,
 				{ $addToSet: { saved: postId } },
 				{ new: true }
 			);
+			// console.log(test)
 		}
-		revalidatePath(req.path);
-		res.sendStatus(204);
+		// revalidatePath(req.path);
+		res.status(200).json({message: 'Post collection updated'});
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -676,7 +682,7 @@ const toggleSavePost = async (req, res) => {
 
 const getSavedPosts = async (req, res) => {
 	try {
-		const { clerkId } = req.params;
+		const { userId } = req;
 		const { page = 1, pageSize = 10, filter, searchQuery } = req.query;
 		const skipAmount = (page - 1) * pageSize;
 		const query = searchQuery
@@ -702,7 +708,7 @@ const getSavedPosts = async (req, res) => {
 			default:
 				break;
 		}
-		const user = await User.findOne({ clerkId }).populate({
+		const user = await User.findById(userId).populate({
 			path: "saved",
 			match: query,
 			options: {
@@ -712,7 +718,7 @@ const getSavedPosts = async (req, res) => {
 			},
 			populate: [
 				{ path: "tags", model: Tag, select: "_id name" },
-				{ path: "author", model: User, select: "_id clrekId name picture" },
+				{ path: "author", model: User, select: "_id  name avatar" },
 			],
 		});
 		const isNext = user.saved.length > pageSize;
@@ -720,10 +726,10 @@ const getSavedPosts = async (req, res) => {
 			throw new Error("User not found");
 		}
 		const savedPosts = user.saved;
-		return { posts: savedPosts, isNext };
+		 res.status(200).json({ posts: savedPosts, isNext });
 	} catch (error) {
 		console.log(error);
-		throw error;
+		res.status(500).send("Internal server error");
 	}
 };
 
@@ -813,7 +819,7 @@ const getUserPosts = async ({ userId, page = 1, pageSize = 10 }) => {
 			.skip(skipAmount)
 			.limit(pageSize)
 			.populate("tags", "_id name")
-			.populate("author", "_id clerkId name picture");
+			.populate("author", "_id  name avatar");
 		const isNextPosts = totalPosts > skipAmount + userPosts.length;
 		return { totalPosts, posts: userPosts, isNextPosts };
 	} catch (error) {
@@ -831,7 +837,7 @@ const getUserReplies = async ({ userId, page = 1, pageSize = 10 }) => {
 			.skip(skipAmount)
 			.limit(pageSize)
 			.populate("post", "_id title")
-			.populate("author", "_id clerkId name picture");
+			.populate("author", "_id name avatar");
 		const isNextReply = totalReplies > skipAmount + userReplies.length;
 		return { totalReplies, replies: userReplies, isNextReply };
 	} catch (error) {
