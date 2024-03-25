@@ -26,6 +26,8 @@ import MyCollection from "./pages/community/myCollection/MyCollection";
 import AllTags from "./pages/community/tags/allTags/AllTags";
 import TagPosts from "./pages/community/tags/tagPosts/TagPosts";
 import EditPost from "./pages/community/posts/editPost/EditPost";
+import Users from "./pages/community/users/allUsers/Users";
+import PublicProfile from "./pages/community/users/publicProfile/PublicProfile";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -59,6 +61,8 @@ function App() {
 								<Route path="feeds" element={<Feeds />} />
 								<Route path="my-collection" element={<MyCollection />} />
 								<Route path="all-tags" element={<AllTags />} />
+								<Route path="users" element={<Users />} />
+								<Route path="profile/:user" element={<PublicProfile />} />
 								<Route path="tags/:tagId" element={<TagPosts />} />
 								<Route path="posts">
 									<Route path="create-post" element={<CreatePost />} />

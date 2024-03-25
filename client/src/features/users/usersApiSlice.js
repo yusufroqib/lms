@@ -17,39 +17,37 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 				},
 			}),
 			transformResponse: (responseData) => {
-                // console.log(responseData)
-				const loggedUser = responseData.user
-                loggedUser.id = loggedUser._id;
-                // console.log(loggedUser)
+				// console.log(responseData)
+				const loggedUser = responseData.user;
+				loggedUser.id = loggedUser._id;
+				// console.log(loggedUser)
 
 				return myInfoAdapter.addOne(myInitialState, loggedUser);
 			},
 			providesTags: (result, error, arg) => [{ type: "MyInfo", id: "ME" }],
 		}),
-		getUsers: builder.query({
-			query: () => ({
-				url: "/users",
-				validateStatus: (response, result) => {
-					return response.status === 200 && !result.isError;
-				},
-			}),
+		getAllUsers: builder.query({
+			query: ({ searchParams }) => `/community/users/all-users?${searchParams}`,
+
 			transformResponse: (responseData) => {
-				const loadedUsers = responseData.map((user) => {
-					user.id = user._id;
-					return user;
-				});
-				return usersAdapter.setAll(initialState, loadedUsers);
+				// Extract users and isNext from responseData
+				const { users, isNext } = responseData;
+				// No need to use setAll here
+				return { users, isNext };
 			},
 			providesTags: (result, error, arg) => {
-				if (result?.ids) {
+				if (result?.users) {
+					// Generate tags for each user returned by the query
 					return [
 						{ type: "User", id: "LIST" },
-						...result.ids.map((id) => ({ type: "User", id })),
+						...result?.users?.map((user) => ({ type: "User", id: user._id })),
 					];
-				} else return [{ type: "User", id: "LIST" }];
+				}
+				// If no users are returned, provide a tag for the entire list
+				return [{ type: "User", id: "LIST" }];
 			},
 		}),
-	
+
 		updateUser: builder.mutation({
 			query: (initialUserData) => ({
 				url: "/users",
@@ -69,23 +67,29 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 			invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
 		}),
 		getUserById: builder.query({
-            query: (userId) => `/community/users/${userId}`,
-            transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
-            providesTags: (result, error, userId) => [{ type: "User", id: userId }],
-        }),
+			query: (userId) => `/community/users/${userId}`,
+			transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
+			providesTags: (result, error, userId) => [{ type: "UserID", id: userId }],
+		}),
+		getUserInfo: builder.query({
+			query: (user) => `/community/users/profile/${user}`,
+			transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
+			providesTags: (result, error, user) => [
+				{ type: "UserProfile", id: 'USER' },
+			],
+		}),
 	}),
 });
 
 export const {
 	useGetMyDetailsQuery,
-	useGetUsersQuery,
+	useGetAllUsersQuery,
 	useAddNewUserMutation,
 	useUpdateUserMutation,
 	useDeleteUserMutation,
-	useGetUserByIdQuery 
+	useGetUserByIdQuery,
+	useGetUserInfoQuery
 } = usersApiSlice;
-
-
 
 // // returns the query result object
 // export const selectUsersResult = usersApiSlice.endpoints.getUsers.select();

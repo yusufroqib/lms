@@ -3,12 +3,21 @@ const Reply = require("../models/ReplyModel");
 const Post = require("../models/PostModel");
 const Interaction = require("../models/InteractionModel");
 const Tag = require("../models/TagModel");
+const assignBadges = require("../utils/assignBadges");
 // const mongoose = require('mongoose');
 
 const createPost = async (req, res) => {
 	try {
+		const userId = req.userId;
 		const { title, content, tags, author } = req.body;
 		// console.log(req.body);
+		if (!author || !title || !content || !tags.length) {
+			return res.status(400).json({ message: "Missing required fields" });
+		}
+
+		if (userId !== author) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
 
 		const post = await Post.create({ title, content, author });
 
@@ -55,6 +64,7 @@ const getPostById = async (req, res) => {
 				model: User,
 				select: "_id name avatar",
 			});
+		// console.log(post)
 		res.status(200).json(post);
 	} catch (error) {
 		console.log(error);
@@ -102,7 +112,7 @@ const downvotePost = async (req, res) => {
 		const { postId, userId, hasupVoted, hasdownVoted, path } = req.body;
 		let updateQuery = {};
 		if (hasdownVoted) {
-			updateQuery = { $pull: { downvote: userId } };
+			updateQuery = { $pull: { downvotes: userId } };
 		} else if (hasupVoted) {
 			updateQuery = {
 				$pull: { upvotes: userId },
@@ -133,12 +143,27 @@ const downvotePost = async (req, res) => {
 // Controller method for deleting a post
 const deletePost = async (req, res) => {
 	try {
-		const { postId, path } = req.body;
+		const { postId } = req.params;
+		// Remove the post
 		await Post.deleteOne({ _id: postId });
+		// Remove related replies and interactions
 		await Reply.deleteMany({ post: postId });
 		await Interaction.deleteMany({ post: postId });
+
+		// Remove the post from tags
 		await Tag.updateMany({ posts: postId }, { $pull: { posts: postId } });
-		res.status(200).send("Post deleted successfully");
+
+		// Find tags with no posts
+		const tagsWithNoPosts = await Tag.find({
+			posts: { $exists: true, $eq: [] },
+		});
+
+		// Delete tags with no posts
+		for (const tag of tagsWithNoPosts) {
+			await Tag.deleteOne({ _id: tag._id });
+		}
+
+		res.status(200).send({ message: "Post deleted successfully" });
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -148,15 +173,22 @@ const deletePost = async (req, res) => {
 // Controller method for editing a post
 const editPost = async (req, res) => {
 	try {
-		const { postId, title, content, path } = req.body;
+		const userId = req.userId;
+		const { postId, title, content } = req.body;
 		const post = await Post.findById(postId).populate("tags");
 		if (!post) {
-			throw new Error("Post not found");
+			return res.status(404).send({ message: "Post not found" });
+		}
+		const ownerPost = await Post.findOne({ _id: postId, author: userId });
+		if (!ownerPost) {
+			return res
+				.status(401)
+				.send({ message: "You are not the owner of this post" });
 		}
 		post.title = title;
 		post.content = content;
 		await post.save();
-		res.status(200).send("Post edited successfully");
+		res.status(200).send({ message: "Post edited successfully" });
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -403,7 +435,7 @@ const deleteReply = async (req, res) => {
 		await reply.deleteOne({ _id: replyId });
 		await Post.updateMany({ _id: reply.post }, { $pull: { replies: replyId } });
 		await Interaction.deleteMany({ reply: replyId });
-		res.status(200).send("Reply deleted successfully");
+		res.status(200).send({ message: "Reply deleted successfully" });
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -414,17 +446,53 @@ const deleteReply = async (req, res) => {
 const getTopInteractedTags = async (req, res) => {
 	try {
 		const { userId } = req.params;
+
 		const user = await User.findById(userId);
-		if (!user) throw new Error("User not found");
+		if (!user) {
+			return res.status(404).json({ error: "User not found" });
+		}
 
-		// Logic for finding interactions for the user and group by tags...
+		// Find interactions for the user
+		const interactions = await Interaction.find({ user: userId }).populate(
+			"tags"
+		);
 
-		const topInteractedTags = [
-			{ _id: "1", name: "Next" },
-			{ _id: "2", name: "Prism" },
-			{ _id: "3", name: "Docker" },
-		];
-		res.status(200).json(topInteractedTags);
+		// Count occurrences of each tag
+		const tagCounts = {};
+		interactions.forEach((interaction) => {
+			interaction.tags.forEach((tag) => {
+				const tagId = tag._id.toString();
+				if (!tagCounts[tagId]) {
+					tagCounts[tagId] = { count: 1, name: tag.name };
+				} else {
+					tagCounts[tagId].count++;
+				}
+			});
+		});
+
+		// Sort the tag counts in descending order
+		const sortedTags = Object.keys(tagCounts).sort(
+			(a, b) => tagCounts[b].count - tagCounts[a].count
+		);
+
+		// console.log(tagCounts);
+		// Extract the top 3 interacted tags
+		const topTags = sortedTags
+			.slice(0, 3)
+			.map((tagId) => ({ _id: tagId, name: tagCounts[tagId].name }));
+
+		res.status(200).json(topTags);
+		// const user = await User.findById(userId);
+		// if (!user) throw new Error("User not found");
+
+		// // Logic for finding interactions for the user and group by tags...
+
+		// const topInteractedTags = [
+		// 	{ _id: "1", name: "Next" },
+		// 	{ _id: "2", name: "Prism" },
+		// 	{ _id: "3", name: "Docker" },
+		// ];
+		// res.status(200).json(topInteractedTags);
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -473,8 +541,8 @@ const getAllTags = async (req, res) => {
 // Controller method for getting posts by tag ID
 const getPostByTagId = async (req, res) => {
 	try {
-		const {tagId} = req.params
-		const {  searchQuery, page = 1, pageSize = 10 } = req.query;
+		const { tagId } = req.params;
+		const { searchQuery, page = 1, pageSize = 10 } = req.query;
 		const skipAmount = (page - 1) * pageSize;
 		const tagFilter = { _id: tagId };
 		const tag = await Tag.findOne(tagFilter).populate({
@@ -649,8 +717,8 @@ const getAllUsers = async (req, res) => {
 
 const toggleSavePost = async (req, res) => {
 	try {
-		const userId = req.userId
-		const {  postId } = req.body;
+		const userId = req.userId;
+		const { postId } = req.body;
 		const user = await User.findById(userId);
 		if (!user) {
 			res.status(404).send("User not found");
@@ -658,14 +726,14 @@ const toggleSavePost = async (req, res) => {
 		}
 		const isPostSaved = user.saved.includes(postId);
 		if (isPostSaved) {
-			 await User.findByIdAndUpdate(
+			await User.findByIdAndUpdate(
 				userId,
 				{ $pull: { saved: postId } },
 				{ new: true }
 			);
 			// console.log(testing)
 		} else {
-			 await User.findByIdAndUpdate(
+			await User.findByIdAndUpdate(
 				userId,
 				{ $addToSet: { saved: postId } },
 				{ new: true }
@@ -673,7 +741,7 @@ const toggleSavePost = async (req, res) => {
 			// console.log(test)
 		}
 		// revalidatePath(req.path);
-		res.status(200).json({message: 'Post collection updated'});
+		res.status(200).json({ message: "Post collection updated" });
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
@@ -726,91 +794,64 @@ const getSavedPosts = async (req, res) => {
 			throw new Error("User not found");
 		}
 		const savedPosts = user.saved;
-		 res.status(200).json({ posts: savedPosts, isNext });
+		res.status(200).json({ posts: savedPosts, isNext });
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Internal server error");
 	}
 };
 
-const getUserInfo = async ({ userId }) => {
+const getUserInfo = async (req, res) => {
+	const { user: username_id } = req.params;
 	try {
-		const user = await User.findOne({ clerkId: userId });
+		const user = await User.findOne({
+			$or: [{ username: username_id }, { _id: username_id }],
+		});
 		if (!user) {
-			throw new Error("User not found");
+			return res.status(404).json({ error: "User not found" });
 		}
+
 		const totalPosts = await Post.countDocuments({ author: user._id });
 		const totalReplies = await Reply.countDocuments({ author: user._id });
 		const [postUpvotes] = await Post.aggregate([
 			{ $match: { author: user._id } },
-			{
-				$project: {
-					_id: 0,
-					upvotes: { $size: "$upvotes" },
-				},
-			},
-			{
-				$group: {
-					_id: null,
-					totalUpvotes: { $sum: "$upvotes" },
-				},
-			},
+			{ $project: { _id: 0, upvotes: { $size: "$upvotes" } } },
+			{ $group: { _id: null, totalUpvotes: { $sum: "$upvotes" } } },
 		]);
 		const [replyUpvotes] = await Reply.aggregate([
 			{ $match: { author: user._id } },
-			{
-				$project: {
-					_id: 0,
-					upvotes: { $size: "$upvotes" },
-				},
-			},
-			{
-				$group: {
-					_id: null,
-					totalUpvotes: { $sum: "$upvotes" },
-				},
-			},
+			{ $project: { _id: 0, upvotes: { $size: "$upvotes" } } },
+			{ $group: { _id: null, totalUpvotes: { $sum: "$upvotes" } } },
 		]);
-		const [postViews] = await Reply.aggregate([
+		const [postViews] = await Post.aggregate([
 			{ $match: { author: user._id } },
-			{
-				$group: {
-					_id: null,
-					totalViews: { $sum: "$views" },
-				},
-			},
+			{ $group: { _id: null, totalViews: { $sum: "$views" } } },
 		]);
 		const criteria = [
 			{ type: "POST_COUNT", count: totalPosts },
 			{ type: "REPLY_COUNT", count: totalReplies },
-			{
-				type: "POST_UPVOTES",
-				count: postUpvotes?.totalUpvotes || 0,
-			},
-			{
-				type: "REPLY_UPVOTES",
-				count: replyUpvotes?.totalUpvotes || 0,
-			},
-			{
-				type: "TOTAL_VIEWS",
-				count: postViews?.totalViews || 0,
-			},
+			{ type: "POST_UPVOTES", count: postUpvotes?.totalUpvotes || 0 },
+			{ type: "REPLY_UPVOTES", count: replyUpvotes?.totalUpvotes || 0 },
+			{ type: "TOTAL_VIEWS", count: postViews?.totalViews || 0 },
 		];
 		const badgeCounts = assignBadges({ criteria });
-		return {
+		res.status(200).json({
 			user,
 			totalPosts,
 			totalReplies,
 			badgeCounts,
 			reputation: user.reputation,
-		};
+		});
 	} catch (error) {
 		console.log(error);
-		throw error;
+		res.status(500).json({ error: "Internal server error" });
 	}
 };
 
-const getUserPosts = async ({ userId, page = 1, pageSize = 10 }) => {
+const getUserPosts = async (req, res) => {
+	const { userId } = req.params;
+	const { page = 1 } = req.body;
+	const { pageSize = 10 } = req.query;
 	try {
 		const skipAmount = (page - 1) * pageSize;
 		const totalPosts = await Post.countDocuments({ author: userId });
@@ -821,14 +862,17 @@ const getUserPosts = async ({ userId, page = 1, pageSize = 10 }) => {
 			.populate("tags", "_id name")
 			.populate("author", "_id  name avatar");
 		const isNextPosts = totalPosts > skipAmount + userPosts.length;
-		return { totalPosts, posts: userPosts, isNextPosts };
+		res.status(200).json({ totalPosts, posts: userPosts, isNextPosts });
 	} catch (error) {
 		console.log(error);
-		throw error;
+		res.status(500).json({ error: "Internal server error" });
 	}
 };
 
-const getUserReplies = async ({ userId, page = 1, pageSize = 10 }) => {
+const getUserReplies = async (req, res) => {
+	const { userId } = req.params;
+	const { page = 1 } = req.body;
+	const { pageSize = 10 } = req.query;
 	try {
 		const skipAmount = (page - 1) * pageSize;
 		const totalReplies = await Reply.countDocuments({ author: userId });
@@ -839,10 +883,10 @@ const getUserReplies = async ({ userId, page = 1, pageSize = 10 }) => {
 			.populate("post", "_id title")
 			.populate("author", "_id name avatar");
 		const isNextReply = totalReplies > skipAmount + userReplies.length;
-		return { totalReplies, replies: userReplies, isNextReply };
+		res.status(200).json({ totalReplies, replies: userReplies, isNextReply });
 	} catch (error) {
 		console.log(error);
-		throw error;
+		res.status(500).json({ error: "Internal server error" });
 	}
 };
 

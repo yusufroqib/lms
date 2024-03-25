@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import Post from "../../components/forms/Post";
 // import { getPostById } from "@/lib/actions/post.action";
 // import { getUserById } from "@/lib/actions/user.action";
@@ -30,6 +30,13 @@ const EditPost = () => {
 	} = useGetUserByIdQuery(userId);
 	// console.log(result);
 	// console.log(mongoUser);
+
+    
+	if (isSuccess && !result) {
+		// console.log('working...')
+		return <Navigate to={"/community/feeds"} />;
+	}
+
 
 	if (!userId || !mongoUser || !result) return null;
 

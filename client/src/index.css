@@ -16,15 +16,15 @@ body,
 	height: 100%;
 }
 ::-webkit-scrollbar {
-	width: 5px;
+	width: 7px;
 	height: 8px;
 	border-radius: 20px;
-	background-color: #c2c2c2; /* or add it to the track */
+	background-color: #d4d4d4; /* or add it to the track */
   }
   
   /* Add a thumb */
   ::-webkit-scrollbar-thumb {
-	background: #0f01d1;
+	background: #212121;
 	border-radius: 20px;
   }
 

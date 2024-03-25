@@ -7,8 +7,9 @@ import { getTimestamp } from "@/lib/utils";
 // import ParseHTML from "./ParseHTML";
 import Votes from "./Votes";
 import qs from "query-string";
-import parse from "html-react-parser";
+// import parse from "html-react-parser";
 import { useGetRepliesQuery } from "@/features/posts/postsApiSlice";
+import ParseHTML from "./ParseHTML";
 
 const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 	// const [result, setResult] = useState({ replies: [] });
@@ -37,11 +38,11 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 		isError,
 	} = useGetRepliesQuery(queryString);
 
-    // console.log(result)
-    // console.log(error)
+	// console.log(result)
+	// console.log(error)
 
-    if (isLoading) return <div>Loading</div>;
-    // if (isError) return <div>{error.message}</div>;
+	if (isLoading) return <div>Loading</div>;
+	// if (isError) return <div>{error.message}</div>;
 
 	return (
 		<div className="mt-11">
@@ -80,8 +81,8 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 							<div className="flex justify-end">
 								<Votes
 									type="Reply"
-									itemId={(reply?._id)}
-									userId={(userId)}
+									itemId={reply?._id}
+									userId={userId}
 									upvotes={reply.upvotes.length}
 									hasupVoted={reply.upvotes.includes(userId)}
 									downvotes={reply.downvotes.length}
@@ -89,8 +90,7 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 								/>
 							</div>
 						</div>
-						{/* <ParseHTML data={reply.content} /> */}
-						{parse(reply.content)}
+						<ParseHTML data={reply.content} />
 					</article>
 				))}
 			</div>

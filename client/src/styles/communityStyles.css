@@ -142,7 +142,7 @@ code {
   display: block;
   overflow-x: auto;
 
-  color: inherit !important;
+  /* color: inherit !important; */
 }
 /* Markdown End */
 

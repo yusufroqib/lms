@@ -1,3 +1,4 @@
+import { useDeletePostMutation } from "@/features/posts/postsApiSlice";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 // import { deleteReply } from "@/lib/actions/reply.action";
@@ -6,25 +7,30 @@ import { useNavigate } from "react-router-dom";
 
 const EditDeleteAction = ({ type, itemId }) => {
 	const navigate = useNavigate();
+    const [deletePost] = useDeletePostMutation();
 
 	const handleEdit = () => {
 		navigate(`/community/posts/edit-post/${itemId}`);
 	};
 
+
 	const handleDelete = async () => {
-		// if (type === "Post") {
-		//     // Delete post
-		//     await deletePost({
-		//         postId: JSON.parse(itemId),
-		//         path: window.location.pathname,
-		//     });
-		// } else if (type === "Reply") {
-		//     // Delete reply
-		//     await deleteReply({
-		//         replyId: JSON.parse(itemId),
-		//         path: window.location.pathname,
-		//     });
-		// }
+		try{
+        if (type === "Post") {
+			// Delete post
+			await deletePost({
+				postId: itemId,
+			}).unwrap();
+		} else if (type === "Reply") {
+			// Delete reply
+			// await deleteReply({
+			// 	replyId: JSON.parse(itemId),
+			// 	path: window.location.pathname,
+			// });
+		}
+    }catch(error){
+        console.log(error)
+    }
 	};
 
 	return (

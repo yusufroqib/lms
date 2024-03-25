@@ -31,6 +31,48 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 				return [{ type: "Post", id: "LIST" }];
 			},
 		}),
+		getUserPosts: builder.query({
+			query: ({userId, page}) => `/community/user-posts/${userId}?page=${page}`,
+
+			transformResponse: (responseData) => {
+				// Extract posts and isNext from responseData
+				const { posts, isNextPosts, totalPosts } = responseData;
+				// No need to use setAll here
+				return { posts, isNextPosts, totalPosts };
+			},
+			providesTags: (result, error, arg) => {
+				if (result?.posts) {
+					// Generate tags for each post returned by the query
+					return [
+						{ type: "Post", id: "LIST" },
+						...result?.posts?.map((post) => ({ type: "UserPost", id: post._id })),
+					];
+				}
+				// If no posts are returned, provide a tag for the entire list
+				return [{ type: "UserPost", id: "LIST" }];
+			},
+		}),
+		getUserReplies: builder.query({
+			query: ({userId, page}) => `/community/user-replies/${userId}?page=${page}`,
+
+			transformResponse: (responseData) => {
+				// Extract replies and isNext from responseData
+				const { replies, isNextReplies, totalReplies } = responseData;
+				// No need to use setAll here
+				return { replies, isNextReplies, totalReplies };
+			},
+			providesTags: (result, error, arg) => {
+				if (result?.replies) {
+					// Generate tags for each post returned by the query
+					return [
+						{ type: "Reply", id: "LIST" },
+						...result?.replies?.map((reply) => ({ type: "UserReply", id: reply._id })),
+					];
+				}
+				// If no replies are returned, provide a tag for the entire list
+				return [{ type: "UserReply", id: "LIST" }];
+			},
+		}),
 		getSavedPosts: builder.query({
 			query: ({ searchParams }) =>
 				`/community/posts/saved-posts?${searchParams}`,
@@ -42,7 +84,6 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 				return { posts, isNext };
 			},
 			providesTags: (result, error, arg) => {
-			
 				return [{ type: "SavedPost", id: "LIST" }];
 			},
 		}),
@@ -91,7 +132,21 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: [
 				{ type: "Post", id: "LIST" },
+				{ type: "Post", id: "HOT_LIST" },
 				{ type: "Tag", id: "POPULAR_TAGS" },
+				{ type: "UserProfile", id: 'USER' }
+				
+			],
+		}),
+		editPost: builder.mutation({
+			query: (data) => ({
+				url: "/community/posts/edit-post",
+				method: "PUT",
+				body: { ...data },
+			}),
+			invalidatesTags: (result, error, { postId }) => [
+				// { type: "Post", id: "LIST" },
+				{ type: "Post", id: postId },
 			],
 		}),
 		getHotPosts: builder.query({
@@ -113,8 +168,16 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 				{ type: "Post", id: postId },
 			],
 		}),
+		getTopInteractedTags: builder.query({
+			query: ({ userId }) => `/community/users/top-interacted-tags/${userId}`,
+			transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
+			providesTags: (result, error, { userId }) => [
+				{ type: "TopInteractingTags", id: userId },
+			],
+		}),
 		getPostByTagId: builder.query({
-			query: ({ tagId, searchParams }) => `/community/tags/get/${tagId}?${searchParams}`,
+			query: ({ tagId, searchParams }) =>
+				`/community/tags/get/${tagId}?${searchParams}`,
 			transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
 			providesTags: (result, error, { tagId }) => [
 				{ type: "AllTag", id: tagId },
@@ -128,6 +191,8 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: (result, error, { post }) => [
 				{ type: "Reply", id: "LIST" },
+				{ type: "UserProfile", id: 'USER' },
+				
 			],
 		}),
 		viewPost: builder.mutation({
@@ -222,7 +287,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 									const newDownvoteArray = draft.downvotes.filter(
 										(downvote) => downvote !== userId
 									);
-									draft.upvotes = [...newDownvoteArray];
+									draft.downvotes = [...newDownvoteArray];
 								} else {
 									const newUpvoteArray = draft.upvotes.filter(
 										(upvote) => upvote !== userId
@@ -288,7 +353,33 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "Post", id: arg.postId },
-				{ type: "SavedPost", id: "LIST" }
+				{ type: "SavedPost", id: "LIST" },
+			],
+		}),
+		toggleSavePost: builder.mutation({
+			query: ({ userId, postId }) => ({
+				url: "/community/posts/toggle-save",
+				method: "POST",
+				body: {
+					userId,
+					postId,
+				},
+			}),
+			invalidatesTags: (result, error, arg) => [
+				{ type: "Post", id: arg.postId },
+				{ type: "SavedPost", id: "LIST" },
+			],
+		}),
+		deletePost: builder.mutation({
+			query: ({ postId }) => ({
+				url: `/community/posts/${postId}`,
+				method: "DELETE",
+			}),
+			invalidatesTags: (result, error, arg) => [
+				{ type: "Post", id: 'LIST' },
+				// { type: "SavedPost", id: "LIST" },
+				{ type: "Tag", id: "POPULAR_TAGS" },
+				{ type: "Post", id: "HOT_LIST" }
 			],
 		}),
 	}),
@@ -296,11 +387,15 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 
 export const {
 	useGetPostsQuery,
+	useGetUserPostsQuery,
+	useGetUserRepliesQuery,
 	useGetRepliesQuery,
 	useCreatePostMutation,
+	useEditPostMutation,
 	useGetHotPostsQuery,
 	useGetPopularTagsQuery,
 	useGetPostByIdQuery,
+	useGetTopInteractedTagsQuery,
 	useCreateReplyMutation,
 	useViewPostMutation,
 	useUpvotePostMutation,
@@ -310,5 +405,6 @@ export const {
 	useToggleSavePostMutation,
 	useGetSavedPostsQuery,
 	useGetAllTagsQuery,
-	useGetPostByTagIdQuery
+	useGetPostByTagIdQuery,
+	useDeletePostMutation
 } = postsApiSlice;

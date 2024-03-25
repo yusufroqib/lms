@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useSearchParams } from "react-router-dom";
 import Filter from "../../components/Filter";
 import NoResult from "../../components/NoResult";
 import Pagination from "../../components/Pagination";
@@ -7,6 +7,7 @@ import LocalSearchBar from "../../components/search/LocalSearchBar";
 import { TagFilters } from "@/lib/filters";
 import { useGetAllTagsQuery } from "@/features/posts/postsApiSlice";
 import qs from "query-string";
+import Loading from "./components/Loading";
 
 // import { getAllTags } from "@/lib/actions/tag.actions";
 // import useAuth from "@/hooks/useAuth";
@@ -48,6 +49,15 @@ const AllTags = () => {
 		fetchSavedPosts();
 	}, [searchParams]);
 
+    
+    if(isLoading) {
+        return <Loading/>
+    }
+
+	if ((isSuccess && !result) || isError) {
+		return <Navigate to="/community/feeds" />;
+	}
+
 	if (result) {
 		return (
 			<>
@@ -70,7 +80,7 @@ const AllTags = () => {
 
 				<section className="mt-12 flex flex-wrap gap-4">
 					{result.tags.length > 0 ? (
-						result.tags.map((tag) => (
+						result?.tags?.map((tag) => (
 							<Link
 								to={`/community/tags/${tag._id}`}
 								key={tag._id}
@@ -85,9 +95,9 @@ const AllTags = () => {
 
 									<p className="small-medium text-dark400_light500 mt-3.5">
 										<span className="body-semibold primary-text-gradient mr-2.5">
-											{tag.posts.length}+
+											{tag?.posts?.length}+
 										</span>{" "}
-										Posts
+										{tag.posts.length === 1 ? 'Post' : 'Posts'}
 									</p>
 								</article>
 							</Link>
@@ -96,8 +106,8 @@ const AllTags = () => {
 						<NoResult
 							title="No Tags Found"
 							description="It looks like there are no tags found."
-							link="/ask-question"
-							linkTitle="Ask a question"
+							link="/community/create-post"
+							linkTitle="Create a Post"
 						/>
 					)}
 				</section>

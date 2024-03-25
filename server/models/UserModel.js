@@ -17,7 +17,7 @@ const userSchema = new Schema(
 		googleId: String,
 		password: {
 			type: String,
-			select: false // Excludes the password field from query results
+			select: false, // Excludes the password field from query results
 			// required: true,
 		},
 		bio: String,
@@ -45,6 +45,10 @@ const userSchema = new Schema(
 			},
 		],
 		badges: [{ type: Schema.Types.ObjectId, ref: "Badge" }],
+		joinedAt: {
+			type: Date,
+			default: Date.now,
+		},
 	},
 	{
 		timestamps: true,

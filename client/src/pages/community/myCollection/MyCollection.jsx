@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useSearchParams } from "react-router-dom";
 import PostCard from "../components/cards/PostCard";
 import Filter from "../components/Filter";
 import NoResult from "../components/NoResult";
@@ -9,6 +9,7 @@ import useAuth from "@/hooks/useAuth";
 import { PostFilters } from "@/lib/filters";
 import qs from "query-string";
 import { useGetSavedPostsQuery } from "@/features/posts/postsApiSlice";
+import Loading from "./components/Loading";
 
 // import { auth } from "@clerk/nextjs";
 
@@ -56,7 +57,17 @@ export default function MyCollection() {
 		fetchSavedPosts();
 	}, [userId, searchParams]);
 
-	if (!userId) return null;
+	// if (!userId) return null;
+
+    
+	if (isLoading) {
+		return <Loading />;
+	}
+
+	if ((isSuccess && !result) || isError) {
+		return <Navigate to="/community/feeds" />;
+	}
+
 
 	if (result) {
 		return (
@@ -96,9 +107,9 @@ export default function MyCollection() {
 					) : (
 						<NoResult
 							title="There’s no saved post to show"
-							description="Be the first to break the silence! 🚀 Ask a Post and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
-							link="/ask-post"
-							linkTitle="Ask a Post"
+							description="Be the first to break the silence! 🚀 Create a Post and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
+							link="/community/posts/create-post"
+							linkTitle="Create a Post"
 						/>
 					)}
 				</div>

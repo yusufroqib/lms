@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 // import { createPost, editPost } from "@/lib/actions/post.action";
 import { useNavigate } from "react-router-dom";
 // import Editor from "@/components/ui/editor";
-import { useCreatePostMutation } from "@/features/posts/postsApiSlice";
+import { useCreatePostMutation, useEditPostMutation } from "@/features/posts/postsApiSlice";
 import toast from "react-hot-toast";
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 // import Editor from "ckeditor5-custom-build";
@@ -30,14 +30,14 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 	// const editorRef = useRef(null);
 	const [createPost, { isLoading, isError, isSuccess, error }] =
 		useCreatePostMutation();
+	const [editPost] =
+	useEditPostMutation();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const navigate = useNavigate();
 	const [value, setValue] = useState(postDetails?.content);
-	// const parsedPostDetails = postDetails && JSON.parse(postDetails || "");
-	// const groupedTags = parsedPostDetails?.tags.map((tag) => tag.name);
 	const groupedTags = postDetails?.tags?.map((tag) => tag.name);
 	const editorRef = useRef(null);
-	console.log(postDetails?.title)
+	// console.log(postDetails?.title)
 
 
 	const form = useForm({
@@ -54,13 +54,13 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 		setIsSubmitting(true);
 		try {
 			if (type === "Edit") {
-				// await editPost({
-				// 	postId: parsedPostDetails._id,
-				// 	title: values.title,
-				// 	content: values.explanation,
-				// 	path: window.location.pathname,
-				// });
-				// navigate(`/post/${parsedPostDetails._id}`);
+				await editPost({
+					postId: postDetails._id,
+					title: values.title,
+					content: values.explanation,
+				}).unwrap()
+				toast.success("Post updated successfully");
+				navigate(`/community/posts/${postDetails._id}`);
 			} else {
 				await createPost({
 					title: values.title,
@@ -129,7 +129,7 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 								/>
 							</FormControl>
 							<FormDescription className="body-regular mt-2.5 text-light-500">
-								Be specific and imagine you&apos;re asking a post to another
+								Be specific and imagine you&apos;re making a post to another
 								person.
 							</FormDescription>
 							<FormMessage className="text-red-500" />
@@ -146,68 +146,16 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 								<span className="text-primary-500">*</span>
 							</FormLabel>
 							<FormControl className="mt-3.5">
-								{/* <Editor
-									name="description"
-									value={value}
-									setValue={setValue}
-									field={field}
-								/> */}
+							
 
 								<RTEditor
 									value={postDetails?.content}
 									field={field}
 									editorRef={editorRef}
-									// className='prose'
-									// editor={Editor}
-									// data="<p>Hello from CKEditor&nbsp;5!</p>"
-									// onReady={(editor) => {
-									// 	// You can store the "editor" and use when it is needed.
-									// 	console.log("Editor is ready to use!", editor);
-									// }}
-									// onChange={(event, editor) => {
-									// 	const data = editor.getData();
-									// 	console.log({ event, editor, data });
-									// 	// setValue(data);
-									// 	console.log(event);
-									// }}
-									// onBlur={(event, editor) => {
-									// 	console.log("Blur.", editor);
-									// }}
-									// onFocus={(event, editor) => {
-									// 	console.log("Focus.", editor);
-									// }}
+								
 								/>
 
-								{/* <Editor apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY} onInit={(evt, editor) => {
-                // @ts-ignore
-                editorRef.current = editor;
-            }} onBlur={field.onBlur} onEditorChange={(content) => field.onChange(content)} initialValue={parsedPostDetails?.content || ""} init={{
-                height: 350,
-                menubar: false,
-                plugins: [
-                    "advlist",
-                    "autolink",
-                    "lists",
-                    "link",
-                    "image",
-                    "charmap",
-                    "preview",
-                    "anchor",
-                    "searchreplace",
-                    "visualblocks",
-                    "codesample",
-                    "fullscreen",
-                    "insertdatetime",
-                    "media",
-                    "table",
-                ],
-                toolbar: "undo redo | " +
-                    "codesample | bold italic forecolor | alignleft aligncenter |" +
-                    "alignright alignjustify | bullist numlist",
-                content_style: "body { font-family:Inter; font-size:16px }",
-                skin: mode === "dark" ? "oxide-dark" : "oxide",
-                content_css: mode === "dark" ? "dark" : "light",
-            }}/> */}
+							
 							</FormControl>
 							<FormDescription className="body-regular mt-2.5 text-light-500">
 								Introduce the problem and expand on what you put in the title.
@@ -278,7 +226,7 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 					{isSubmitting ? (
 						<>{type === "Edit" ? "Editing..." : "Posting..."}</>
 					) : (
-						<>{type === "Edit" ? "Edit Post" : "Ask a Post"}</>
+						<>{type === "Edit" ? "Edit Post" : "Create a Post"}</>
 					)}
 				</Button>{" "}
 			</form>
