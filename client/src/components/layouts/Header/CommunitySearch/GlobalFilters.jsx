@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Adjusted for React Router v6
+import React, { useState, useCallback } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { GlobalSearchFilters } from "@/lib/filters";
 import { formUrlQuery } from "@/lib/utils";
 
 const GlobalFilters = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
+    const [searchParams, setSearchParams] = useSearchParams();
     const typeParams = searchParams.get("type");
     const [active, setActive] = useState(typeParams || "");
 
-    const handleTypeClick = (item) => {
+    // console.log('rendering')
+
+    const handleTypeClick = useCallback((item) => {
         let newUrl;
         if (active === item) {
             setActive("");
@@ -24,8 +26,8 @@ const GlobalFilters = () => {
             key: "type",
             value: item.toLowerCase(),
         });
-        navigate(newUrl, { replace: true }); // Using navigate with replace option to update the URL without adding a new entry to the history stack
-    };
+        navigate(newUrl, { replace: true });
+    }, [active, navigate, searchParams]);
 
     return (
         <div className="flex items-center gap-5 px-5">

@@ -799,7 +799,8 @@ const getSavedPosts = async (req, res) => {
 		console.log(error);
 		res.status(500).send("Internal server error");
 	}
-};
+}; 
+
 
 const getUserInfo = async (req, res) => {
 	const { user: username_id } = req.params;

@@ -1,65 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { useNavigate, useLocation } from "react-router-dom"; // Adjusted for React Router
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import GlobalFilters from "./GlobalFilters";
 import qs from "query-string";
-import { useGetPostsQuery } from "@/features/posts/postsApiSlice";
+import { useGlobalSearchQuery } from "@/features/posts/postsApiSlice";
 
-const GlobalResult = () => {
+const GlobalResult = ({setIsOpen}) => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const searchParams = new URLSearchParams(location.search);
-	// const [isLoading, setIsLoading] = useState(false);
-	// const [result, setResult] = useState([
-	// 	{ type: "post", id: 1, title: "Next.js post" },
-	// 	{ type: "tag", id: 1, title: "Nextjs" },
-	// 	{ type: "user", id: 1, title: "jsm" },
-	// ]);
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [reqData, setReqData] = useState("");
 	const global = searchParams.get("global");
 	const type = searchParams.get("type");
 
-	const url = qs.stringifyUrl(
-		{
-			url: location.pathname,
-			query: {
-				query: global,
-				type,
-			},
-		},
-		{ skipEmptyString: true, skipNull: true }
-	);
-
-	const queryString = url.split("?")[1];
-
-	const {
-		data: result,
-		isLoading,
-		isSuccess,
-		error,
-		isError,
-	} = useGetPostsQuery({ searchParams: queryString });
-	// setStringifyQuery(queryString);
-
-	// useEffect(() => {
-	// 	const fetchResult = async () => {
-	// 		setResult([]);
-	// 		setIsLoading(true);
-	// 		try {
-	// 			const res = await globalSearch({ query: global, type });
-	// 			setResult(JSON.parse(res));
-	// 		} catch (error) {
-	// 			console.error(error);
-	// 			throw error;
-	// 		} finally {
-	// 			setIsLoading(false);
-	// 		}
-	// 	};
-	// 	if (global) {
-	// 		fetchResult();
-	// 	}
-	// }, [global, type]);
-
-	const renderLink = (type, id) => {
+	const renderLink = useCallback((type, id) => {
 		switch (type) {
 			case "post":
 				return `/community/posts/${id}`;
@@ -72,7 +26,36 @@ const GlobalResult = () => {
 			default:
 				return "/community/feeds";
 		}
-	};
+	}, []);
+
+	useEffect(() => {
+		const url = qs.stringifyUrl(
+			{
+				url: location.pathname,
+				query: {
+					query: global,
+					type,
+				},
+			},
+			{ skipEmptyString: true, skipNull: true }
+		);
+		const queryString = url.split("?")[1];
+		setReqData(queryString);
+	}, [global, type, location.pathname]);
+
+	const {
+		data: result,
+		isLoading,
+		isFetching,
+		isSuccess,
+		error,
+		isError,
+	} = useGlobalSearchQuery(
+		{ searchParams: reqData },
+		{
+			skip: !reqData,
+		}
+	);
 
 	return (
 		<div className="absolute top-full z-10 mt-3 w-full rounded-xl bg-light-800 py-5 shadow-sm dark:bg-dark-400">
@@ -84,7 +67,7 @@ const GlobalResult = () => {
 					Top Match
 				</p>
 
-				{isLoading ? (
+				{isLoading || isFetching ? (
 					<div className="flex-center flex-col px-5">
 						<ReloadIcon className="my-2 h-10 w-10 animate-spin text-primary-500" />
 						<p className="text-dark200_light800 body-regular">
@@ -98,7 +81,10 @@ const GlobalResult = () => {
 								<div
 									key={item.type + item.id + index}
 									className="flex w-full cursor-pointer items-start gap-3 px-5 py-2.5 hover:bg-light-700/50 dark:bg-dark-500/50"
-									onClick={() => navigate(renderLink(item.type, item.id))}
+									onClick={() => {
+                    setIsOpen(false)
+										navigate(renderLink(item.type, item.id));
+									}}
 								>
 									<img
 										src="/assets/icons/tag.svg"
