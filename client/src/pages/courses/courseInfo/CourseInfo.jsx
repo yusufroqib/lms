@@ -81,17 +81,20 @@ const CourseInfo = () => {
 		const isPurchased = course.purchasedBy.some((item) => item.user === _id);
 		return (
 			<>
-				<div className="px-6 pt-6">
-					<Breadcrumbs separator=">">
+			<div className="sticky top-15 bg-white pb-3 z-99">
+
+				<div className="p-3 pt-6 ">
+					<Breadcrumbs className='bg-transparent ' separator=">">
 						<Link to="/dashboard" className="opacity-60">
 							Dashboard
 						</Link>
 						<Link to="/courses/search" className="opacity-60">
 							All Courses
 						</Link>
-						<Link href="#">Course Info</Link>
+						<Link disabled href="#">Course Info</Link>
 					</Breadcrumbs>
 				</div>
+			</div>
 				<div className=" flex overflow-hidden">
 					<div className="w-full xl:w-3/5 h-full overflow-y-auto   p-6 pr-8 z-9">
 						<div className=" h-full">
