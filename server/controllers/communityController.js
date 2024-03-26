@@ -896,13 +896,13 @@ const SearchableTypes = ["post", "reply", "user", "tag"];
 
 const globalSearch = async (req, res) => {
     const { query, type } = req.query;
-	console.log(query)
+	// console.log(query)
     try {
         const regexQuery = { $regex: query, $options: "i" };
         let results = [];
         const modelsAndTypes = [
             { model: Post, searchField: "title", type: "post" },
-            { model: User, searchField: "name", type: "user" },
+            { model: User, searchField: ["name", "username"], type: "user" }, // Include "username" field for user type
             { model: Reply, searchField: "content", type: "reply" },
             { model: Tag, searchField: "name", type: "tag" },
         ];
@@ -910,19 +910,31 @@ const globalSearch = async (req, res) => {
         if (!typeLower || !SearchableTypes.includes(typeLower)) {
             // SEARCH ACROSS EVERYTHING
             for (const { model, searchField, type } of modelsAndTypes) {
-                const queryResults = await model
-                    .find({ [searchField]: regexQuery })
-                    .limit(2);
+                let queryResults;
+                if (Array.isArray(searchField)) {
+                    queryResults = await model
+                        .find({ $or: searchField.map(field => ({ [field]: regexQuery })) }) // Search across multiple fields
+                        .limit(2);
+                } else {
+                    queryResults = await model
+                        .find({ [searchField]: regexQuery })
+                        .limit(2);
+                }
                 results.push(...queryResults.map((item) => ({
                     title: type === "reply"
                         ? `Replies containing ${query}`
-                        : item[searchField],
+                        : type === "user"
+                            ? item.name
+                            : item[searchField], // Use the searchField as the title
                     type,
                     id: type === "user"
                         ? item._id
                         : type === "reply"
                             ? item.post
                             : item._id,
+                    name: type === "user"
+                        ? item.name
+                        : null, // Include the name of the user found
                 })));
             }
         }
@@ -932,19 +944,31 @@ const globalSearch = async (req, res) => {
             if (!modelInfo) {
                 return res.status(400).json({ error: "Invalid search type" });
             }
-            const queryResults = await modelInfo.model
-                .find({ [modelInfo.searchField]: regexQuery })
-                .limit(8);
+            let queryResults;
+            if (Array.isArray(modelInfo.searchField)) {
+                queryResults = await modelInfo.model
+                    .find({ $or: modelInfo.searchField.map(field => ({ [field]: regexQuery })) }) // Search across multiple fields
+                    .limit(8);
+            } else {
+                queryResults = await modelInfo.model
+                    .find({ [modelInfo.searchField]: regexQuery })
+                    .limit(8);
+            }
             results = queryResults.map((item) => ({
                 title: type === "reply"
                     ? `Replies containing ${query}`
-                    : item[modelInfo.searchField],
+                    : type === "user"
+                        ? item.name
+                        : item[modelInfo.searchField], // Use the searchField as the title
                 type,
                 id: type === "user"
                     ? item._id
                     : type === "reply"
                         ? item.post
                         : item._id,
+                name: type === "user"
+                    ? item.name
+                    : null, // Include the name of the user found
             }));
         }
         res.status(200).json(results);

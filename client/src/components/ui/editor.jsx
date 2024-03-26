@@ -1,5 +1,6 @@
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "ckeditor5-custom-build";
+
 // import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
 
 // import {
@@ -13,6 +14,19 @@ import Editor from "ckeditor5-custom-build";
 // } from "@syncfusion/ej2-react-richtexteditor";
 import React from "react";
 // import * as React from 'react';
+
+const addDataCopyAttribute = (editor) => {
+	if (editor && editor.model && editor.model.document) {
+	  editor.model.document.on('change:data', () => {
+		const codeElements = editor.model.document.find('code');
+		codeElements.forEach((codeElement) => {
+		  if (codeElement.parent.name === 'pre') {
+			codeElement.setAttribute('data-copy', 'true');
+		  }
+		});
+	  });
+	}
+  };
 
 function RTEditor({ name, value, setValue, editorRef, field }) {
 	const pathname = window.location.pathname;
@@ -182,9 +196,12 @@ function RTEditor({ name, value, setValue, editorRef, field }) {
 			config={editorConfig}
 			onReady={(editor) => {
 				editorRef.current = editor;
+				addDataCopyAttribute(editor);
+
 				// You can store the "editor" and use when it is needed.
 				console.log("Editor is ready to use!", editor);
 			}}
+	
 			onBlur={field.onBlur}
 			onChange={(event, editor) => {
 				const data = editor.getData();
@@ -196,19 +213,7 @@ function RTEditor({ name, value, setValue, editorRef, field }) {
 				// console.log("Editor change:", editor, data);
 			}}
 		/>
-		// <RichTextEditorComponent
-		// 	className="z-[100] relative w-auto no-tailwindcss-base"
-		// 	// height={400}
-		// 	value={value}
-		// 	placeholder={`What you'll learn, Requirements, Description, Who is this course for, etc `}
-		// 	change={handleChange}
-		// 	toolbarSettings={toolbarSettings}
-		// 	onKeyDown={handleKeyDown}
-		// 	insertImageSettings={insertImageSettings}
-		// >
-		// 	{/* {value} */}
-		// 	<Inject services={[Toolbar, Image, Link, HtmlEditor, QuickToolbar]} />
-		// </RichTextEditorComponent>
+	
 	);
 }
 export default React.memo(RTEditor);

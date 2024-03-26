@@ -17,15 +17,20 @@ const GlobalFilters = () => {
         if (active === item) {
             setActive("");
             searchParams.delete("type");
+            newUrl = formUrlQuery({
+                params: searchParams.toString(),
+                key: "type",
+                value: null
+            });
         } else {
             setActive(item);
             searchParams.set("type", item.toLowerCase());
+            newUrl = formUrlQuery({
+                params: searchParams.toString(),
+                key: "type",
+                value: item.toLowerCase(),
+            });
         }
-        newUrl = formUrlQuery({
-            params: searchParams.toString(),
-            key: "type",
-            value: item.toLowerCase(),
-        });
         navigate(newUrl, { replace: true });
     }, [active, navigate, searchParams]);
 

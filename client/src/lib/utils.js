@@ -1,7 +1,6 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import qs from "query-string";
-import { BADGE_CRITERIA } from "./badgeCriteria";
 
 export function cn(...inputs) {
 	return twMerge(clsx(inputs));

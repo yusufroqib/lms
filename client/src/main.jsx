@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./index.css";
 import "./styles/prism.css"
+
 import App from "./App";
 import { store } from "./app/store";
 import { Provider } from "react-redux";

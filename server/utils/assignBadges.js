@@ -28,7 +28,7 @@ const BADGE_CRITERIA = {
 
 
 module.exports = assignBadges = (params) => {
-    console.log(params)
+    // console.log(params)
 	const badgeCounts = {
 		GOLD: 0,
 		SILVER: 0,
