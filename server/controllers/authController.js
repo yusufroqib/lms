@@ -3,6 +3,14 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/sendMail.js");
 const createActivationToken = require("../utils/createActivationToken.js");
+const { connect } = require("getstream");
+const StreamChat = require("stream-chat").StreamChat;
+
+const api_key = process.env.STREAM_API_KEY;
+const api_secret = process.env.STREAM_API_SECRET;
+const app_id = process.env.STREAM_APP_ID;
+
+// console.log(api_key)
 
 const getCurrentUserInfo = async (req, res) => {
 	try {
@@ -33,11 +41,13 @@ const signUp = async (req, res) => {
 
 		const existingUser = await User.findOne({ email }).select("-password");
 		if (existingUser)
-			return res.status(400).json({ error: "User already exists with this email" });
+			return res
+				.status(400)
+				.json({ error: "User already exists with this email" });
 
 		const existingUsername = await User.findOne({ username }).select(
 			"-password"
-		);		
+		);
 		if (existingUsername)
 			return res.status(400).json({ error: "Username already taken" });
 
@@ -264,18 +274,29 @@ const login = async (req, res) => {
 
 			// Saving refreshToken with current user
 			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+
+			const serverClient = connect(api_key, api_secret, app_id);
+			const streamToken = serverClient.createUserToken(
+				// JSON.stringify(foundUser._id)
+				foundUser._id.toString()
+			);
+			// console.log(streamToken);
+
 			// console.log(foundUser)
 			const result = await foundUser.save();
 			// console.log(result)
-			result.password = ''
-			result.refreshToken = ''
+			result.password = "";
+			result.refreshToken = "";
 			// console.log(result)
 			const accessToken = jwt.sign(
 				{
 					UserInfo: {
-						_id : foundUser._id,
+						_id: foundUser._id,
 						username: foundUser.username,
+						fullName: foundUser.name,
+						image: foundUser.avatar,
 						roles: roles,
+						streamToken: streamToken,
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,
@@ -330,7 +351,7 @@ const logout = async (req, res) => {
 			(rt) => rt !== refreshToken
 		);
 		const result = await foundUser.save();
-		console.log(result);
+		// console.log(result);
 
 		res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
 		res.sendStatus(204);

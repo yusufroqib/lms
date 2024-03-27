@@ -23,6 +23,7 @@ import { useGetPostByIdQuery } from "@/features/posts/postsApiSlice";
 import { useGetUserByIdQuery } from "@/features/users/usersApiSlice";
 import Reply from "../../components/forms/Reply";
 import ParseHTML from "../../components/ParseHTML";
+import Loading from "./components/Loading";
 
 const PostPage = () => {
 	const { postId } = useParams();
@@ -38,37 +39,26 @@ const PostPage = () => {
 	const {
 		data: result = {},
 		isLoading,
+		isFetching,
 		isSuccess,
 		error,
 		isError,
 	} = useGetPostByIdQuery({ postId });
 
-	console.log(!!result);
+	// console.log(!!result);
+	console.log(isFetching)
 
 	const {
 		data: mongoUser = {},
 		isLoading: isLoadingUser,
+		// isFetching: isFetchingUser,
 		error: userError,
 		refetch,
 	} = useGetUserByIdQuery(userId);
-	// console.log(userError)
 
-	// console.log(result._id)
-
-	// useEffect(() => {
-	//     const fetchData = async () => {
-	//         const postResult = await getPostById({ postId: postId });
-	//         setResult(postResult);
-
-	//         if (clerkId) {
-	//             const userResult = await getUserById({ userId: clerkId });
-	//             setMongoUser(userResult);
-	//         }
-	//     };
-
-	//     fetchData();
-	// }, [postId, userId]);
-	if (isLoading || isLoadingUser || isLoadingUser) return <div>Loading</div>;
+	if ( isLoading || isLoadingUser ) {
+		return <Loading />;
+	}
 	// if (isError) return <div>{error.message}</div>;
 
 	if (isSuccess && !result) {

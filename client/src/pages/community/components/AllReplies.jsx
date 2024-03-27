@@ -10,6 +10,7 @@ import qs from "query-string";
 // import parse from "html-react-parser";
 import { useGetRepliesQuery } from "@/features/posts/postsApiSlice";
 import ParseHTML from "./ParseHTML";
+import AllRepliesLoading from "./AllRepliesLoading";
 
 const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 	// const [result, setResult] = useState({ replies: [] });
@@ -34,6 +35,7 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 		data: result = {},
 		isLoading,
 		isSuccess,
+		isFetching,
 		error,
 		isError,
 	} = useGetRepliesQuery(queryString);
@@ -41,7 +43,7 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 	// console.log(result)
 	// console.log(error)
 
-	if (isLoading) return <div>Loading</div>;
+	if ( isLoading || !result) return <AllRepliesLoading />;
 	// if (isError) return <div>{error.message}</div>;
 
 	return (

@@ -81,9 +81,9 @@ const CourseInfo = () => {
 		const isPurchased = course.purchasedBy.some((item) => item.user === _id);
 		return (
 			<>
-			<div className="sticky top-15 bg-white pb-3 z-99">
+			<div className="sticky top-19 bg-white  z-99">
 
-				<div className="p-3 pt-6 ">
+				<div className="p-3 ">
 					<Breadcrumbs className='bg-transparent ' separator=">">
 						<Link to="/dashboard" className="opacity-60">
 							Dashboard

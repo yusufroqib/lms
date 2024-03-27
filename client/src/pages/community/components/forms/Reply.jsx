@@ -46,12 +46,6 @@ const Reply = ({ post, postId, authorId }) => {
 
 			toast.success("Reply added");
 
-			//     await createReply({
-			//         content: values.reply,
-			//         author: JSON.parse(authorId),
-			//         post: JSON.parse(postId),
-			//         path: pathname,
-			//     });
 			    form.reset();
 			if (editorRef.current) {
                 editorRef.current.setData('');
@@ -72,12 +66,6 @@ const Reply = ({ post, postId, authorId }) => {
 					Write your reply here
 				</h4>
 
-				{/* <Button className="btn light-border-2 gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500" onClick={generateAIReply}>
-          {isSubmittingAI ? (<>Generating...</>) : (<>
-              <Image src="/assets/icons/stars.svg" alt="star" width={12} height={12} className="object-contain"/>
-              Generate AI Reply
-            </>)}
-        </Button> */}
 			</div>
 
 			<Form {...form}>
@@ -96,7 +84,6 @@ const Reply = ({ post, postId, authorId }) => {
 										editorRef={editorRef}
 									/>
 
-					
 								</FormControl>
 								<FormMessage className="text-red-500" />
 							</FormItem>

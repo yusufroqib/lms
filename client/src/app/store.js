@@ -4,6 +4,7 @@ import { apiSlice } from './api/apiSlice'
 import { setupListeners } from "@reduxjs/toolkit/query"
 import authReducer from '../features/auth/authSlice'
 import confettiReducer from "@/features/confettiSlice"
+import streamChatClientReducer from "@/features/streamChatClientSlice";
 
 
 export const store = configureStore({
@@ -12,6 +13,8 @@ export const store = configureStore({
 		auth: authReducer,
 		authScreen: authScreenReducer,
 		confetti: confettiReducer,
+		streamChat: streamChatClientReducer,
+
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware().concat(apiSlice.middleware),
