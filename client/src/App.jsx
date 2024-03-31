@@ -31,6 +31,9 @@ import PublicProfile from "./pages/community/users/publicProfile/PublicProfile";
 import { Messages } from "./pages/messages/Messages";
 import RequireTutor from "./pages/tutor/ProtectTutor";
 import Classrooms from "./pages/classroom/Classrooms";
+import ClassroomById from "./pages/classroom/liveClassroomApp/classroomById/ClassroomById";
+import LiveClassroomLayout from "./pages/classroom/liveClassroomApp/layout/LiveClassroomLayout";
+import Upcoming from "./pages/classroom/liveClassroomApp/upcoming/Upcoming";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -77,7 +80,15 @@ function App() {
 									<Route path="edit-post/:postId" element={<EditPost />} />
 								</Route>
 							</Route>
-							<Route path={"classrooms"} element={<Classrooms />} />
+							<Route path={"classrooms"}>
+								<Route index element={<Classrooms />} />
+								<Route element={<LiveClassroomLayout />}>
+									<Route path=":classroomId">
+										<Route path="home" element={<ClassroomById />} />
+										<Route path="upcoming" element={<Upcoming />} />
+									</Route>
+								</Route>
+							</Route>
 						</Route>
 						<Route path="study/:courseId">
 							<Route index element={<StudyIndex />} />

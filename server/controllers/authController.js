@@ -276,13 +276,11 @@ const login = async (req, res) => {
 			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
 
 			const serverClient = connect(api_key, api_secret, app_id);
-			const streamToken = serverClient.createUserToken(
-				// JSON.stringify(foundUser._id)
-				foundUser._id.toString(), Math.floor(Date.now() / 1000) + (60 * 30)
-			);
-			// console.log(streamToken);
+			const expirationTime = Math.floor(Date.now() / 1000) + 3600;
+			const issuedAt = Math.floor(Date.now() / 1000) - 60;
+			const streamToken = serverClient.createUserToken(foundUser._id.toString(), expirationTime, issuedAt);
+	
 
-			// console.log(foundUser)
 			const result = await foundUser.save();
 			// console.log(result)
 			result.password = "";

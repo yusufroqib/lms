@@ -92,8 +92,29 @@ export default withMT({
 				card: {
 					DEFAULT: "hsl(var(--card))",
 					foreground: "hsl(var(--card-foreground))",
-				}, 
+				},
+				blue: {
+					1: "#0E78F9",
+				},
+				sky: {
+					1: "#C9DDFF",
+					2: "#ECF0FF",
+					3: "#F5FCFF",
+				},
+				orange: {
+					1: "#FF742E",
+				},
+				purple: {
+					1: "#830EF9",
+				},
+				yellow: {
+					1: "#F9A90E",
+				},
 				dark: {
+					1: "#1C1F2E",
+					2: "#161925",
+					3: "#252A41",
+					4: "#1E2757",
 					100: "#000000",
 					200: "#0F1117",
 					300: "#151821",

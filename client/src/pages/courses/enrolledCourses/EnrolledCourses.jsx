@@ -16,14 +16,6 @@ const EnrolledCourses = () => {
 	const { data } = useGetCourseCategoriesQuery("");
 	// console.log(searchParams)
 
-	// const {
-	// 	data: courses,
-	// 	isLoading,
-	// 	isSuccess,
-	// 	error,
-	// 	isError,
-	// } = useGetCoursesQuery({ searchParams: searchParams });
-
 	const {
 		data: courses,
 		isLoading,

@@ -3,7 +3,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@material-tailwind/react";
 import { setAuthScreen } from "@/features/authScreenSlice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/features/auth/authApiSlice";
 import { setCredentials } from "@/features/auth/authSlice";
 import toast from 'react-hot-toast';
@@ -24,6 +24,8 @@ const Login = () => {
 	const inputRef = useRef(null);
 
 	const navigate = useNavigate();
+	const location = useLocation();
+	const from = location.state?.from?.pathname || "/dashboard";
 	const [login, { isLoading }] = useLoginMutation();
 
 	const handleTogglePassword = () => {
@@ -84,7 +86,7 @@ const Login = () => {
 			dispatch(setCredentials({ accessToken }));
 			// dispatch(setLoggedUser({loggedUser}))
 			// console.log(loggedUser);
-			navigate("/dashboard")
+			navigate(from, { replace: true });
 			setData({
 				...data,
 				user: "",

@@ -23,7 +23,7 @@ const ClassroomCard = ({ classroom }) => {
 					<div className="h-15 ">
 						<h5
 							// variant="h6"
-							className=" text-lg mt-2 md:text-xl font-bold two-line-truncate"
+							className=" text-md md:text-lg font-[500] two-line-truncate"
 						>
 							{classroom.name}
 						</h5>

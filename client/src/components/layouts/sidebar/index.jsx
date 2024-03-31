@@ -197,7 +197,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 											</clipPath>
 										</defs>
 									</svg>
-									Classrooms
+									Live Classrooms
 								</NavLink>
 							</li>
 							{/* <!-- Menu Item Calendar --> */}

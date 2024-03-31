@@ -58,11 +58,10 @@ const handleRefreshToken = async (req, res) => {
 			// console.log(foundUser)
 
 			const serverClient = connect(api_key, api_secret, app_id);
-			const streamToken = serverClient.createUserToken(
-				// JSON.stringify(foundUser._id)
-				foundUser._id.toString()
-
-			);
+			const expirationTime = Math.floor(Date.now() / 1000) + 3600;
+			const issuedAt = Math.floor(Date.now() / 1000) - 60;
+			const streamToken = serverClient.createUserToken(foundUser._id.toString(), expirationTime, issuedAt);
+	
 			// console.log("refreshTokenStream", streamToken);
 
 			// Refresh token was still valid

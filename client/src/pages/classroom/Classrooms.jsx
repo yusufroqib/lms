@@ -25,6 +25,10 @@ const Classrooms = () => {
 	}
 	return (
 		<div>
+            <div className="px-6 pt-6">
+					
+					<h2 className="text-2xl font-bold">Live Classrooms</h2>
+				</div>
 			<div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 p-6 gap-4">
 				{/* {items.map((item) => ( */}
 				{classrooms.map((classroom) => (
@@ -35,11 +39,7 @@ const Classrooms = () => {
 
 				{/* ))} */}
 			</div>
-			{/* {items.length === 0 && (
-        <div className="text-center text-sm text-muted-foreground mt-10">
-            No courses found
-        </div>
-    )} */}
+			
 		</div>
 	);
 };

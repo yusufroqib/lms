@@ -57,7 +57,7 @@ const CourseCard = ({
 				</div>
 				<h5
 					// variant="h6"
-					className=" text-md md:text-lg two-line-truncate"
+					className=" text-md md:text-lg font-[500] two-line-truncate"
 					color="blue-gray"
 				>
 					{title}

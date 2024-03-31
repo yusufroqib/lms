@@ -29,8 +29,8 @@ const CourseCard = ({
 	category,
 	averageRating,
 }) => {
-	console.log(progress);
-	console.log(averageRating);
+	// console.log(progress);
+	// console.log(averageRating);
 	return (
 		<Card className=" hover:bg-gray-100 transition overflow-hidden">
 			<CardHeader
@@ -56,13 +56,13 @@ const CourseCard = ({
 					/>
 					<p className="text-xs text-muted-foreground">{tutor.name}</p>
 				</div>
-				<Typography
+				<h2
 					variant="h6"
-					className=" text-md md:text-lg two-line-truncate"
+					className=" text-md md:text-lg font-[500] two-line-truncate"
 					color="blue-gray"
 				>
 					{title}{" "}
-				</Typography>
+				</h2>
 			</CardBody>
 			<CardFooter className="p-3">
 				
