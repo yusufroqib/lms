@@ -1,5 +1,6 @@
 const Course = require("../models/CourseModel");
 const Category = require("../models/CategoryModel");
+const Classroom = require("../models/ClassroomModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
 
 //Get all courses categories
@@ -479,10 +480,25 @@ const toggleCoursePublicationStatus = async (req, res) => {
 		if (ownCourse.isPublished) {
 			const channel = client.channel("messaging", courseId);
 			// console.log(channel)
-			await channel.addMembers([{user_id: userId,  channel_role:"channel_moderator"}]);
+			await channel.addMembers([
+				{ user_id: userId, channel_role: "channel_moderator" },
+			]);
 			await channel.assignRoles([
 				{ user_id: userId, channel_role: "channel_moderator" },
 			]);
+		}
+
+		const isClassroomExist = await Classroom.findOne({ course: courseId });
+
+		//Create new classroom
+		if (ownCourse.isPublished && !isClassroomExist) {
+			const classroom = await Classroom.create({
+				name: ownCourse.title,
+				course: courseId,
+				tutor: userId,
+			});
+			ownCourse.classroom = classroom._id;
+			// await ownCourse.save();
 		}
 
 		// Save the updated course with toggled publication status

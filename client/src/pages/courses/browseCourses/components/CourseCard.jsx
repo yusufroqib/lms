@@ -55,13 +55,13 @@ const CourseCard = ({
 					/>
 					<p className="text-xs text-muted-foreground">{tutor.name}</p>
 				</div>
-				<p
-					variant="h6"
+				<h5
+					// variant="h6"
 					className=" text-md md:text-lg two-line-truncate"
 					color="blue-gray"
 				>
 					{title}
-				</p>
+				</h5>
 			</CardBody>
 			<CardFooter className="p-3">
 				{/* <div className="flex items-center -space-x-3">

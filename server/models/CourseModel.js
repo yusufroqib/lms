@@ -72,6 +72,10 @@ const courseSchema = new Schema(
 			default: 0
 			// required: true,
 		},
+		classroom: {
+			type: Schema.Types.ObjectId,
+			ref: "Classroom",
+		},
 		// estimatePrice: {
 		// 	type: String,
 		// },
