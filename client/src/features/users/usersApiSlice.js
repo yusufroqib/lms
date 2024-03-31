@@ -26,6 +26,18 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 			},
 			providesTags: (result, error, arg) => [{ type: "MyInfo", id: "ME" }],
 		}),
+		getMyClassrooms: builder.query({
+			query: () => ({
+				url: "/classrooms",
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+			transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
+			providesTags: (result, error, arg) => [
+				{ type: "Classroom", id: "LIST" },
+			],
+		}),
 		getAllUsers: builder.query({
 			query: ({ searchParams }) => `/community/users/all-users?${searchParams}`,
 
@@ -75,7 +87,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 			query: (user) => `/community/users/profile/${user}`,
 			transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
 			providesTags: (result, error, user) => [
-				{ type: "UserProfile", id: 'USER' },
+				{ type: "UserProfile", id: "USER" },
 			],
 		}),
 	}),
@@ -88,7 +100,8 @@ export const {
 	useUpdateUserMutation,
 	useDeleteUserMutation,
 	useGetUserByIdQuery,
-	useGetUserInfoQuery
+	useGetUserInfoQuery,
+	useGetMyClassroomsQuery,
 } = usersApiSlice;
 
 // // returns the query result object
