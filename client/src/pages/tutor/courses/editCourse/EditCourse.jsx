@@ -97,6 +97,8 @@ const EditCourse = () => {
 							</span>
 						</div>
 						<Actions
+							title={course.title}
+							courseImage={course.courseImage}
 							disabled={!isComplete}
 							courseId={courseId}
 							isPublished={course.isPublished}
@@ -108,7 +110,7 @@ const EditCourse = () => {
 								<IconBadge icon={LuLayoutDashboard} />
 								<h2 className="text-xl">Customize your course</h2>
 							</div>
-							<TitleForm initialData={course} courseId={course.id} />
+							<TitleForm initialData={course}  courseId={course.id} />
 							<CategoryForm
 								initialData={course}
 								courseId={course.id}
@@ -136,8 +138,7 @@ const EditCourse = () => {
 								</div>
 								<PriceForm initialData={course} courseId={course.id} />
 							</div>
-							<PreviewVideoForm initialData={course} courseId={course.id}/>
-						
+							<PreviewVideoForm initialData={course} courseId={course.id} />
 						</div>
 					</div>
 				</div>

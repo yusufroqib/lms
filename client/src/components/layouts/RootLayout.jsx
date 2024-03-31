@@ -3,21 +3,20 @@ import React, { useEffect, useState } from "react";
 import Header from "../layouts/Header/index";
 import Sidebar from "./Sidebar/index";
 import { Outlet, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { setLoggedUser } from "@/features/auth/authSlice";
+import { StreamChatProvider } from "@/context/StreamChatContext";
 
 const RootLayout = () => {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const loggedUser = useSelector((state) => state.auth.loggedUser);
-	const dispatch = useDispatch();
-	const location = useLocation();
-	const {
-		data: user,
-		isLoading,
-		isSuccess,
-		isError,
-		error,
-	} = useGetMyDetailsQuery();
+	// const loggedUser = useSelector((state) => state.auth.loggedUser);
+	// const dispatch = useDispatch();
+	// const location = useLocation();
+	// const {
+	// 	data: user,
+	// 	isLoading,
+	// 	isSuccess,
+	// 	isError,
+	// 	error,
+	// } = useGetMyDetailsQuery();
 	//   "myDetails",
 	//  {
 	// 	pollingInterval: 60000,
@@ -27,25 +26,23 @@ const RootLayout = () => {
 
 	// console.log(user);
 
-	useEffect(() => {
-		const userId = user?.ids[0];
-		const userInfo = user?.entities[userId];
-		dispatch(setLoggedUser({ loggedUser: userInfo }));
-		// localStorage.setItem("myInfo", JSON.stringify(userInfo));
-	}, [user]);
+	// useEffect(() => {
+	// 	const userId = user?.ids[0];
+	// 	const userInfo = user?.entities[userId];
+	// 	dispatch(setLoggedUser({ loggedUser: userInfo }));
+	// 	// localStorage.setItem("myInfo", JSON.stringify(userInfo));
+	// }, [user]);
 
-	if (isLoading) {
-		return <h1>Fetching Details...</h1>;
-	} else if (loggedUser) {
-		return (
+	// if (isLoading) {
+	// 	return <h1>Fetching Details...</h1>;
+	// } else if (loggedUser) {
+	return (
+		<StreamChatProvider>
 			<div className="dark:bg-boxdark-2 dark:text-bodydark">
 				{/* <!-- ===== Page Wrapper Start ===== --> */}
 				<div className="flex h-screen overflow-hidden">
 					{/* <!-- ===== Sidebar Start ===== --> */}
-						<Sidebar
-							sidebarOpen={sidebarOpen}
-							setSidebarOpen={setSidebarOpen}
-						/>
+					<Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 					{/* <!-- ===== Sidebar End ===== --> */}
 
 					{/* <!-- ===== Content Area Start ===== --> */}
@@ -68,9 +65,10 @@ const RootLayout = () => {
 					{/* <!-- ===== Content Area End ===== --> */}
 				</div>
 				{/* <!-- ===== Page Wrapper End ===== --> */}
-			</div>
-		);
-	}
+			</div>{" "}
+		</StreamChatProvider>
+	);
+	// }
 };
 
 export default React.memo(RootLayout);

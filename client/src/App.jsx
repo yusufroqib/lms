@@ -28,7 +28,8 @@ import TagPosts from "./pages/community/tags/tagPosts/TagPosts";
 import EditPost from "./pages/community/posts/editPost/EditPost";
 import Users from "./pages/community/users/allUsers/Users";
 import PublicProfile from "./pages/community/users/publicProfile/PublicProfile";
-import Messages from "./pages/messages/Messages";
+import {Messages} from "./pages/messages/Messages";
+import RequireTutor from "./pages/tutor/ProtectTutor";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -50,7 +51,7 @@ function App() {
 								<Route path=":courseId/info" element={<CourseInfo />} />
 								<Route path="enrolled-courses" element={<EnrolledCourses />} />
 							</Route>
-							<Route path="tutors">
+							<Route path="tutors" element={<RequireTutor allowedRoles={[ROLES.Tutor]} />}>
 								<Route path="my-courses" element={<TutorCourses />} />
 								<Route path="create-course" element={<CreateCourse />} />
 								<Route path="edit-course/:courseId" element={<EditCourse />} />

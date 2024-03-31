@@ -9,13 +9,25 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 // import { useConfettiStore } from "@/hooks/use-confetti-store";
 import { getStorage, ref, listAll, deleteObject } from "firebase/storage";
 import { useDispatch, useSelector } from "react-redux";
+import { openConfetti } from "@/features/confettiSlice";
 import {
-	openConfetti,
-} from "@/features/confettiSlice";
-import { useDeleteCourseMutation, useToggleCoursePublishMutation } from "@/features/courses/coursesApiSlice";
+	useDeleteCourseMutation,
+	useToggleCoursePublishMutation,
+} from "@/features/courses/coursesApiSlice";
 import { useNavigate } from "react-router-dom";
+import useAuth from "@/hooks/useAuth";
+import { useStreamChat } from "@/context/StreamChatContext";
 
-export const Actions = ({ disabled, courseId, isPublished }) => {
+export const Actions = ({
+	disabled,
+	title,
+	courseImage,
+	courseId,
+	isPublished,
+}) => {
+	// const { _id, username, fullName, image, streamToken } = useAuth();
+	const { streamChat } = useStreamChat();
+
 	// const router = useRouter();
 	// const confetti = useConfettiStore();
 	const dispatch = useDispatch();
@@ -69,15 +81,29 @@ export const Actions = ({ disabled, courseId, isPublished }) => {
 				}).unwrap();
 				toast.success("Course unpublished");
 			} else {
-				await toggleCoursePublish({
-					id: courseId,
-				}).unwrap();
+				const channel = await streamChat
+				.channel("messaging", courseId, {
+					name: title,
+						image: courseImage,
+						// members: [_id, ...memberIds],
+					})
+					await channel.create();
+					
+					await toggleCoursePublish({
+						id: courseId,
+					}).unwrap();
+				// console.log(channel);
+
+
+				// await channel.updateMembers([{ user_id: _id, role: "channel_moderator" }]);
+
 				toast.success("Course published");
 				// confetti.onOpen();
 				dispatch(openConfetti());
 			}
 			// router.refresh();
-		} catch {
+		} catch(error) {
+			console.log(error)
 			toast.error("Something went wrong");
 		} finally {
 			setIsLoading(false);
@@ -95,8 +121,8 @@ export const Actions = ({ disabled, courseId, isPublished }) => {
 
 			navigate(`/tutors/my-courses`);
 			toast.success("Course deleted");
-		} catch (error){
-            console.log(error)
+		} catch (error) {
+			console.log(error);
 			toast.error("Something went wrong");
 		} finally {
 			setIsLoading(false);

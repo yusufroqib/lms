@@ -22,7 +22,9 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 url: '/auth/login',
                 method: 'POST',
                 body: { ...credentials }
-            })
+            }),
+            keepUnusedDataFor: Infinity
+
         }),
         sendLogout: builder.mutation({
             query: () => ({

@@ -1,67 +1,98 @@
-import React, { useState } from "react";
-import { Chat } from "stream-chat-react";
-// import Cookies from 'universal-cookie';
-// import { selectStreamChatClient } from "@/features/streamChatClientSlice";
-// import { useSelector } from "react-redux";
-import { StreamChat } from "stream-chat";
-// import { setStreamChatClient } from "../streamChatClientSlice";
-
-import { ChannelListContainer, ChannelContainer } from "./components";
-
+import { useNavigate } from "react-router-dom";
+import {
+	LoadingIndicator,
+	Chat,
+	useChatContext,
+	ChannelList,
+	Channel,
+	Window,
+	MessageInput,
+	MessageList,
+	ChannelHeader,
+	Thread,
+} from "stream-chat-react";
+// import { useChatContext } from "stream-chat-react/dist/context";
 import "stream-chat-react/dist/css/index.css";
-import "@/styles/messagesStyles.css";
+// import "@/styles/messagesStyles.css";
 import useAuth from "@/hooks/useAuth";
+import { Button } from "./components/Button";
+import { useStreamChat } from "@/context/StreamChatContext";
+import "@/styles/streamChatStyles.css";
+// import { CustomMessage } from "./components/CustomMessage";
+// import useStreamChat from "@/hooks/useStreamChat";
+// import { useLoggedInAuth } from "./context/AuthContext";
+export function Messages() {
+	const { _id } = useAuth();
+	const { streamChat } = useStreamChat();
+	// console.log(streamChat);
+	// console.log(_id);
 
-const Messages = () => {
-	const [createType, setCreateType] = useState("");
-	const [isCreating, setIsCreating] = useState(false);
-	const [isEditing, setIsEditing] = useState(false);
-	// const client = useSelector(selectStreamChatClient);
-	// console.log(client)
-	const { _id, username, fullName, image, streamToken } = useAuth();
-  // console.log(image)
-
-	const apiKey = import.meta.env.VITE_STREAM_API_KEY;
-	// const authToken = cookies.get("token");
-
-	const client = StreamChat.getInstance(apiKey);
-
-	if (streamToken) {
-		client.connectUser(
-			{
-				id: _id,
-				name: username,
-				fullName,
-				image,
-			},
-			streamToken
-		);
-	}
-
-    console.log(client)
-	// if(!client) return <Auth />
-	// if(!client) return <Auth />
-	// if(!authToken) return <Auth />
-
+	// const { user, streamChat } = useLoggedInAuth();
+	if (streamChat == null) return <LoadingIndicator />;
 	return (
-		<div className="app__wrapper p-4 rounded-md">
-			<Chat client={client} theme="team light">
-				<ChannelListContainer
-					isCreating={isCreating}
-					setIsCreating={setIsCreating}
-					setCreateType={setCreateType}
-					setIsEditing={setIsEditing}
+		<div>
+			<Chat client={streamChat}>
+				<ChannelList
+					List={Channels}
+					sendChannelsToList
+					filters={{ members: { $in: [_id] } }}
 				/>
-				<ChannelContainer
-					isCreating={isCreating}
-					setIsCreating={setIsCreating}
-					isEditing={isEditing}
-					setIsEditing={setIsEditing}
-					createType={createType}
-				/>
+				<Channel PinIndicator={CustomPinIndicator} >
+					<Window>
+						<ChannelHeader />
+						<MessageList />
+						<MessageInput />
+					</Window>
+					<Thread />
+				</Channel>
 			</Chat>
 		</div>
 	);
-};
+}
+function Channels({ loadedChannels }) {
+	const navigate = useNavigate();
+	// const { logout } = useLoggedInAuth();
+	const { setActiveChannel, channel: activeChannel } = useChatContext();
+	return (
+		<div className="w-60 flex flex-col gap-4 m-3 flex-grow">
+			<Button onClick={() => navigate("/channel/new")}>New Conversation</Button>
+			<hr className="border-gray-500" />
+			{loadedChannels != null && loadedChannels.length > 0
+				? loadedChannels.map((channel) => {
+						const isActive = channel === activeChannel;
+						const extraClasses = isActive
+							? "bg-blue-500 text-white"
+							: "hover:bg-blue-100 bg-gray-100";
+						return (
+							<button
+								onClick={() => setActiveChannel(channel)}
+								disabled={isActive}
+								className={`p-4 rounded-lg flex gap-3 items-center ${extraClasses}`}
+								key={channel.id}
+							>
+								{channel.data?.image && (
+									<img
+										src={channel.data.image}
+										className="w-10 h-10 rounded-full object-center object-cover"
+									/>
+								)}
+								<div className="text-ellipsis overflow-hidden whitespace-nowrap">
+									{channel.data?.name || channel.id}
+								</div>
+							</button>
+						);
+				  })
+				: "No Conversations"}
+			<hr className="border-gray-500 mt-auto" />
+			<Button>Logout</Button>
+		</div>
+	);
+}
 
-export default Messages;
+export const CustomPinIndicator = () => {
+	return (
+		<div>
+			<div className="italic text-gray-800">pinned</div>
+		</div>
+	);
+};

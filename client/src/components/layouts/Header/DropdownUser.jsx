@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import UserOne from '../../images/user/user-01.png';
+import useAuth from '@/hooks/useAuth';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 const DropdownUser = () => {
+	const {  fullName, image, status } = useAuth();
+
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const trigger = useRef(null);
     const dropdown = useRef(null);
@@ -32,14 +37,19 @@ const DropdownUser = () => {
     return (<div className="relative">
       <Link ref={trigger} onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-4" to="#">
         <span className="hidden text-right lg:block">
-          <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+          <span className="block text-md font-medium text-black dark:text-white">
+            {fullName}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">{status}</span>
         </span>
 
-        <span className="h-12 w-12 rounded-full">
-          <img src={UserOne} alt="User"/>
+        <span className="">
+        <Avatar>
+  <AvatarImage src={image} />
+  <AvatarFallback>{fullName}</AvatarFallback>
+</Avatar>
+
+          {/* <img src={image} className='rounded-full border h-12 w-12 border-gray-100' alt="Profile picture"/> */}
         </span>
 
         <svg className="hidden fill-current sm:block" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">

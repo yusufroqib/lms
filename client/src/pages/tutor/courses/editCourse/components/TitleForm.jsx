@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
+import { useStreamChat } from "@/context/StreamChatContext";
 
 const formSchema = z.object({
 	title: z.string().min(1, {
@@ -29,21 +30,34 @@ export const TitleForm = ({ initialData, courseId }) => {
 	const toggleEdit = () => setIsEditing((current) => !current);
 	const [updateCourse, { isLoading, isError, isSuccess, error }] =
 		useUpdateCourseMutation();
+	const { streamChat } = useStreamChat();
+
 	// const router = useRouter();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: initialData,
 	});
-	const { isSubmitting, isValid, } = form.formState;
+	const { isSubmitting, isValid } = form.formState;
 
 	const onSubmit = async (values) => {
 		try {
 			// console.log(values);
 			await updateCourse({ id: courseId, ...values }).unwrap();
+
+			const channel = streamChat.channel("messaging", courseId);
+
+			const channelData = await channel.query();
+
+			// Update the channel name
+			await channel.update({
+				name: values.title,
+				image: channelData.data.image, // Include the existing image URL
+
+			});
 			// await axios.patch(`/api/courses/${courseId}`, values);
 			toast.success("Course updated");
 			toggleEdit();
-			form.reset({title: ''});
+			form.reset({ title: "" });
 			// router.refresh();
 		} catch {
 			toast.error("Something went wrong");

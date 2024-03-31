@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/sendMail.js");
 const createActivationToken = require("../utils/createActivationToken.js");
 const { connect } = require("getstream");
-const StreamChat = require("stream-chat").StreamChat;
+// const StreamChat = require("stream-chat").StreamChat;
 
 const api_key = process.env.STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
@@ -278,7 +278,7 @@ const login = async (req, res) => {
 			const serverClient = connect(api_key, api_secret, app_id);
 			const streamToken = serverClient.createUserToken(
 				// JSON.stringify(foundUser._id)
-				foundUser._id.toString()
+				foundUser._id.toString(), Math.floor(Date.now() / 1000) + (60 * 30)
 			);
 			// console.log(streamToken);
 

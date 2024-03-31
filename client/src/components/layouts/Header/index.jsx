@@ -10,6 +10,7 @@ import GlobalSearch from "./CommunitySearch/GlobalSearch";
 const Header = (props) => {
 	const location = useLocation();
 
+
 	const isSearchPage = location.pathname === "/courses/search";
 	const isCommunityPage = location.pathname.includes('community')
 

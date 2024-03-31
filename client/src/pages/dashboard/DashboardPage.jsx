@@ -1,4 +1,4 @@
-import { useGetMyDetailsQuery } from "@/features/users/usersApiSlice";
+// import { useGetMyDetailsQuery } from "@/features/users/usersApiSlice";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -91,7 +91,7 @@ const TABLE_ROWS = [
 ];
 
 const Dashboard = () => {
-	const loggedUser = useSelector((state) => state.auth.loggedUser);
+	// const loggedUser = useSelector((state) => state.auth.loggedUser);
 
 	// console.log(loggedUser)
 

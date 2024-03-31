@@ -1,5 +1,6 @@
 const Course = require("../models/CourseModel");
 const Category = require("../models/CategoryModel");
+const { createStreamChatClient } = require("../utils/createStreamChatClient");
 
 //Get all courses categories
 const getCategories = async (req, res) => {
@@ -156,50 +157,50 @@ const updateCourseCategory = async (req, res) => {
 
 const createChapter = async (req, res) => {
 	try {
-	  const userId = req.userId; // Assuming you have user information stored in req.user after authentication
-	  const { title } = req.body;
-  
-	  // Check if userId exists
-	  if (!userId) {
-		return res.status(401).json({ message: "Unauthorized" });
-	  }
-  
-	  // Check if the course exists and the user is the owner
-	  const courseOwner = await Course.findOne({
-		_id: req.params.id,
-		tutor: userId,
-	  });
-	  if (!courseOwner) {
-		return res.status(401).json({ message: "Unauthorized" });
-	  }
-  
-	  // Determine the position for the new chapter
-	  let newPosition = 0;
-	  if (courseOwner.chapters.length > 0) {
-		const lastChapterPosition = courseOwner.chapters[courseOwner.chapters.length - 1].position;
-		newPosition = lastChapterPosition + 1;
-	  }
-  
-	  const isFree = courseOwner.price ? false : true;
-  
-	  // Create the new chapter
-	  const newChapter = {
-		title,
-		isFree,
-		position: newPosition,
-	  };
-  
-	  // Add the newly created chapter to the course's chapters array
-	  courseOwner.chapters.push(newChapter);
-	  await courseOwner.save();
-  
-	  return res.json(newChapter);
+		const userId = req.userId; // Assuming you have user information stored in req.user after authentication
+		const { title } = req.body;
+
+		// Check if userId exists
+		if (!userId) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		// Check if the course exists and the user is the owner
+		const courseOwner = await Course.findOne({
+			_id: req.params.id,
+			tutor: userId,
+		});
+		if (!courseOwner) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		// Determine the position for the new chapter
+		let newPosition = 0;
+		if (courseOwner.chapters.length > 0) {
+			const lastChapterPosition =
+				courseOwner.chapters[courseOwner.chapters.length - 1].position;
+			newPosition = lastChapterPosition + 1;
+		}
+
+		const isFree = courseOwner.price ? false : true;
+
+		// Create the new chapter
+		const newChapter = {
+			title,
+			isFree,
+			position: newPosition,
+		};
+
+		// Add the newly created chapter to the course's chapters array
+		courseOwner.chapters.push(newChapter);
+		await courseOwner.save();
+
+		return res.json(newChapter);
 	} catch (error) {
-	  console.error("[CHAPTERS]", error);
-	  return res.status(500).json({ message: "Internal Error" });
+		console.error("[CHAPTERS]", error);
+		return res.status(500).json({ message: "Internal Error" });
 	}
-  };
-  
+};
 
 const reorderChapters = async (req, res) => {
 	try {
@@ -452,6 +453,8 @@ const toggleCoursePublicationStatus = async (req, res) => {
 			return res.status(401).json({ message: "Unauthorized" });
 		}
 
+		const client = createStreamChatClient();
+
 		const { id: courseId } = req.params;
 
 		// Check if the user owns the course
@@ -473,6 +476,15 @@ const toggleCoursePublicationStatus = async (req, res) => {
 				.json({ message: "Cannot publish course with no chapters" });
 		}
 
+		if (ownCourse.isPublished) {
+			const channel = client.channel("messaging", courseId);
+			// console.log(channel)
+			await channel.addMembers([{user_id: userId,  channel_role:"channel_moderator"}]);
+			await channel.assignRoles([
+				{ user_id: userId, channel_role: "channel_moderator" },
+			]);
+		}
+
 		// Save the updated course with toggled publication status
 		await ownCourse.save();
 
@@ -486,33 +498,32 @@ const toggleCoursePublicationStatus = async (req, res) => {
 };
 
 const deleteCourse = async (req, res) => {
-    try {
-        const { userId } = req; // Assuming you have user information stored in req.user after authentication
-        if (!userId) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
+	try {
+		const { userId } = req; // Assuming you have user information stored in req.user after authentication
+		if (!userId) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
 
-        const { id } = req.params;
+		const { id } = req.params;
 
-        // Check if the user owns the course
-        const ownCourse = await Course.findOne({
-            _id: id,
-            tutor: userId
-        });
-        if (!ownCourse) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
+		// Check if the user owns the course
+		const ownCourse = await Course.findOne({
+			_id: id,
+			tutor: userId,
+		});
+		if (!ownCourse) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
 
-        // Delete the course
-        await Course.deleteOne({ _id: id });
+		// Delete the course
+		await Course.deleteOne({ _id: id });
 
-        return res.status(200).json({ message: "Course deleted successfully" });
-    } catch (error) {
-        console.log("[DELETE COURSE]", error);
-        return res.status(500).json({ message: "Internal Error" });
-    }
+		return res.status(200).json({ message: "Course deleted successfully" });
+	} catch (error) {
+		console.log("[DELETE COURSE]", error);
+		return res.status(500).json({ message: "Internal Error" });
+	}
 };
-
 
 module.exports = {
 	createTitle,
@@ -528,5 +539,5 @@ module.exports = {
 	deleteChapter,
 	toggleChapterPublicationStatus,
 	toggleCoursePublicationStatus,
-	deleteCourse, 
+	deleteCourse,
 };

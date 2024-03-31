@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 export function DataTable({ columns, data }) {
-	console.log(data);
+	// console.log(data);
 	const [sorting, setSorting] = React.useState([]);
 	const [columnFilters, setColumnFilters] = React.useState([]);
 	const table = useReactTable({
@@ -38,14 +38,25 @@ export function DataTable({ columns, data }) {
 			columnFilters,
 		},
 	});
+	if(!data) return <div> <div className="flex items-center py-4 justify-between">
+
+	<Link to="/tutors/create-course">
+		<Button>
+			<PlusCircle className="h-4 w-4 mr-2" />
+			New course
+		</Button>
+	</Link>
+</div> <p className="text-center mt-20">No data to display</p></div>
+
+
 	return (
 		<div className="w-full" >
 			<div className="flex items-center py-4 justify-between">
 				<Input
 					placeholder="Filter courses..."
-					value={table.getColumn("title")?.getFilterValue() ?? ""}
+					value={table?.getColumn("title")?.getFilterValue() ?? ""}
 					onChange={(event) =>
-						table.getColumn("title")?.setFilterValue(event.target.value)
+						table?.getColumn("title")?.setFilterValue(event.target.value)
 					}
 					className="max-w-sm"
 				/>
@@ -59,12 +70,12 @@ export function DataTable({ columns, data }) {
 			<div className="rounded-md border">
 				<Table>
 					<TableHeader>
-						{table.getHeaderGroups().map((headerGroup) => (
+						{table?.getHeaderGroups()?.map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
-								{headerGroup.headers.map((header) => {
+								{headerGroup.headers?.map((header) => {
 									return (
 										<TableHead key={header.id}>
-											{header.isPlaceholder
+											{header?.isPlaceholder
 												? null
 												: flexRender(
 														header.column.columnDef.header,
@@ -77,13 +88,13 @@ export function DataTable({ columns, data }) {
 						))}
 					</TableHeader>
 					<TableBody>
-						{table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
+						{table?.getRowModel().rows?.length ? (
+							table?.getRowModel().rows?.map((row) => (
 								<TableRow
 									key={row.id}
-									data-state={row.getIsSelected() && "selected"}
+									data-state={row?.getIsSelected() && "selected"}
 								>
-									{row.getVisibleCells().map((cell) => (
+									{row?.getVisibleCells()?.map((cell) => (
 										<TableCell key={cell.id}>
 											{flexRender(
 												cell.column.columnDef.cell,
@@ -110,16 +121,16 @@ export function DataTable({ columns, data }) {
 				<Button
 					variant="outline"
 					size="sm"
-					onClick={() => table.previousPage()}
-					disabled={!table.getCanPreviousPage()}
+					onClick={() => table?.previousPage()}
+					disabled={!table?.getCanPreviousPage()}
 				>
 					Previous
 				</Button>
 				<Button
 					variant="outline"
 					size="sm"
-					onClick={() => table.nextPage()}
-					disabled={!table.getCanNextPage()}
+					onClick={() => table?.nextPage()}
+					disabled={!table?.getCanNextPage()}
 				>
 					Next
 				</Button>
