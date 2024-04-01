@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux'
 import { selectCurrentToken } from "./authSlice"
 
 const PersistLogin = () => {
+    console.log('rendering persistLogin')
+
 
     const [persist] = usePersist()
     const token = useSelector(selectCurrentToken)

@@ -84,7 +84,7 @@ function App() {
 								<Route index element={<Classrooms />} />
 								<Route element={<LiveClassroomLayout />}>
 									<Route path=":classroomId">
-										<Route path="home" element={<ClassroomById />} />
+										<Route index element={<ClassroomById />} />
 										<Route path="upcoming" element={<Upcoming />} />
 									</Route>
 								</Route>

@@ -8,6 +8,8 @@ import { StreamChatProvider } from "@/context/StreamChatContext";
 const RootLayout = () => {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const { classroomId } = useParams();
+	console.log('rendering rootlayout')
+
 
 	return (
 		<StreamChatProvider>

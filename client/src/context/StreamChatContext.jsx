@@ -10,6 +10,7 @@ export function useStreamChat() {
 }
 
 export function StreamChatProvider({ children }) {
+	console.log('rendering streamchatcontext')
 
     const [streamChat, setStreamChat] = useState(null);
 	const { _id, username, fullName, image, streamToken } = useAuth();
