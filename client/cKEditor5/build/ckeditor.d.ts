@@ -27,8 +27,9 @@ import { Table, TableToolbar } from '@ckeditor/ckeditor5-table';
 import { TextTransformation } from '@ckeditor/ckeditor5-typing';
 import { Undo } from '@ckeditor/ckeditor5-undo';
 import { WordCount } from '@ckeditor/ckeditor5-word-count';
+import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
 declare class Editor extends ClassicEditor {
-    static builtinPlugins: (typeof Alignment | typeof AutoLink | typeof Autoformat | typeof BlockQuote | typeof Bold | typeof CloudServices | typeof CodeBlock | typeof Essentials | typeof FontBackgroundColor | typeof FontColor | typeof FontFamily | typeof FontSize | typeof Heading | typeof HorizontalLine | typeof Image | typeof ImageCaption | typeof ImageInsert | typeof ImageStyle | typeof ImageToolbar | typeof ImageUpload | typeof Indent | typeof Italic | typeof Link | typeof List | typeof MediaEmbed | typeof Mention | typeof Paragraph | typeof PasteFromOffice | typeof SelectAll | typeof Strikethrough | typeof Subscript | typeof Superscript | typeof Table | typeof TableToolbar | typeof TextTransformation | typeof Underline | typeof Undo | typeof WordCount)[];
+    static builtinPlugins: (typeof Alignment | typeof AutoLink | typeof Autoformat | typeof BlockQuote | typeof Bold | typeof CloudServices | typeof CodeBlock | typeof Essentials | typeof FontBackgroundColor | typeof FontColor | typeof FontFamily | typeof FontSize | typeof FindAndReplace | typeof Heading | typeof HorizontalLine | typeof Image | typeof ImageCaption | typeof ImageInsert | typeof ImageStyle | typeof ImageToolbar | typeof ImageUpload | typeof Indent | typeof Italic | typeof Link | typeof List | typeof MediaEmbed | typeof Mention | typeof Paragraph | typeof PasteFromOffice | typeof SelectAll | typeof Strikethrough | typeof Subscript | typeof Superscript | typeof Table | typeof TableToolbar | typeof TextTransformation | typeof Underline | typeof Undo | typeof WordCount)[];
     static defaultConfig: EditorConfig;
 }
 export default Editor;

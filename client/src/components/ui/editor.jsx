@@ -1,32 +1,9 @@
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "ckeditor5-custom-build";
 
-// import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
-
-// import {
-// 	HtmlEditor,
-// 	Image,
-// 	Inject,
-// 	Link,
-// 	QuickToolbar,
-// 	RichTextEditorComponent,
-// 	Toolbar,
-// } from "@syncfusion/ej2-react-richtexteditor";
 import React from "react";
-// import * as React from 'react';
 
-const addDataCopyAttribute = (editor) => {
-	if (editor && editor.model && editor.model.document) {
-	  editor.model.document.on('change:data', () => {
-		const codeElements = editor.model.document.find('code');
-		codeElements.forEach((codeElement) => {
-		  if (codeElement.parent.name === 'pre') {
-			codeElement.setAttribute('data-copy', 'true');
-		  }
-		});
-	  });
-	}
-  };
+
 
 function RTEditor({ name, value, setValue, editorRef, field }) {
 	const pathname = window.location.pathname;
@@ -41,44 +18,7 @@ function RTEditor({ name, value, setValue, editorRef, field }) {
 	const editorConfig = {
 		placeholder: placeholder,
 		extraPlugins: [MentionLinks],
-
-		toolbar: {
-			items: [
-				"heading",
-				"|",
-				// "findAndReplace",
-				"bold",
-				"italic",
-				"strikethrough",
-				"underline",
-				"fontColor",
-				"fontFamily",
-				"subscript",
-				"superscript",
-				"link",
-				"|",
-				"bulletedList",
-				"numberedList",
-				"|",
-				"alignment",
-				"outdent",
-				"indent",
-				"|",
-				"blockQuote",
-				"codeBlock",
-
-				"|",
-				"horizontalLine",
-				"insertTable",
-				"imageInsert",
-				"mediaEmbed",
-				"|",
-				"undo",
-				"redo",
-			],
-			shouldNotGroupWhenFull: true,
-		},
-		// Include the Paragraph plugin in the configuration
+		
 		mention: {
 			feeds: [
 				{
@@ -196,7 +136,7 @@ function RTEditor({ name, value, setValue, editorRef, field }) {
 			config={editorConfig}
 			onReady={(editor) => {
 				editorRef.current = editor;
-				addDataCopyAttribute(editor);
+				// addDataCopyAttribute(editor);
 
 				// You can store the "editor" and use when it is needed.
 				console.log("Editor is ready to use!", editor);
@@ -205,11 +145,8 @@ function RTEditor({ name, value, setValue, editorRef, field }) {
 			onBlur={field.onBlur}
 			onChange={(event, editor) => {
 				const data = editor.getData();
-				// console.log(data);
-				// setValue(data);
 
 				field.onChange(data);
-
 				// console.log("Editor change:", editor, data);
 			}}
 		/>

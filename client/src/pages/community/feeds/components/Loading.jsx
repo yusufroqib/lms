@@ -12,7 +12,7 @@ const Loading = () => {
 					className="flex justify-end max-sm:w-full"
 				>
 					<Button className="primary-gradient min-h-[46px] px-4 py-3 !text-light-900">
-						Ask a Post
+						Create a Post
 					</Button>
 				</Link>
 			</div>

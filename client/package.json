@@ -36,6 +36,7 @@
     "body-parser": "^1.20.2",
     "ckeditor-tailwind-reset": "^1.0.5",
     "ckeditor5-custom-build": "file:ckeditor5",
+    "ckeditor5-full-screen": "^0.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^0.2.1",

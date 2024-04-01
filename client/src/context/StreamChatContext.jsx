@@ -1,67 +1,56 @@
-import { createContext, useContext, useEffect, useState, } from "react";
-
+import { createContext, useContext, useEffect, useState } from "react";
 import { StreamChat } from "stream-chat";
 import useAuth from "@/hooks/useAuth";
+
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 
 const Context = createContext(null);
+
 export function useStreamChat() {
     return useContext(Context);
 }
 
 export function StreamChatProvider({ children }) {
-	console.log('rendering streamchatcontext')
-
     const [streamChat, setStreamChat] = useState(null);
-	const { _id, username, fullName, image, streamToken } = useAuth();
+    const { _id, username, fullName, image, streamToken } = useAuth();
 
-	const chat = new StreamChat(apiKey);
 
-	if (streamToken) {
-		chat.connectUser(
-			{
-				id: _id,
-				name: username,
-				fullName,
-				image,
-			},
-			streamToken
-		);
-	}
+    useEffect(() => {
+        if (streamToken == null || _id == null) return;
 
-	useEffect(() => {
-		// const initializeChatClient = async () => {
-		if (streamToken == null || _id == null) return;
-		const chat = new StreamChat(apiKey);
-		if (chat.tokenManager.token === streamToken && chat.userID === _id) return;
-		let isInterrupted = false;
-		const connectPromise = chat
-			.connectUser(
-				{
-					id: _id,
-					name: username,
-					fullName,
-					image,
-				},
-				streamToken
-			)
-			.then(() => {
-				if (isInterrupted) return;
-				setStreamChat(chat);
-			});
-		// };
+        // Check if StreamChat is already initialized and connected
+        if (streamChat && streamChat.userID === _id && streamChat.tokenManager.token === streamToken) {
+			console.log('returning now........')
+            return; // No need to reconnect
+        }
 
-		// initializeChatClient();
-		return () => {
-			isInterrupted = true;
-			setStreamChat(undefined);
-			connectPromise.then(() => {
-				chat.disconnectUser();
-			});
-		};
-	}, [streamToken, _id]);
-  
-    return (<Context.Provider value={{  streamChat }}>
-      {children}
-    </Context.Provider>);
+        const chat = new StreamChat(apiKey);
+
+        // Connect to StreamChat
+        chat.connectUser(
+            {
+                id: _id,
+                name: username,
+                fullName,
+                image,
+            },
+            streamToken
+        ).then(() => {
+            setStreamChat(chat);
+        });
+
+        return () => {
+            // Disconnect from StreamChat when component unmounts
+            if (streamChat) {
+                streamChat.disconnectUser();
+                setStreamChat(null);
+            }
+        };
+    }, [streamToken, _id, username, fullName, image]);
+
+    return (
+        <Context.Provider value={{ streamChat }}>
+            {children}
+        </Context.Provider>
+    );
 }

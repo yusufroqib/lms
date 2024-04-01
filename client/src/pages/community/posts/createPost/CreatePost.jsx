@@ -11,7 +11,7 @@ const CreatePost = () => {
 
 	return (
 		<div>
-			<h1 className="h1-bold text-dark100_light900">Ask a post</h1>
+			<h1 className="h1-bold text-dark100_light900">Create a post</h1>
 
 			<div className="mt-9">
 				<Post mongoUserId={userId} />

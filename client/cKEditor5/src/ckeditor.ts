@@ -43,7 +43,8 @@ import { Table, TableToolbar } from '@ckeditor/ckeditor5-table';
 import { TextTransformation } from '@ckeditor/ckeditor5-typing';
 import { Undo } from '@ckeditor/ckeditor5-undo';
 import { WordCount } from '@ckeditor/ckeditor5-word-count';
-
+import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
+// import FullScreen from "ckeditor5-full-screen/src/fullscreen";
 // You can read more about extending the build with additional plugins in the "Installing plugins" guide.
 // See https://ckeditor.com/docs/ckeditor5/latest/installation/plugins/installing-plugins.html for details.
 
@@ -52,6 +53,7 @@ class Editor extends ClassicEditor {
 		Alignment,
 		AutoLink,
 		Autoformat,
+		// FullScreen,
 		BlockQuote,
 		Bold,
 		CloudServices,
@@ -61,6 +63,7 @@ class Editor extends ClassicEditor {
 		FontColor,
 		FontFamily,
 		FontSize,
+		FindAndReplace,
 		Heading,
 		HorizontalLine,
 		Image,
@@ -92,38 +95,39 @@ class Editor extends ClassicEditor {
 	public static override defaultConfig: EditorConfig = {
 		toolbar: {
 			items: [
-				'heading',
-				'|',
-				'bold',
-				'italic',
-				'strikethrough',
-				'underline',
-				'fontColor',
-				'fontFamily',
-				'link',
-				'|',
-				'bulletedList',
-				'numberedList',
-				'|',
-				'alignment',
-				'outdent',
-				'indent',
-				'|',
-				'blockQuote',
-				'insertTable',
-				'subscript',
-				'superscript',
-				'|',
-				'horizontalLine',
-				'codeBlock',
-				'selectAll',
-				'imageInsert',
-				'mediaEmbed',
-				'|',
-				'undo',
-				'redo'
+				"heading",
+				"|",
+				"bold",
+				"italic",
+				"strikethrough",
+				"underline",
+				"fontColor",
+				"fontFamily",
+				"subscript",
+				"superscript",
+				"link",
+				"|",
+				"findAndReplace",
+				"bulletedList",
+				"numberedList",
+				"|",
+				"alignment",
+				"outdent",
+				"indent",
+				"|",
+				"blockQuote",
+				"codeBlock",
+				"|",
+				"horizontalLine",
+				"insertTable",
+				"imageInsert",
+				"mediaEmbed",
+				"|",
+				// "fullscreen",
+				"undo",
+				"redo",
 			],
-			shouldNotGroupWhenFull: true
+			shouldNotGroupWhenFull: true,
 		},
 		language: 'en',
 		image: {
