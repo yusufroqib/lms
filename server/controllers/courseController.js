@@ -2,6 +2,7 @@ const Course = require("../models/CourseModel");
 const Category = require("../models/CategoryModel");
 const User = require("../models/userModel");
 const StripeCustomer = require("../models/StripeCustomerModel");
+const Classroom = require("../models/ClassroomModel");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const browseAllCourses = async (req, res) => {
@@ -178,6 +179,8 @@ const handleStripeWebhook = async (req, res, next) => {
 		//   console.log(courseId)
 
 		const course = await Course.findById(courseId);
+		const courseClassroom = await Classroom.findOne({course: courseId})
+
 		const user = await User.findById(userId);
 
 		if (event.type === "checkout.session.completed") {
@@ -186,6 +189,10 @@ const handleStripeWebhook = async (req, res, next) => {
 			}
 			course.purchasedBy.push({ user: userId, amount: course.price });
 			await course.save();
+
+			courseClassroom.students.push(userId)
+			await courseClassroom.save()
+
 
 			// Add the course to the enrolledCourses array in the user model
 			user.enrolledCourses.push(courseId);

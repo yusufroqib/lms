@@ -100,6 +100,7 @@ export default withMT({
 					1: "#C9DDFF",
 					2: "#ECF0FF",
 					3: "#F5FCFF",
+					...colors.sky,
 				},
 				orange: {
 					1: "#FF742E",

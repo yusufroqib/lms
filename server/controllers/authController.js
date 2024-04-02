@@ -3,8 +3,8 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/sendMail.js");
 const createActivationToken = require("../utils/createActivationToken.js");
-const { connect } = require("getstream");
-// const StreamChat = require("stream-chat").StreamChat;
+// const { connect } = require("getstream");
+const { StreamClient } = require("@stream-io/node-sdk");
 
 const api_key = process.env.STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
@@ -275,11 +275,16 @@ const login = async (req, res) => {
 			// Saving refreshToken with current user
 			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
 
-			const serverClient = connect(api_key, api_secret, app_id);
+			const streamClient = new StreamClient(api_key, api_secret);
 			const expirationTime = Math.floor(Date.now() / 1000) + 3600;
 			const issuedAt = Math.floor(Date.now() / 1000) - 60;
-			const streamToken = serverClient.createUserToken(foundUser._id.toString(), expirationTime, issuedAt);
-	
+			// const streamToken = streamClient.createToken(foundUser._id.toString(), expirationTime, issuedAt);
+			const streamToken = streamClient.createToken(foundUser._id.toString());
+
+			// const serverClient = connect(api_key, api_secret, app_id);
+			// const expirationTime = Math.floor(Date.now() / 1000) + 3600;
+			// const issuedAt = Math.floor(Date.now() / 1000) - 60;
+			// const streamToken = serverClient.createUserToken(foundUser._id.toString(), expirationTime, issuedAt);
 
 			const result = await foundUser.save();
 			// console.log(result)

@@ -31,9 +31,14 @@ import PublicProfile from "./pages/community/users/publicProfile/PublicProfile";
 import { Messages } from "./pages/messages/Messages";
 import RequireTutor from "./pages/tutor/ProtectTutor";
 import Classrooms from "./pages/classroom/Classrooms";
-import ClassroomById from "./pages/classroom/liveClassroomApp/classroomById/ClassroomById";
+// import ClassroomById from "./pages/classroom/liveClassroomApp/classroomHome/classroomHome";
 import LiveClassroomLayout from "./pages/classroom/liveClassroomApp/layout/LiveClassroomLayout";
 import Upcoming from "./pages/classroom/liveClassroomApp/upcoming/Upcoming";
+import Previous from "./pages/classroom/liveClassroomApp/previous/Previous";
+import Ongoing from "./pages/classroom/liveClassroomApp/ongoing/ongoing";
+import ClassroomHome from "./pages/classroom/liveClassroomApp/classroomHome/classroomHome";
+import MeetingPage from "./pages/classroom/liveClassroomApp/meeting/MeetingPage";
+// import InProgress from "./pages/classroom/liveClassroomApp/ongoing/InProgress";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
@@ -84,8 +89,13 @@ function App() {
 								<Route index element={<Classrooms />} />
 								<Route element={<LiveClassroomLayout />}>
 									<Route path=":classroomId">
-										<Route index element={<ClassroomById />} />
+										<Route index element={<ClassroomHome />} />
+										<Route path="ongoing" element={<Ongoing />} />
 										<Route path="upcoming" element={<Upcoming />} />
+										<Route path="previous" element={<Previous />} />
+										<Route path="meeting">
+											<Route path="callId" element={<MeetingPage />} />
+										</Route>
 									</Route>
 								</Route>
 							</Route>

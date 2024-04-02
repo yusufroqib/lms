@@ -85,6 +85,16 @@ body,
 	animation: blink 1.5s infinite;
 }
 
+@layer utilities {
+	.flex-center {
+	  @apply flex justify-center items-center;
+	}
+  
+	.flex-between {
+	  @apply flex justify-between items-center;
+	}
+  }
+
 @layer base {
 	.no-tailwindcss-base,
 	.no-tailwindcss-base *,
