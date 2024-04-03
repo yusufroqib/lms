@@ -35,7 +35,7 @@ import Classrooms from "./pages/classroom/Classrooms";
 import LiveClassroomLayout from "./pages/classroom/liveClassroomApp/layout/LiveClassroomLayout";
 import Upcoming from "./pages/classroom/liveClassroomApp/upcoming/Upcoming";
 import Previous from "./pages/classroom/liveClassroomApp/previous/Previous";
-import Ongoing from "./pages/classroom/liveClassroomApp/ongoing/ongoing";
+import Ongoing from "./pages/classroom/liveClassroomApp/ongoing/Ongoing";
 import ClassroomHome from "./pages/classroom/liveClassroomApp/classroomHome/classroomHome";
 import MeetingPage from "./pages/classroom/liveClassroomApp/meeting/MeetingPage";
 // import InProgress from "./pages/classroom/liveClassroomApp/ongoing/InProgress";
@@ -94,7 +94,7 @@ function App() {
 										<Route path="upcoming" element={<Upcoming />} />
 										<Route path="previous" element={<Previous />} />
 										<Route path="meeting">
-											<Route path="callId" element={<MeetingPage />} />
+											<Route path=":callId" element={<MeetingPage />} />
 										</Route>
 									</Route>
 								</Route>

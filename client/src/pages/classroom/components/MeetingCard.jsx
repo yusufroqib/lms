@@ -1,7 +1,7 @@
 import React from "react";
 // import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { avatarImages } from "@/constants";
+import { avatarImages } from "../liveClassroomApp/components/constants";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -30,8 +30,8 @@ const MeetingCard = ({
 					</div>
 				</div>
 			</article>
-			<article className={cn("flex justify-center relative", {})}>
-				<div className="relative flex w-full max-sm:hidden">
+			<article className={cn("flex justify-between relative", {})}>
+				<div className="relative flex  max-sm:hidden">
 					{avatarImages.map((img, index) => (
 						<img
 							key={index}

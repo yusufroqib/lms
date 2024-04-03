@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CallControls, CallParticipantsList, CallStatsButton, CallingState, PaginatedGridLayout, SpeakerLayout, useCallStateHooks } from '@stream-io/video-react-sdk';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Users, LayoutList } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Loader from './Loader';
@@ -9,13 +9,15 @@ import { cn } from '@/lib/utils';
 
 const MeetingRoom = () => {
     const navigate = useNavigate();
-    const searchParams = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
     const isPersonalRoom = !!searchParams.get('personal');
     const [layout, setLayout] = useState('speaker-left');
     const [showParticipants, setShowParticipants] = useState(false);
     const { useCallCallingState } = useCallStateHooks();
     // for more detail about types of CallingState see: https://getstream.io/video/docs/react/ui-cookbook/ringing-call/#incoming-call-panel
     const callingState = useCallCallingState();
+    const { classroomId } = useParams();
+
 
     if (callingState !== CallingState.JOINED) return <Loader />;
 
@@ -43,8 +45,8 @@ const MeetingRoom = () => {
                 </div>
             </div>
             {/* video layout and call controls */}
-            <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
-                <CallControls onLeave={() => navigate(`/`)} />
+            <div className="fixed bottom-0 flex flex-wrap w-full items-center justify-center gap-5">
+                <CallControls onLeave={() => navigate(`/classrooms/${classroomId}`)} />
 
                 <DropdownMenu>
                     <div className="flex items-center">

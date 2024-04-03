@@ -18,7 +18,7 @@ const initialValues = {
 	link: "",
 };
 
-const MeetingTypeList = ({currentClassroom}) => {
+const MeetingTypeList = ({ currentClassroom }) => {
 	const { _id, username, fullName, image, streamToken } = useAuth();
 
 	const navigate = useNavigate();
@@ -26,7 +26,7 @@ const MeetingTypeList = ({currentClassroom}) => {
 	const [values, setValues] = useState(initialValues);
 	const [callDetail, setCallDetail] = useState();
 	const client = useStreamVideoClient();
-    const {classroomId} = useParams()
+	const { classroomId } = useParams();
 	// const { user } = useUser();
 	// const { toast } = useToast();
 
@@ -40,17 +40,19 @@ const MeetingTypeList = ({currentClassroom}) => {
 			const id = crypto.randomUUID();
 			const call = client.call("default", id);
 			if (!call) throw new Error("Failed to create meeting");
-            const members = currentClassroom.students
-            .map((student) => ({ user_id: student._id, role: "call_member" }))
-            .concat({ user_id: _id, role: "call_member" })
-            .filter((v, i, a) => a.findIndex((v2) => v2.user_id === v.user_id) === i);
+			const members = currentClassroom.students
+				.map((student) => ({ user_id: student._id, role: "call_member" }))
+				.concat({ user_id: _id, role: "call_member" })
+				.filter(
+					(v, i, a) => a.findIndex((v2) => v2.user_id === v.user_id) === i
+				);
 			const startsAt =
 				values.dateTime.toISOString() || new Date(Date.now()).toISOString();
 			const description = values.description || "Instant Meeting";
 			await call.getOrCreate({
 				data: {
 					starts_at: startsAt,
-                    members,
+					members,
 					custom: {
 						description,
 					},
@@ -69,7 +71,9 @@ const MeetingTypeList = ({currentClassroom}) => {
 
 	if (!client || !_id) return <Loader />;
 
-	const meetingLink = `${ import.meta.env.VITE_CLIENT_BASE_URL}/meeting/${callDetail?.id}`;
+	const meetingLink = `${
+		import.meta.env.VITE_CLIENT_BASE_URL
+	}/classrooms/${classroomId}/meeting/${callDetail?.id}`;
 
 	return (
 		<section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
