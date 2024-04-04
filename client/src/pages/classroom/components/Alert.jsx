@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 const Alert = ({ title, iconUrl }) => {
+  const {classroomId} = useParams()
     return (<section className="flex-center h-screen w-full">
       <Card className="w-full max-w-[520px] border-none bg-dark-1 p-6 py-9 text-white">
         <CardContent>
@@ -14,7 +15,7 @@ const Alert = ({ title, iconUrl }) => {
             </div>
 
             <Button asChild className="bg-blue-1">
-              <Link to="/classrooms">Back to Home</Link>
+              <Link to={`/classrooms/${classroomId}`}>Back to Home</Link>
             </Button>
           </div>
         </CardContent>

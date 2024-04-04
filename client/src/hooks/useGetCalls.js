@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 // import { useUser } from '@clerk/nextjs';
 import { useStreamVideoClient } from '@stream-io/video-react-sdk';
 import useAuth from './useAuth';
+import { useParams } from 'react-router-dom';
 export const useGetCalls = () => {
     // const { user } = useUser();
     const client = useStreamVideoClient();
     const { _id } = useAuth();
-
+	const { classroomId } = useParams();
     const [calls, setCalls] = useState();
     const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
@@ -24,6 +25,7 @@ export const useGetCalls = () => {
                             { created_by_user_id: _id },
                             { members: { $in: [_id] } },
                         ],
+                        'custom.classroomId': classroomId, // Add this line
                     },
                 });
                 setCalls(calls);
@@ -39,7 +41,7 @@ export const useGetCalls = () => {
     }, [client, _id]);
     const now = new Date();
     const endedCalls = calls?.filter(({ state: { startsAt, endedAt } }) => {
-        return (startsAt && new Date(startsAt) < now) || !!endedAt;
+        return (startsAt && new Date(startsAt) < now) && !!endedAt;
     });
     const upcomingCalls = calls?.filter(({ state: { startsAt } }) => {
         return startsAt && new Date(startsAt) > now;

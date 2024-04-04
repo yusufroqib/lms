@@ -3,6 +3,7 @@ import Loader from "./Loader";
 import { useGetCalls } from "@/hooks/useGetCalls";
 import MeetingCard from "./MeetingCard";
 import { useNavigate, useParams } from "react-router-dom";
+import { useCall } from "@stream-io/video-react-sdk";
 
 const CallList = ({ type }) => {
 	const navigate = useNavigate();
@@ -10,6 +11,7 @@ const CallList = ({ type }) => {
 		useGetCalls();
 	const [recordings, setRecordings] = useState([]);
 	const { classroomId } = useParams();
+	const call = useCall();
 
 	const getCalls = () => {
 		switch (type) {
@@ -43,12 +45,14 @@ const CallList = ({ type }) => {
 
 	useEffect(() => {
 		const fetchRecordings = async () => {
-			const callData = await Promise.all(
-				callRecordings?.map((meeting) => meeting.queryRecordings()) ?? []
-			);
-			const recordings = callData
-				.filter((call) => call.recordings.length > 0)
-				.flatMap((call) => call.recordings);
+			// const callData = await Promise.all(
+			// 	callRecordings?.map((meeting) => meeting.queryRecordings()) ?? []
+			// );
+			// const recordings = callData
+			// 	.filter((call) => call.recordings.length > 0)
+			// 	.flatMap((call) => call.recordings);
+			const { recordings } = await call.queryRecordings();
+
 			setRecordings(recordings);
 		};
 		if (type === "recordings") {
@@ -94,11 +98,14 @@ const CallList = ({ type }) => {
 								  }/classrooms/${classroomId}/meeting/${meeting.id}`
 						}
 						buttonIcon1={type === "recordings" ? "/icons/play.svg" : undefined}
-						buttonText={type === "recordings" ? "Play" : "Start"}
+						buttonText={
+							type === "recordings" ? "Play" : type === "ended" ? "Recordings" : "Start"
+						}
 						handleClick={
 							type === "recordings"
-								? () => navigate(`${meeting.url}`)
-								: () => navigate(`/classrooms/${classroomId}/meeting/${meeting.id}`)
+								? () => window.open(meeting.url, "_blank")
+								: () =>
+										navigate(`/classrooms/${classroomId}/meeting/${meeting.id}`)
 						}
 					/>
 				))

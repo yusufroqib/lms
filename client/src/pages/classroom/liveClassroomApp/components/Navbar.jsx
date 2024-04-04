@@ -24,7 +24,7 @@ const Navbar = () => {
 				{/* <SignedIn>
           <UserButton afterSignOutUrl="/sign-in"/>
         </SignedIn> */}
-				<Link to="/courses/search">
+				<Link to="/classrooms">
 					<Button size="sm" variant="destructive">
 						<LogOut className="h-4 w-4 mr-2" />
 						Exit

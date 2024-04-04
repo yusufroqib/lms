@@ -47,14 +47,15 @@ const MeetingCard = ({
 						+5
 					</div>
 				</div>
-				{!isPreviousMeeting && (
-					<div className="flex gap-2">
-						<Button onClick={handleClick} className="rounded bg-blue-1 px-6">
-							{buttonIcon1 && (
-								<img src={buttonIcon1} alt="feature" width={20} height={20} />
-							)}
-							&nbsp; {buttonText}
-						</Button>
+
+				<div className="flex gap-2">
+					<Button onClick={handleClick} className="rounded bg-blue-1 px-6">
+						{buttonIcon1 && (
+							<img src={buttonIcon1} alt="feature" width={20} height={20} />
+						)}
+						&nbsp; {buttonText}
+					</Button>
+					{!isPreviousMeeting && (
 						<Button
 							onClick={() => {
 								navigator.clipboard.writeText(link);
@@ -65,8 +66,8 @@ const MeetingCard = ({
 							<img src="/icons/copy.svg" alt="feature" width={20} height={20} />
 							&nbsp; Copy Link
 						</Button>
-					</div>
-				)}
+					)}
+				</div>
 			</article>
 		</section>
 	);
