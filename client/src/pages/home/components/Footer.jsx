@@ -6,7 +6,7 @@ const Footer = () => {
 			className="bg-cover bg-no-repeat h-[60vh] mt-20 bg-[bottom_-10rem]"
 			style={{ backgroundImage: `url(/footer-bg.svg)` }}
 		>
-			Footer
+			{/* Footer */}
 		</div>
 	);
 };
