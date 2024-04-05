@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { setAuthScreen } from "@/features/authScreenSlice";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
