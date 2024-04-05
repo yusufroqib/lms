@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { Button } from "@material-tailwind/react";
+// import { Button } from "@material-tailwind/react";
 import { setAuthScreen } from "@/features/authScreenSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/features/auth/authApiSlice";
 import { setCredentials } from "@/features/auth/authSlice";
 import toast from 'react-hot-toast';
+import GoogleButton from "./GoogleButton";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 
 
@@ -80,7 +83,7 @@ const Login = () => {
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		try {
-			const { accessToken, loggedUser } = await 
+			const { accessToken,  } = await 
 				login(data).unwrap()
 			// console.log(res)
 			dispatch(setCredentials({ accessToken }));
@@ -95,7 +98,7 @@ const Login = () => {
 			// navigate('/dash')
 		} catch (err) {
 			console.log(err)
-			toast.error(err.data?.message)
+			toast.error(err.data?.error || err.data?.message)
 			if (!err.status) {
 				console.log("No Server Response");
 			} else if (err.status === 400) {
@@ -108,6 +111,16 @@ const Login = () => {
 			// errRef.current.focus();
 		}
 	};
+
+	let buttonText = "Login";
+
+	if (isLoading) {
+		buttonText = (
+			<>
+				<Loader2 key="loader" className="mr-2 h-4 w-4 animate-spin" /> Logging in
+			</>
+		);
+	}
 
 	const { ...allData } = data;
 
@@ -209,13 +222,13 @@ const Login = () => {
 						</div>
 
 						<div className="flex items-center mt-4">
-							<button
+							<Button
 								type="submit"
 								disabled={!canSubmit}
 								className="w-full text-white bg-purple-700 hover:bg-purple-600 focus:ring-1 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center mt-2 disabled:bg-gradient-to-br disabled:from-gray-100 disabled:to-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed group-invalid:bg-gradient-to-br group-invalid:from-gray-100 group-invalid:to-gray-300 group-invalid:text-gray-400 group-invalid:pointer-events-none group-invalid:opacity-70"
 							>
-								Login
-							</button>
+								{buttonText}
+							</Button>
 						</div>
 					</form>
 					<div className="mt-4 text-zinc-600 text-md dark:text-zinc-300">
@@ -233,20 +246,7 @@ const Login = () => {
 						<hr className="w-full h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 					</div>
 					<div className="my-6 space-y-2">
-						<Button
-							size="lg"
-							variant="outlined"
-							color="blue-gray"
-							className="flex items-center justify-center gap-3 w-full py-3"
-							// className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-600 flex items-center justify-center w-full py-3 space-x-4 border rounded-md focus:ring-2 focus:ring-offset-1 border-gray-300 dark:border-gray-700 hover:border-purple-400 focus:ring-purple-400 dark:hover:border-purple-600"
-						>
-							<img
-								src="https://docs.material-tailwind.com/icons/google.svg"
-								alt="googlr"
-								className="h-6 w-6"
-							/>
-							Continue with Google
-						</Button>
+				<GoogleButton/>
 					</div>
 				</div>
 			</div>

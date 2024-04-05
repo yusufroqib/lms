@@ -27,15 +27,18 @@ const handleRefreshToken = async (req, res) => {
 			process.env.REFRESH_TOKEN_SECRET,
 			async (err, decoded) => {
 				if (err) return res.sendStatus(403); //Forbidden
+				console.log("No user found, hacked user");
+
 				// Delete refresh token from db
 				const hackedUser = await User.findOne({
-					username: decoded.username,
+					_id: decoded._id,
 				}).exec();
 				hackedUser.refreshToken = [];
 				const result = await hackedUser.save();
 				// console.log(result);
 			}
 		);
+		console.log("No user found");
 		return res.sendStatus(403);
 	}
 
@@ -53,8 +56,14 @@ const handleRefreshToken = async (req, res) => {
 				foundUser.refreshToken = [...newRefreshTokenArray];
 				const result = await foundUser.save();
 			}
-			if (err || foundUser.username !== decoded.username)
+			if (err || foundUser._id.toString() !== decoded._id) {
+				
+				console.log(foundUser._id.toString());
+				console.log( decoded._id);
+				console.log("_id not equals");
+
 				return res.sendStatus(403);
+			}
 
 			// console.log(foundUser)
 
@@ -90,7 +99,7 @@ const handleRefreshToken = async (req, res) => {
 			);
 
 			const newRefreshToken = jwt.sign(
-				{ username: foundUser.username },
+				{ _id: foundUser._id.toString() },
 				process.env.REFRESH_TOKEN_SECRET,
 				{ expiresIn: "1d" }
 			);

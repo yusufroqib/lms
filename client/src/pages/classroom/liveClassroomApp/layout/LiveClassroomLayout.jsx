@@ -9,6 +9,7 @@ import "@stream-io/video-react-sdk/dist/css/styles.css";
 import "react-datepicker/dist/react-datepicker.css";
 import useAuth from "@/hooks/useAuth";
 import { useGetMyClassroomsQuery } from "@/features/users/usersApiSlice";
+import { Loader2 } from "lucide-react";
 
 const LiveClassroomLayout = ({ children }) => {
 	const location = useLocation();
@@ -25,8 +26,18 @@ const LiveClassroomLayout = ({ children }) => {
 	);
 
 	console.log(currentClassroom);
+
+	if (isLoading) {
+		
+		return (
+			<div className="flex min-h-[100vh]  justify-center items-center">
+				<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
+			</div>
+		);
+	}
 	const isAuthorized =
-		currentClassroom?.students.includes(_id) || currentClassroom?.tutor._id === _id;
+		currentClassroom?.students.includes(_id) ||
+		currentClassroom?.tutor._id === _id;
 
 	if (!isAuthorized) {
 		return <Navigate to={"/classrooms"} />;

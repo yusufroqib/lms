@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 // import { useConfettiStore } from "@/hooks/use-confetti-store";
 import { openConfetti } from "@/features/confettiSlice";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useUpdateChapterProgressMutation } from "@/features/courses/coursesApiSlice";
 export const CourseProgressButton = ({
 	chapterId,
 	courseId,
@@ -18,19 +20,26 @@ export const CourseProgressButton = ({
 	// const confetti = useConfettiStore();
 	const dispatch = useDispatch();
 	const [isLoading, setIsLoading] = useState(false);
+	const navigate = useNavigate();
+	const [updateCourseProgress] = useUpdateChapterProgressMutation();
+
 	const onClick = async () => {
 		try {
 			setIsLoading(true);
 			// await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
 			//     isCompleted: !isCompleted
 			// });
+			await updateCourseProgress({
+				courseId,
+				chapterId,
+			}).unwrap();
 			if (!isCompleted && !nextChapterId) {
 				// confetti.onOpen();
 				dispatch(openConfetti());
 			}
-			// if (!isCompleted && nextChapterId) {
-			//     router.push(`/courses/${courseId}/chapters/${nextChapterId}`);
-			// }
+			if (!isCompleted && nextChapterId) {
+				navigate(`/study/${courseId}/chapter/${nextChapterId}`);
+			}
 			toast.success("Progress updated");
 			// router.refresh();
 		} catch {
@@ -39,16 +48,17 @@ export const CourseProgressButton = ({
 			setIsLoading(false);
 		}
 	};
-	const Icon = isCompleted ? XCircle : CheckCircle;
+	const Icon = isCompleted ? CheckCircle : CheckCircle;
+
 	return (
 		<Button
 			onClick={onClick}
-			disabled={isLoading}
+			disabled={isLoading || isCompleted}
 			type="button"
-			variant={isCompleted ? "outline" : "success"}
+			variant={isCompleted ?  "success" : "outline"}
 			className="w-full md:w-auto"
 		>
-			{isCompleted ? "Not completed" : "Mark as complete"}
+			{isCompleted ? "Completed" : "Mark as complete"}
 			<Icon className="h-4 w-4 ml-2" />
 		</Button>
 	);

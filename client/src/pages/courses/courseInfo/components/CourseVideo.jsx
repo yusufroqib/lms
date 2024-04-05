@@ -5,8 +5,9 @@ import React from "react";
 import { usePurchaseCourseMutation } from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-// import {loadStripe} from '@stripe/stripe-js';
+import { Loader2 } from "lucide-react";
 
+// import {loadStripe} from '@stripe/stripe-js';
 
 const CourseVideo = ({
 	previewVideoUrl,
@@ -23,7 +24,6 @@ const CourseVideo = ({
 	// console.log(courseId);
 	const handlePurchase = async () => {
 		try {
-
 			// console.log(values);
 			const response = await purchaseCourse({ courseId }).unwrap();
 			// console.log(sessionId)
@@ -44,10 +44,6 @@ const CourseVideo = ({
 	};
 	const handleStudy = async () => {
 		try {
-			// console.log(values);
-			// await purchaseCourse({ courseId }).unwrap();
-			// await axios.patch(`/api/courses/${courseId}`, values);
-			// toast.success("Course purchased successfully");
 			navigate(`/study/${courseId}/chapter/${firstChapter._id}`);
 
 			// router.refresh();
@@ -55,6 +51,18 @@ const CourseVideo = ({
 			toast.error("Something went wrong");
 		}
 	};
+
+	let buttonText = "Enroll Now";
+
+	if (isLoading) {
+		buttonText = (
+			<>
+				<Loader2 key="loader" className="mr-2 h-4 w-4 animate-spin" /> Please
+				wait
+			</>
+		);
+	}
+
 	return (
 		<div className="p-2 border border-gray-600 rounded-xl">
 			<div className="relative min-w-full aspect-video">
@@ -91,10 +99,11 @@ const CourseVideo = ({
 					<Button
 						onClick={handlePurchase}
 						size="lg"
+						disabled={isLoading}
 						className="animated-blink"
 						variant={"success"}
 					>
-						Enroll Now
+						{buttonText}
 					</Button>
 				)}
 			</div>

@@ -1,7 +1,7 @@
 import { useGetCoursesQuery } from "@/features/courses/coursesApiSlice";
 import useAuth from "@/hooks/useAuth";
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import CourseVideo from "./components/CourseVideo";
 import {
 	Avatar,
@@ -18,6 +18,8 @@ import {
 	TabPanel,
 } from "@material-tailwind/react";
 import PreviewChaptersList from "./components/PreviewChaptersList";
+import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 const data = [
 	{
@@ -39,6 +41,17 @@ const CourseInfo = () => {
 	const { username, isTutor, isAdmin, _id } = useAuth();
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	const [activeTab, setActiveTab] = React.useState("overview");
+	const [searchParams, setSearchParams] = useSearchParams()
+	const purchaseError = searchParams.get('cancelled')
+
+useEffect(() => {
+
+	if(!!purchaseError){
+		toast.error('Course purchase was unsuccessful')
+	}
+}, [purchaseError])
+
+
 	const { course, isLoading, isFetching, isSuccess, isError } =
 		useGetCoursesQuery("allCourses", {
 			selectFromResult: ({
@@ -73,7 +86,9 @@ const CourseInfo = () => {
 	}, []);
 
 	if (isLoading) {
-		return <p>Loading Tutor Course</p>;
+		return <div className="flex min-h-[80vh] justify-center items-center">
+				<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
+			</div>
 	} else if (isSuccess && !course) {
 		return <Navigate to={"/dashboard"} />;
 	}

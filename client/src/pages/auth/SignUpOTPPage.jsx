@@ -7,8 +7,9 @@ import { useVerifySignUpOTPMutation } from "@/features/auth/authApiSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	selectCurrentActivationToken,
-	setUser,
+	// setUser,
 } from "@/features/auth/authSlice";
+import toast from "react-hot-toast";
 
 const SignUpOTP = () => {
 	const dispatch = useDispatch();
@@ -46,14 +47,18 @@ const SignUpOTP = () => {
 	const verifyOTP = async (e) => {
 		e.preventDefault();
 		try {
-			const { user } = await verifySignUpOTP({
+			 await verifySignUpOTP({
 				activation_code: otp,
 				activation_token: activationToken,
 			}).unwrap();
-			console.log(user);
+
+			toast.success("Account activated successfully")
+
+			navigate("/dashboard")
+
 			// console.log(res)
-			dispatch(setUser({ user }));
-			console.log(user);
+			// dispatch(setUser({ user }));
+			// console.log(user);
 			// setData({
 			// 	...data,
 			// 	fullName: "",

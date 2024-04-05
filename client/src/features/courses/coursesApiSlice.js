@@ -252,6 +252,14 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: [{ type: "Course", id: "LIST" }],
 		}),
+		updateChapterProgress: builder.mutation({
+			query: ({courseId, chapterId}) => ({
+				url: `/courses/${courseId}/chapter/${chapterId}/progress`,
+				method: "PUT",
+				
+			}),
+			invalidatesTags: [{ type: "EnrolledCourse", id: "LIST" }],
+		}),
 	}),
 });
 
@@ -273,6 +281,7 @@ export const {
 	useDeleteChapterAttachmentMutation,
 	useToggleCoursePublishMutation,
 	usePurchaseCourseMutation,
+	useUpdateChapterProgressMutation
 } = coursesApiSlice;
 
 // export const selectallCoursesResult = coursesApiSlice.endpoints.getCourses.select();

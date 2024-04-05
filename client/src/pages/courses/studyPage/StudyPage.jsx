@@ -34,8 +34,8 @@ const StudyPage = () => {
 
     if(!course) return <div>Loading...</div>
     if(isError) return <div>Error</div>
-    if(isLoading) return <div>Loading...</div>
-    if(isFetching) return <div>Loading...</div>
+	if (isLoading || isFetching) return <div>Loading...</div>;
+
     // if(isSuccess) console.log(course)
 
 	if (!!course && isSuccess) {

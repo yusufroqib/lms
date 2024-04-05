@@ -14,7 +14,7 @@ import { DescriptionForm } from "./components/DescriptionForm";
 import { ImageForm } from "./components/ImageForm";
 import CategoryForm from "./components/CategoryForm";
 import toast from "react-hot-toast";
-import { CircleDollarSign, File, ListChecks } from "lucide-react";
+import { CircleDollarSign, File, ListChecks, Loader2 } from "lucide-react";
 import { PriceForm } from "./components/PriceForm";
 import { ChaptersForm } from "./components/ChaptersForm";
 import { PreviewVideoForm } from "./components/PreviewVideo";
@@ -73,7 +73,11 @@ const EditCourse = () => {
 	const isComplete = requiredFields?.every(Boolean);
 
 	if (isLoading) {
-		return <p>Loading Tutor Course</p>;
+		return (
+			<div className="flex min-h-[80vh] justify-center items-center">
+				<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
+			</div>
+		);
 	} else if (isSuccess && !course) {
 		return <Navigate to={"/dashboard"} />;
 	} else if (isSuccess && course?.tutor !== _id) {
@@ -110,7 +114,7 @@ const EditCourse = () => {
 								<IconBadge icon={LuLayoutDashboard} />
 								<h2 className="text-xl">Customize your course</h2>
 							</div>
-							<TitleForm initialData={course}  courseId={course.id} />
+							<TitleForm initialData={course} courseId={course.id} />
 							<CategoryForm
 								initialData={course}
 								courseId={course.id}

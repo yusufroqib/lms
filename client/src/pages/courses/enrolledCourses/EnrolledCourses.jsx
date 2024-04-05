@@ -9,6 +9,7 @@ import {
 import { CoursesList } from "./components/CoursesList";
 import { Link, useSearchParams } from "react-router-dom";
 import { Breadcrumbs } from "@material-tailwind/react";
+import { Loader2 } from "lucide-react";
 
 const EnrolledCourses = () => {
 	const [dynamicSearchParams, setDynamicSearchParams] = useSearchParams();
@@ -27,7 +28,12 @@ const EnrolledCourses = () => {
 	// console.log(error)
 	// console.log(courses)
 
-	if (!courses) return <div>Fetching all...</div>;
+	if (!courses)
+		return (
+			<div className="flex min-h-[80vh] justify-center items-center">
+				<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
+			</div>
+		);
 
 	if (data && courses) {
 		const categories = data?.ids.map((id) => data.entities[id]);
@@ -35,7 +41,6 @@ const EnrolledCourses = () => {
 		return (
 			<div>
 				<div className="px-6 pt-6">
-					
 					{/* <SearchInput /> */}
 					<h2 className="text-2xl font-bold">Enrolled Courses</h2>
 				</div>

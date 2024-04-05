@@ -4,6 +4,7 @@ import { useRefreshMutation } from "./authApiSlice"
 import usePersist from "@/hooks/usePersist"
 import { useSelector } from 'react-redux'
 import { selectCurrentToken } from "./authSlice"
+import { Loader2 } from "lucide-react"
 
 const PersistLogin = () => {
     console.log('rendering persistLogin')
@@ -57,7 +58,9 @@ const PersistLogin = () => {
         content = <Outlet />
     } else if (isLoading) { //persist: yes, token: no
         // console.log('loading')
-        content = <h1 className="loader">Loading...</h1> 
+        content = <div className="flex min-h-[100vh] justify-center items-center">
+        <Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
+    </div>
     } else if (isError) { //persist: yes, token: no
         // console.log('error')
         content = (

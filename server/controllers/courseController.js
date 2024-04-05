@@ -3,6 +3,7 @@ const Category = require("../models/CategoryModel");
 const User = require("../models/userModel");
 const StripeCustomer = require("../models/StripeCustomerModel");
 const Classroom = require("../models/ClassroomModel");
+const { createStreamChatClient } = require("../utils/createStreamChatClient");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const browseAllCourses = async (req, res) => {
@@ -120,7 +121,7 @@ const purchaseCourse = async (req, res) => {
 			line_items,
 			mode: "payment",
 			success_url: `http://localhost:5173/study/${courseId}?success=1`,
-			cancel_url: `http://localhost:5173/courses/${courseId}/info?canceled=1`,
+			cancel_url: `http://localhost:5173/courses/${courseId}/info?cancelled=1`,
 			metadata: {
 				courseId,
 				userId,
@@ -131,18 +132,6 @@ const purchaseCourse = async (req, res) => {
 
 		// res.json({ url: session.url });
 		res.json({ url: session.url });
-
-		// // Mark the course as purchased for the user
-		// course.purchasedBy.push({ user: userId, amount: course.price });
-		// await course.save();
-
-		// // Add the course to the enrolledCourses array in the user model
-		// user.enrolledCourses.push(courseId);
-		// await user.save();
-
-		// res
-		// 	.status(200)
-		// 	.json({ message: "Course purchased and enrolled successfully" });
 	} catch (error) {
 		console.error("[PURCHASE_COURSE]", error);
 		res.status(500).json({ message: "Internal server error" });
@@ -179,7 +168,8 @@ const handleStripeWebhook = async (req, res, next) => {
 		//   console.log(courseId)
 
 		const course = await Course.findById(courseId);
-		const courseClassroom = await Classroom.findOne({course: courseId})
+		const courseClassroom = await Classroom.findOne({ course: courseId });
+		const client = createStreamChatClient();
 
 		const user = await User.findById(userId);
 
@@ -190,13 +180,18 @@ const handleStripeWebhook = async (req, res, next) => {
 			course.purchasedBy.push({ user: userId, amount: course.price });
 			await course.save();
 
-			courseClassroom.students.push(userId)
-			await courseClassroom.save()
-
+			courseClassroom.students.push(userId);
+			await courseClassroom.save();
 
 			// Add the course to the enrolledCourses array in the user model
 			user.enrolledCourses.push(courseId);
 			await user.save();
+
+			const channel = client.channel("messaging", courseId);
+			// console.log(channel)
+			await channel.addMembers([
+				{ user_id: userId, channel_role: "channel_member" },
+			]);
 
 			// await Purchase.create({ courseId, userId });
 		} else {
@@ -290,9 +285,54 @@ const getEnrolledCoursesWithProgress = async (req, res) => {
 	}
 };
 
+const updateChapterProgress = async (req, res) => {
+	try {
+		const { userId } = req; // Assuming userId is extracted from the request object through authentication middleware
+		// const { isCompleted } = req.body;
+		const { courseId, chapterId } = req.params;
+
+		if (!userId) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+
+		// Find the course by courseId
+		const course = await Course.findById(courseId);
+		if (!course) {
+			return res.status(404).json({ message: "Course not found" });
+		}
+
+		// Find the chapter within the course by chapterId
+		const chapter = course.chapters.find((chapter) => chapter._id == chapterId);
+		if (!chapter) {
+			return res.status(404).json({ message: "Chapter not found" });
+		}
+
+		// Update user progress for the chapter
+		const userProgressIndex = chapter.userProgress.findIndex(
+			(progress) => progress.userId == userId
+		);
+		if (userProgressIndex === -1) {
+			// If user progress for the chapter doesn't exist, create a new entry
+			chapter.userProgress.push({ userId, isCompleted: true });
+		} else {
+			// If user progress for the chapter exists, update the existing entry
+			chapter.userProgress[userProgressIndex].isCompleted = true;
+		}
+
+		// Save the updated course
+		await course.save();
+
+		return res.json({ message: "Chapter progress updated successfully" });
+	} catch (error) {
+		console.error("Error updating chapter progress:", error);
+		return res.status(500).json({ message: "Internal Server Error" });
+	}
+};
+
 module.exports = {
 	browseAllCourses,
 	purchaseCourse,
 	getEnrolledCoursesWithProgress,
 	handleStripeWebhook,
+	updateChapterProgress,
 };

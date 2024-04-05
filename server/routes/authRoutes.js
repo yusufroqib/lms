@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+	generateGoogleAuthCookie,
 	signUp,
 	activateUser,
 	login,
@@ -17,8 +18,8 @@ const router = express.Router();
 
 router.get("/google", authenticateGoogle);
 
-router.get("/google/callback", googleAuthCallback);
-router.get("/google/success", getCurrentUserInfo);
+router.get("/google/callback", googleAuthCallback, generateGoogleAuthCookie);
+// router.get("/google/success", getCurrentUserInfo);
 router.post("/signup", signUp);
 router.post("/activate-account", activateUser);
 router.post("/reset-password", passwordReset);

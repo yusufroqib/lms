@@ -15,7 +15,7 @@ import {
 import "stream-chat-react/dist/css/index.css";
 // import "@/styles/messagesStyles.css";
 import useAuth from "@/hooks/useAuth";
-import { Button } from "./components/Button";
+import { Button } from "@/components/ui/button";
 import { useStreamChat } from "@/context/StreamChatContext";
 import "@/styles/streamChatStyles.css";
 // import { CustomMessage } from "./components/CustomMessage";
@@ -55,7 +55,7 @@ function Channels({ loadedChannels }) {
 	const { setActiveChannel, channel: activeChannel } = useChatContext();
 	return (
 		<div className="w-60 flex flex-col gap-4 m-3 flex-grow">
-			<Button onClick={() => navigate("/channel/new")}>New Conversation</Button>
+			<h3 className={'text-xl font-bold'}>Messages</h3>
 			<hr className="border-gray-500" />
 			{loadedChannels != null && loadedChannels.length > 0
 				? loadedChannels.map((channel) => {
@@ -83,8 +83,8 @@ function Channels({ loadedChannels }) {
 						);
 				  })
 				: "No Conversations"}
-			<hr className="border-gray-500 mt-auto" />
-			<Button>Logout</Button>
+			{/* <hr className="border-gray-500 mt-auto" />
+			<Button>Logout</Button> */}
 		</div>
 	);
 }

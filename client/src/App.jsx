@@ -38,12 +38,14 @@ import Previous from "./pages/classroom/liveClassroomApp/previous/Previous";
 import Ongoing from "./pages/classroom/liveClassroomApp/ongoing/Ongoing";
 import ClassroomHome from "./pages/classroom/liveClassroomApp/classroomHome/classroomHome";
 import MeetingPage from "./pages/classroom/liveClassroomApp/meeting/MeetingPage";
+import Home from "./pages/home/Home";
 // import InProgress from "./pages/classroom/liveClassroomApp/ongoing/InProgress";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
 function App() {
 	return (
 		<Routes>
+			<Route path="/" element={<Home />} />
 			<Route path="/auth" element={<AuthPage />} />
 			<Route path="/verify" element={<SignUpOTP />} />
 			<Route element={<PersistLogin />}>

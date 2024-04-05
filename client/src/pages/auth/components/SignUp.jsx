@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Button } from "@material-tailwind/react";
+// import { Button } from "@material-tailwind/react";
 import { setAuthScreen } from "@/features/authScreenSlice";
 import { useSignUpMutation } from "@/features/auth/authApiSlice";
 import { setSignUpToken } from "@/features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
-import toast from 'react-hot-toast';
-
+import toast from "react-hot-toast";
+import GoogleButton from "./GoogleButton";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const SignUp = () => {
 	const dispatch = useDispatch();
@@ -17,9 +19,8 @@ const SignUp = () => {
 	const [signUp, { isLoading }] = useSignUpMutation();
 	const navigate = useNavigate();
 
-
 	const [data, setData] = useState({
-		fullName: "",
+		name: "",
 		email: "",
 		password: "",
 		username: "",
@@ -31,15 +32,15 @@ const SignUp = () => {
 			const { activationToken } = await signUp(data).unwrap();
 			// console.log(res)
 			dispatch(setSignUpToken({ activationToken }));
-			console.log(activationToken);
+			// console.log(activationToken);
 			setData({
 				...data,
-				fullName: "",
+				name: "",
 				email: "",
 				password: "",
 				username: "",
 			});
-			navigate('/verify')
+			navigate("/verify");
 		} catch (err) {
 			if (!err.status) {
 				console.log("No Server Response");
@@ -71,6 +72,17 @@ const SignUp = () => {
 	const canSubmit =
 		[...Object.values(allData)].every(Boolean) && pwd === confirmPasword;
 
+	let buttonText = "Create account";
+
+	if (isLoading) {
+		buttonText = (
+			<>
+				<Loader2 key="loader" className="mr-2 h-4 w-4 animate-spin" /> Creating
+				your account
+			</>
+		);
+	}
+
 	return (
 		<div className="flex flex-col bg-[#dfdfe6] justify-center items-center min-h-screen">
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
@@ -86,7 +98,7 @@ const SignUp = () => {
 					<form action="" onSubmit={handleRegistration} className="group">
 						<div>
 							<label
-								htmlFor="fullName"
+								htmlFor="name"
 								className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 							>
 								Full Name <span className="text-red-500"> *</span>
@@ -94,7 +106,7 @@ const SignUp = () => {
 							<div className="flex flex-col items-start">
 								<input
 									type="text"
-									name="fullName"
+									name="name"
 									placeholder="Full Name"
 									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
 									pattern="^(?!\s+$).{5,}$"
@@ -102,7 +114,7 @@ const SignUp = () => {
 									onChange={(e) => {
 										setData({
 											...data,
-											fullName: e.target.value,
+											name: e.target.value,
 										});
 									}}
 								/>
@@ -154,7 +166,7 @@ const SignUp = () => {
 									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
 									// autoComplete="off"
 									required
-									pattern="[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+									// pattern="[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
 									onChange={(e) => {
 										setData({
 											...data,
@@ -235,13 +247,13 @@ const SignUp = () => {
 							</div>
 						</div>
 						<div className="flex items-center mt-4">
-							<button
+							<Button
 								type="submit"
 								disabled={!canSubmit}
 								className="w-full text-white bg-purple-700 hover:bg-purple-600 focus:ring-1 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center mt-2 disabled:bg-gradient-to-br disabled:from-gray-100 disabled:to-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed group-invalid:bg-gradient-to-br group-invalid:from-gray-100 group-invalid:to-gray-300 group-invalid:text-gray-400 group-invalid:pointer-events-none group-invalid:opacity-70"
 							>
-								Create account
-							</button>
+								{buttonText}
+							</Button>
 						</div>
 					</form>
 					<div className="mt-4 text-zinc-600 text-md dark:text-zinc-300">
@@ -259,20 +271,7 @@ const SignUp = () => {
 						<hr className="w-full h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 					</div>
 					<div className="my-6 space-y-2">
-						<Button
-							size="lg"
-							variant="outlined"
-							color="blue-gray"
-							className="flex items-center justify-center gap-3 w-full py-3"
-							// className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-600 flex items-center justify-center w-full py-3 space-x-4 border rounded-md focus:ring-2 focus:ring-offset-1 border-gray-300 dark:border-gray-700 hover:border-purple-400 focus:ring-purple-400 dark:hover:border-purple-600"
-						>
-							<img
-								src="https://docs.material-tailwind.com/icons/google.svg"
-								alt="googlr"
-								className="h-6 w-6"
-							/>
-							Continue with Google
-						</Button>
+						<GoogleButton />
 					</div>
 				</div>
 			</div>

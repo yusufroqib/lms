@@ -7,6 +7,25 @@ const api_key = process.env.STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
 const app_id = process.env.STREAM_APP_ID;
 
+//create new username
+const createUsername = async (req, res) => {
+	try {
+		const { username } = req.body;
+		const userId = req.userId;
+		const foundUser = await User.findById(userId);
+		const existingUsername = await User.findOne({ username }).select(
+			"-password"
+		);
+		if (existingUsername)
+			return res.status(400).json({ error: "Username already taken" });
+		foundUser.username = username;
+		await foundUser.save();
+		res.status(200).json({ message: "Username updated successfully" });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
 const loggedInUser = async (req, res) => {
 	try {
 		const username = req.user;
@@ -33,4 +52,4 @@ const videocall = async (req, res) => {
 	}
 };
 
-module.exports = { loggedInUser, videocall };
+module.exports = {createUsername, loggedInUser, videocall };

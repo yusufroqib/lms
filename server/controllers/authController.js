@@ -10,6 +10,8 @@ const api_key = process.env.STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
 const app_id = process.env.STREAM_APP_ID;
 
+const clientUrl = process.env.CLIENT_URL;
+
 // console.log(api_key)
 
 const getCurrentUserInfo = async (req, res) => {
@@ -29,6 +31,86 @@ const getCurrentUserInfo = async (req, res) => {
 	} catch (error) {
 		console.error("Error retrieving user information:", error);
 		return res.status(500).json({ message: "Internal Server Error" });
+	}
+};
+
+const generateGoogleAuthCookie = async (req, res) => {
+	try {
+		const googleProfile = req.user;
+		const cookies = req.cookies;
+
+		// Fetch user profile from MongoDB based on the email
+		const foundUser = await User.findOne({ email: googleProfile.email });
+
+		if (!foundUser) {
+			// Handle the case where the user is not found in the database
+			return res
+				.status(404)
+				.json({ message: "User not found in the database" });
+		}
+
+		const newRefreshToken = jwt.sign(
+			{ _id: foundUser._id.toString() },
+			process.env.REFRESH_TOKEN_SECRET,
+			{ expiresIn: "1d" }
+		);
+
+		let newRefreshTokenArray = !cookies?.jwt
+			? foundUser.refreshToken
+			: foundUser.refreshToken.filter((rt) => rt !== cookies.jwt);
+
+		if (cookies?.jwt) {
+			/*
+					Scenario added here: 
+					1) User logs in but never uses RT and does not logout 
+					2) RT is stolen
+					3) If 1 & 2 occurs, reuse detection is needed to clear all RTs when user logs in
+				*/
+			const refreshToken = cookies.jwt;
+			const foundToken = await User.findOne({ refreshToken }).exec();
+
+			//Detected refresh token reuse!
+			if (!foundToken) {
+				// console.log("Used cookie already");
+				// clear out ALL previous refresh tokens
+				newRefreshTokenArray = [];
+			}
+
+			res.clearCookie("jwt", {
+				httpOnly: true,
+				sameSite: "None",
+				secure: true,
+			});
+		}
+
+		// Saving refreshToken with current user
+		foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+
+		// const serverClient = connect(api_key, api_secret, app_id);
+		// const expirationTime = Math.floor(Date.now() / 1000) + 3600;
+		// const issuedAt = Math.floor(Date.now() / 1000) - 60;
+		// const streamToken = serverClient.createUserToken(foundUser._id.toString(), expirationTime, issuedAt);
+
+		const result = await foundUser.save();
+		// console.log(result)
+
+		// const userInfo = {...result, password: ''}
+
+		// Creates Secure Cookie with refresh token
+		res.cookie("jwt", newRefreshToken, {
+			httpOnly: true,
+			secure: true,
+			sameSite: "None",
+			maxAge: 24 * 60 * 60 * 1000,
+		});
+
+		// console.log(accessToken)
+		// console.log(accessToken)
+
+		// Send authorization roles and access token to user
+		res.redirect(`${clientUrl}/dashboard`);
+	} catch (error) {
+		res.status(500).json({ message: error.message });
 	}
 };
 
@@ -106,9 +188,31 @@ const activateUser = async (req, res) => {
 			password,
 		});
 
-		res.status(201).json({
-			success: true,
-			user,
+		const newRefreshToken = jwt.sign(
+			{ _id: user._id.toString() },
+			process.env.REFRESH_TOKEN_SECRET,
+			{ expiresIn: "1d" }
+		);
+		let newRefreshTokenArray = user.refreshToken;
+
+		// Saving refreshToken with current user
+		user.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+
+		const result = await user.save();
+		// console.log(result)
+
+		// const userInfo = {...result, password: ''}
+
+		// Creates Secure Cookie with refresh token
+		res.cookie("jwt", newRefreshToken, {
+			httpOnly: true,
+			secure: true,
+			sameSite: "None",
+			maxAge: 24 * 60 * 60 * 1000,
+		});
+
+		res.status(200).json({
+			message: "Account has been activated",
 		});
 	} catch (error) {
 		console.log(error);
@@ -233,13 +337,19 @@ const login = async (req, res) => {
 		if (!foundUser)
 			return res.status(401).json({ message: "Invalid username or password" }); //Unauthorized
 
+		if (!foundUser.password) {
+			return res.status(404).json({
+				error:
+					"This user was registered using Google. Login with Google and create password.",
+			});
+		}
 		// evaluate password
 		const match = await bcrypt.compare(password, foundUser.password);
 		if (match) {
 			const roles = Object.values(foundUser.roles).filter(Boolean);
 
 			const newRefreshToken = jwt.sign(
-				{ username: foundUser.username },
+				{ _id: foundUser._id.toString() },
 				process.env.REFRESH_TOKEN_SECRET,
 				{ expiresIn: "1d" }
 			);
@@ -288,8 +398,7 @@ const login = async (req, res) => {
 
 			const result = await foundUser.save();
 			// console.log(result)
-			result.password = "";
-			result.refreshToken = "";
+
 			// console.log(result)
 			const accessToken = jwt.sign(
 				{
@@ -320,7 +429,7 @@ const login = async (req, res) => {
 			// console.log(accessToken)
 
 			// Send authorization roles and access token to user
-			res.json({ accessToken, loggedUser: result });
+			res.json({ accessToken });
 		} else {
 			res.status(401).json({ message: "Invalid username or password" }); //Unauthorized
 		}
@@ -364,6 +473,7 @@ const logout = async (req, res) => {
 };
 
 module.exports = {
+	generateGoogleAuthCookie,
 	signUp,
 	activateUser,
 	login,

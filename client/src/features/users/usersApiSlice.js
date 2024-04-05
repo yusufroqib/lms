@@ -60,24 +60,24 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 			},
 		}),
 
-		updateUser: builder.mutation({
+		createUsername: builder.mutation({
 			query: (initialUserData) => ({
-				url: "/users",
-				method: "PATCH",
+				url: "/users/username",
+				method: "PUT",
 				body: {
 					...initialUserData,
 				},
 			}),
-			invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
+		
 		}),
-		deleteUser: builder.mutation({
-			query: ({ id }) => ({
-				url: `/users`,
-				method: "DELETE",
-				body: { id },
-			}),
-			invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
-		}),
+		// deleteUser: builder.mutation({
+		// 	query: ({ id }) => ({
+		// 		url: `/users`,
+		// 		method: "DELETE",
+		// 		body: { id },
+		// 	}),
+		// 	invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
+		// }),
 		getUserById: builder.query({
 			query: (userId) => `/community/users/${userId}`,
 			transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
@@ -97,7 +97,7 @@ export const {
 	useGetMyDetailsQuery,
 	useGetAllUsersQuery,
 	useAddNewUserMutation,
-	useUpdateUserMutation,
+	useCreateUsernameMutation,
 	useDeleteUserMutation,
 	useGetUserByIdQuery,
 	useGetUserInfoQuery,

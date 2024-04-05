@@ -1,14 +1,22 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { CourseProgressButton } from "./CourseProgressButton";
 import { File } from "lucide-react";
 import { Banner } from "@/components/ui/banner";
 import { Separator } from "@/components/ui/separator";
 import parse from "html-react-parser";
 import ReactPlayer from "react-player/lazy";
+import { openConfetti } from "@/features/confettiSlice";
+import { useDispatch } from "react-redux";
+import { useUpdateChapterProgressMutation } from "@/features/courses/coursesApiSlice";
+import toast from "react-hot-toast";
 
 const ChapterContents = ({ nextChapterId, chapter, purchase }) => {
 	const { courseId } = useParams();
+	const dispatch = useDispatch();
+	const [isLoading, setIsLoading] = useState(false);
+	const navigate = useNavigate();
+	const [updateCourseProgress] = useUpdateChapterProgressMutation();
 	// const { userId } = auth();
 	// if (!userId) {
 	//     return redirect("/");
@@ -24,6 +32,36 @@ const ChapterContents = ({ nextChapterId, chapter, purchase }) => {
 	const userProgress = chapter.userProgress;
 	const attachments = chapter.attachments;
 	const isLocked = !chapter.isFree && !purchase;
+
+	const isCompleted = !!userProgress?.isCompleted;
+
+	const updateProgress = async () => {
+		try {
+			setIsLoading(true);
+			// await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
+			//     isCompleted: !isCompleted
+			// });
+			if (!isCompleted)
+				await updateCourseProgress({
+					courseId,
+					chapterId: chapter._id,
+				}).unwrap();
+			if (!isCompleted && !nextChapterId) {
+				// confetti.onOpen();
+				dispatch(openConfetti());
+			}
+			if (nextChapterId) {
+				navigate(`/study/${courseId}/chapter/${nextChapterId}`);
+			}
+			if (!isCompleted) toast.success("Progress updated");
+			// router.refresh();
+		} catch {
+			toast.error("Something went wrong");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	// const completeOnEnd = !!purchase && !userProgress?.isCompleted;
 	return (
 		<div>
@@ -42,6 +80,7 @@ const ChapterContents = ({ nextChapterId, chapter, purchase }) => {
 						width={"100%"}
 						height={"100%"}
 						url={chapter.videoUrl}
+						onEnded={updateProgress}
 						controls
 					/>
 				</div>
