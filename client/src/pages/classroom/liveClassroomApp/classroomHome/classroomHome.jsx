@@ -2,9 +2,12 @@ import React from "react";
 import MeetingTypeList from "../../components/MeetingTypeList";
 import { useGetMyClassroomsQuery } from "@/features/users/usersApiSlice";
 import { useParams } from "react-router-dom";
+import useAuth from "@/hooks/useAuth";
 
 const ClassroomHome = () => {
 	const { classroomId } = useParams();
+	const { _id } = useAuth();
+
 	const {
 		data: classrooms,
 		isLoading,
@@ -49,7 +52,9 @@ const ClassroomHome = () => {
 					</div>
 				</div>
 
-				<MeetingTypeList currentClassroom={currentClassroom}/>
+				{_id === currentClassroom?.tutor?._id && (
+					<MeetingTypeList currentClassroom={currentClassroom} />
+				)}
 			</section>
 		);
 	}

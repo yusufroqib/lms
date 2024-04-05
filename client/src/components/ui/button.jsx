@@ -10,6 +10,7 @@ const buttonVariants = cva("inline-flex items-center justify-center rounded-md t
             outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
             secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
             ghost: "hover:bg-accent hover:text-accent-foreground",
+            orange: "bg-orange-600 text-white hover:bg-orange-500",
             link: "text-primary underline-offset-4 hover:underline",
             success: "bg-emerald-600 text-white hover:bg-emerald-600/80"
         },
