@@ -12,32 +12,34 @@ import {
 	Thread,
 } from "stream-chat-react";
 // import { useChatContext } from "stream-chat-react/dist/context";
-import "stream-chat-react/dist/css/index.css";
+// import "stream-chat-react/dist/css/index.css";
+
+import 'stream-chat-react/dist/css/v2/index.css';
 // import "@/styles/messagesStyles.css";
 import useAuth from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { useStreamChat } from "@/context/StreamChatContext";
+import { useStreamChatClient } from "@/context/StreamChatContext";
 import "@/styles/streamChatStyles.css";
 // import { CustomMessage } from "./components/CustomMessage";
 // import useStreamChat from "@/hooks/useStreamChat";
 // import { useLoggedInAuth } from "./context/AuthContext";
 export function Messages() {
 	const { _id } = useAuth();
-	const { streamChat } = useStreamChat();
-	// console.log(streamChat);
+	const { streamChatClient } = useStreamChatClient();
+	// console.log(streamChatClient);
 	// console.log(_id);
 
-	// const { user, streamChat } = useLoggedInAuth();
-	if (streamChat == null) return <LoadingIndicator />;
+	// const { user, streamChatClient } = useLoggedInAuth();
+	if (streamChatClient == null) return <LoadingIndicator />;
 	return (
-		<div>
-			<Chat client={streamChat}>
+		<div className="flex h-full">
+			<Chat client={streamChatClient}>
 				<ChannelList
 					List={Channels}
 					sendChannelsToList
 					filters={{ members: { $in: [_id] } }}
 				/>
-				<Channel PinIndicator={CustomPinIndicator} >
+				<Channel >
 					<Window>
 						<ChannelHeader />
 						<MessageList />
@@ -54,7 +56,7 @@ function Channels({ loadedChannels }) {
 	// const { logout } = useLoggedInAuth();
 	const { setActiveChannel, channel: activeChannel } = useChatContext();
 	return (
-		<div className="w-60 flex flex-col gap-4 m-3 flex-grow">
+		<div className="w-full flex flex-col gap-4 m-3 flex-grow">
 			<h3 className={'text-xl font-bold'}>Messages</h3>
 			<hr className="border-gray-500" />
 			{loadedChannels != null && loadedChannels.length > 0
@@ -89,10 +91,10 @@ function Channels({ loadedChannels }) {
 	);
 }
 
-export const CustomPinIndicator = () => {
-	return (
-		<div>
-			<div className="italic text-gray-800">pinned</div>
-		</div>
-	);
-};
+// export const CustomPinIndicator = () => {
+// 	return (
+// 		<div>
+// 			<div className="italic text-gray-800">pinned</div>
+// 		</div>
+// 	);
+// };

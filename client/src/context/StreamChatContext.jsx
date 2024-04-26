@@ -6,12 +6,12 @@ const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 
 const Context = createContext(null);
 
-export function useStreamChat() {
+export function useStreamChatClient() {
     return useContext(Context);
 }
 
 export function StreamChatProvider({ children }) {
-    const [streamChat, setStreamChat] = useState(null);
+    const [streamChatClient, setStreamChatClient] = useState(null);
     const { _id, username, fullName, image, streamToken } = useAuth();
 
 
@@ -19,7 +19,7 @@ export function StreamChatProvider({ children }) {
         if (streamToken == null || _id == null) return;
 
         // Check if StreamChat is already initialized and connected
-        if (streamChat && streamChat.userID === _id && streamChat.tokenManager.token === streamToken) {
+        if (streamChatClient && streamChatClient.userID === _id && streamChatClient.tokenManager.token === streamToken) {
 			console.log('returning now........')
             return; // No need to reconnect
         }
@@ -36,20 +36,20 @@ export function StreamChatProvider({ children }) {
             },
             streamToken
         ).then(() => {
-            setStreamChat(chat);
+            setStreamChatClient(chat);
         });
 
         return () => {
             // Disconnect from StreamChat when component unmounts
-            if (streamChat) {
-                streamChat.disconnectUser();
-                setStreamChat(null);
+            if (streamChatClient) {
+                streamChatClient.disconnectUser();
+                setStreamChatClient(null);
             }
         };
     }, [streamToken, _id, username, fullName, image]);
 
     return (
-        <Context.Provider value={{ streamChat }}>
+        <Context.Provider value={{ streamChatClient }}>
             {children}
         </Context.Provider>
     );

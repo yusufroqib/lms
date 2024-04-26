@@ -1,45 +1,72 @@
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { LuPencil } from "react-icons/lu";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 // import { useRouter } from "next/navigation";
-import { Form } from "@/components/ui/form";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormMessage,
+} from "@/components/ui/form";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { Button } from "@/components/ui/button";
 // import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
 import { cn } from "@/lib/utils";
-import Editor from "@/components/ui/editor";
+import RTEditor from "@/components/ui/editor";
 import { useUpdateChapterMutation } from "@/features/courses/coursesApiSlice";
 
-export const ChapterDescriptionForm = ({ initialData, courseId, chapterId }) => {
+const formSchema = z.object({
+	description: z.string().min(1),
+});
+
+export const ChapterDescriptionForm = ({
+	initialData,
+	courseId,
+	chapterId,
+}) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const toggleEdit = () => setIsEditing((current) => !current);
+	const editorRef = useRef(null);
+
 	const [updateChapter, { isLoading, isError, isSuccess, error }] =
 		useUpdateChapterMutation();
 	// const [updateCourse, { isLoading, isError, isSuccess, error }] =
 	// 	useUpdateCourseMutation();
-	const [value, setValue] = useState(initialData.description);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	// const [value, setValue] = useState(initialData.description);
+	// const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+	const form = useForm({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			description: initialData?.description || "",
+		},
+	});
+	const { isSubmitting, isValid } = form.formState;
+
+	const onSubmit = async (values) => {
+		// e.preventDefault();
 		// const sanitizedContent = DOMPurify.sanitize(value);
 
 		try {
-			setIsSubmitting(true);
+			// setIsSubmitting(true);
 			await updateChapter({
 				courseId: courseId,
 				chapterId: chapterId,
-				description: value,
+				...values,
 			}).unwrap();
 			toast.success("Course updated successfully");
 			setIsEditing(false);
-			setIsSubmitting(false);
+			// setIsSubmitting(false);
 		} catch (error) {
-            console.log(error)
+			console.log(error);
 			toast.error("Something went wrong");
 		} finally {
-			setIsSubmitting(false);
+			// setIsSubmitting(false);
 		}
 	};
 
@@ -70,16 +97,29 @@ export const ChapterDescriptionForm = ({ initialData, courseId, chapterId }) => 
 				</div>
 			)}
 			{isEditing && (
-				<Form>
-					<form onSubmit={handleSubmit} className="space-y-4 mt-4">
-						<Editor
+				<Form {...form}>
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="space-y-4 mt-4"
+					>
+						<FormField
+							control={form.control}
 							name="description"
-							value={initialData.description}
-							setValue={setValue}
+							render={({ field }) => (
+								<FormItem>
+									<FormControl>
+										<RTEditor
+											value={initialData.description}
+											editorRef={editorRef}
+											field={field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-
 						<div className="flex items-center gap-x-2">
-							<Button disabled={!value || isSubmitting} type="submit">
+							<Button disabled={!isValid || isSubmitting} type="submit">
 								Save
 							</Button>
 						</div>

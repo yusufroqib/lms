@@ -2,7 +2,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LuPencil } from "react-icons/lu";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 // import { useRouter } from "next/navigation";
 import {
@@ -25,6 +25,7 @@ const formSchema = z.object({
 export const DescriptionForm = ({ initialData, courseId }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const toggleEdit = () => setIsEditing((current) => !current);
+	const editorRef = useRef(null)
 	const [updateCourse, { isLoading, isError, isSuccess, error }] =
 		useUpdateCourseMutation();
 	// const [value, setValue] = useState(initialData.description);
@@ -39,8 +40,6 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 	const { isSubmitting, isValid } = form.formState;
 
 	const onSubmit = async (values) => {
-	
-
 		try {
 			// setIsSubmitting(true);
 			await updateCourse({
@@ -102,7 +101,11 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 							render={({ field }) => (
 								<FormItem>
 									<FormControl>
-										<RTEditor value={initialData.description} field={field} />
+										<RTEditor
+											value={initialData.description}
+											field={field}
+											editorRef={editorRef}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>

@@ -3,7 +3,7 @@ import { setCredentials } from '../../features/auth/authSlice'
 
 const baseQuery = fetchBaseQuery({
     // baseUrl: 'http:///192.168.1.44:3000',
-    baseUrl: 'http://localhost:3000',
+    baseUrl:  import.meta.env.VITE_SERVER_BASE_URL,
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
         const token = getState().auth.token

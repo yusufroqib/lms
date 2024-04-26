@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -46,12 +46,14 @@
     "firebase": "^10.8.0",
     "framer-motion": "^11.0.5",
     "html-react-parser": "^5.1.8",
+    "jsvectormap": "^1.5.3",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.338.0",
     "prismjs": "^1.29.0",
     "query-string": "^9.0.0",
     "quill": "^2.0.0-rc.2",
     "react": "^18.2.0",
+    "react-apexcharts": "^1.4.1",
     "react-confetti": "^6.1.0",
     "react-datepicker": "^6.6.0",
     "react-dom": "^18.2.0",
@@ -84,6 +86,7 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.33",
     "postcss-nesting": "^12.1.0",
+    "sass": "^1.69.5",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.8"
   }

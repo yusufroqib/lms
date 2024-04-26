@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
-import { useStreamChat } from "@/context/StreamChatContext";
+import { useStreamChatClient } from "@/context/StreamChatContext";
 
 const formSchema = z.object({
 	title: z.string().min(1, {
@@ -30,7 +30,7 @@ export const TitleForm = ({ initialData, courseId }) => {
 	const toggleEdit = () => setIsEditing((current) => !current);
 	const [updateCourse, { isLoading, isError, isSuccess, error }] =
 		useUpdateCourseMutation();
-	const { streamChat } = useStreamChat();
+	const { streamChatClient } = useStreamChatClient();
 
 	// const router = useRouter();
 	const form = useForm({
@@ -44,7 +44,7 @@ export const TitleForm = ({ initialData, courseId }) => {
 			// console.log(values);
 			await updateCourse({ id: courseId, ...values }).unwrap();
 
-			const channel = streamChat.channel("messaging", courseId);
+			const channel = streamChatClient.channel("messaging", courseId);
 
 			const channelData = await channel.query();
 

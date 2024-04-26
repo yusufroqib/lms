@@ -4,7 +4,8 @@ const defaultTheme = require("tailwindcss/defaultTheme");
 const colors = require("tailwindcss/colors");
 
 export default withMT({
-	darkMode: "class",
+	// darkMode: "class",
+	darkMode: "false",
 	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 	theme: {
 		extend: {

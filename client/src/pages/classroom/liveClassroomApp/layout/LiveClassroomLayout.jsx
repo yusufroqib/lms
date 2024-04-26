@@ -4,12 +4,16 @@ import StreamVideoProvider from "@/context/StreamVideoProvider";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
-import "@/styles/liveClassroomStyles.css";
+import 'stream-chat-react/dist/css/v2/index.css';
+// import "@/styles/liveClassroomStyles.css";
 import "@stream-io/video-react-sdk/dist/css/styles.css";
+import "@/styles/index.scss";
+
 import "react-datepicker/dist/react-datepicker.css";
 import useAuth from "@/hooks/useAuth";
 import { useGetMyClassroomsQuery } from "@/features/users/usersApiSlice";
 import { Loader2 } from "lucide-react";
+import { StreamChatProvider } from "@/context/StreamChatContext";
 
 const LiveClassroomLayout = ({ children }) => {
 	const location = useLocation();
@@ -28,7 +32,6 @@ const LiveClassroomLayout = ({ children }) => {
 	console.log(currentClassroom);
 
 	if (isLoading) {
-		
 		return (
 			<div className="flex min-h-[100vh]  justify-center items-center">
 				<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
@@ -36,7 +39,7 @@ const LiveClassroomLayout = ({ children }) => {
 		);
 	}
 	const isAuthorized =
-		currentClassroom?.students.includes(_id) ||
+		currentClassroom?.students.some((student) => student._id === _id) ||
 		currentClassroom?.tutor._id === _id;
 
 	if (!isAuthorized) {
@@ -46,24 +49,27 @@ const LiveClassroomLayout = ({ children }) => {
 	if (currentClassroom) {
 		return (
 			<StreamVideoProvider>
-				<main className="relative bg-dark-2">
-					{!location.pathname.includes("meeting") && <Navbar />}
+				<StreamChatProvider>
 
-					<div className="flex">
-						{!location.pathname.includes("meeting") && <Sidebar />}
+					<main className="relative bg-dark-2">
+						{!location.pathname.includes("meeting") && <Navbar />}
 
-						<section
-							className={`flex min-h-screen flex-1 flex-col  ${
-								!location.pathname.includes("meeting") &&
-								"px-6 pb-6 pt-28 max-md:pb-14  sm:px-14"
-							}`}
-						>
-							<div className="w-full">
-								<Outlet />
-							</div>
-						</section>
-					</div>
-				</main>
+						<div className="flex">
+							{!location.pathname.includes("meeting") && <Sidebar />}
+
+							<section
+								className={`flex min-h-screen flex-1 flex-col  ${
+									!location.pathname.includes("meeting") &&
+									"px-6 pb-6 pt-28 max-md:pb-14  sm:px-14"
+								}`}
+							>
+								<div className="w-full">
+									<Outlet />
+								</div>
+							</section>
+						</div>
+					</main>
+				</StreamChatProvider>
 			</StreamVideoProvider>
 		);
 	}

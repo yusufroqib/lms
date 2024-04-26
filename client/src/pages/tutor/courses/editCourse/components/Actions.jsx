@@ -16,7 +16,7 @@ import {
 } from "@/features/courses/coursesApiSlice";
 import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
-import { useStreamChat } from "@/context/StreamChatContext";
+import { useStreamChatClient } from "@/context/StreamChatContext";
 
 export const Actions = ({
 	disabled,
@@ -26,7 +26,7 @@ export const Actions = ({
 	isPublished,
 }) => {
 	// const { _id, username, fullName, image, streamToken } = useAuth();
-	const { streamChat } = useStreamChat();
+	const { streamChatClient } = useStreamChatClient();
 
 	// const router = useRouter();
 	// const confetti = useConfettiStore();
@@ -81,7 +81,7 @@ export const Actions = ({
 				}).unwrap();
 				toast.success("Course unpublished");
 			} else {
-				const channel = await streamChat
+				const channel = await streamChatClient
 				.channel("messaging", courseId, {
 					name: title,
 						image: courseImage,
