@@ -140,12 +140,9 @@ const purchaseCourse = async (req, res) => {
 
 const handleStripeWebhook = async (req, res, next) => {
 	try {
-		// console.log(req)
 		const { body, headers } = req;
 		const signature = headers["stripe-signature"];
-		//   console.log('body', body)
-		//   console.log('headers', headers)
-		//   console.log('signature', signature)
+		
 
 		let event;
 		try {
@@ -163,9 +160,7 @@ const handleStripeWebhook = async (req, res, next) => {
 		const session = event.data.object;
 		const userId = session?.metadata?.userId;
 		const courseId = session?.metadata?.courseId;
-		//   console.log(session)
-		//   console.log(userId)
-		//   console.log(courseId)
+	
 
 		const course = await Course.findById(courseId);
 		const courseClassroom = await Classroom.findOne({ course: courseId });

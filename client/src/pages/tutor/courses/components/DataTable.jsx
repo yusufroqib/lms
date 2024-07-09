@@ -38,19 +38,24 @@ export function DataTable({ columns, data }) {
 			columnFilters,
 		},
 	});
-	if(!data) return <div> <div className="flex items-center py-4 justify-between">
-
-	<Link to="/tutors/create-course">
-		<Button>
-			<PlusCircle className="h-4 w-4 mr-2" />
-			New course
-		</Button>
-	</Link>
-</div> <p className="text-center mt-20">No data to display</p></div>
-
+	if (!data)
+		return (
+			<div>
+				{" "}
+				<div className="flex items-center py-4 justify-between">
+					<Link to="/tutors/create-course">
+						<Button>
+							<PlusCircle className="h-4 w-4 mr-2" />
+							New course
+						</Button>
+					</Link>
+				</div>{" "}
+				<p className="text-center mt-20">No data to display</p>
+			</div>
+		);
 
 	return (
-		<div className="w-full" >
+		<div className="w-full">
 			<div className="flex items-center py-4 justify-between">
 				<Input
 					placeholder="Filter courses..."
