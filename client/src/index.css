@@ -39,7 +39,12 @@ body,
 	height: 1rem;
 	width: 1rem;
 }
-
+input {
+	background: transparent ;
+}
+input[type="file"] {
+background: transparent !important;
+}
 
 /* Styling for the copy button */
  .copy-to-clipboard-button {

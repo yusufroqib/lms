@@ -34,7 +34,10 @@ const userSchema = new Schema(
 		},
 		reputation: { type: Number, default: 0 },
 		saved: [{ type: Schema.Types.ObjectId, ref: "Post" }],
-		enrolledCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
+		enrolledCourses: [{
+			course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+			lastStudiedAt: { type: Date, default: null }
+		  }],
 		createdCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 		refreshToken: [String],
 		points: [

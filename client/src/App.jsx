@@ -39,6 +39,7 @@ import Ongoing from "./pages/classroom/liveClassroomApp/ongoing/Ongoing";
 import ClassroomHome from "./pages/classroom/liveClassroomApp/classroomHome/classroomHome";
 import MeetingPage from "./pages/classroom/liveClassroomApp/meeting/MeetingPage";
 import Home from "./pages/home/Home";
+import StudentDashBoard from "./pages/dashboard/studentDashboard/StudentDashboard";
 // import InProgress from "./pages/classroom/liveClassroomApp/ongoing/InProgress";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
@@ -54,6 +55,7 @@ function App() {
 				>
 					<Route element={<Prefetch />}>
 						<Route element={<RootLayout />}>
+							<Route path="/studentdash" element={<StudentDashBoard />} />
 							<Route path="dashboard" element={<Dashboard />} />
 							<Route path="messages" element={<Messages />} />
 							<Route path="courses">
