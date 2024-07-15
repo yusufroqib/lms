@@ -4,6 +4,8 @@ const User = require("../models/userModel");
 const StripeCustomer = require("../models/StripeCustomerModel");
 const Classroom = require("../models/ClassroomModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
+const StudyTime = require("../models/StudyTimeModel");
+const { default: mongoose } = require("mongoose");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const browseAllCourses = async (req, res) => {
@@ -69,7 +71,7 @@ const browseAllCourses = async (req, res) => {
 
 const purchaseCourse = async (req, res) => {
 	try {
-		const userId = req.userId; // Assuming you have user information stored in req.user after authentication
+		const userId = req.userId;
 		const courseId = req.params.courseId;
 
 		// Find the course by its ID
@@ -85,7 +87,11 @@ const purchaseCourse = async (req, res) => {
 
 		// Check if the user is already enrolled in the course
 		const user = await User.findById(userId);
-		if (user.enrolledCourses.includes(courseId)) {
+		if (
+			user.enrolledCourses.some(
+				(enrollment) => enrollment.course.toString() === courseId
+			)
+		) {
 			return res
 				.status(403)
 				.json({ message: "User is already enrolled in this course" });
@@ -128,9 +134,6 @@ const purchaseCourse = async (req, res) => {
 			},
 		});
 
-		// console.log(session)
-
-		// res.json({ url: session.url });
 		res.json({ url: session.url });
 	} catch (error) {
 		console.error("[PURCHASE_COURSE]", error);
@@ -142,7 +145,6 @@ const handleStripeWebhook = async (req, res, next) => {
 	try {
 		const { body, headers } = req;
 		const signature = headers["stripe-signature"];
-		
 
 		let event;
 		try {
@@ -151,16 +153,13 @@ const handleStripeWebhook = async (req, res, next) => {
 				signature,
 				process.env.STRIPE_WEBHOOK_SECRET
 			);
-			// console.log(event)
 		} catch (error) {
-			// console.log('error', error)
 			return res.status(400).send(`Webhook Error: ${error.message}`);
 		}
 
 		const session = event.data.object;
 		const userId = session?.metadata?.userId;
 		const courseId = session?.metadata?.courseId;
-	
 
 		const course = await Course.findById(courseId);
 		const courseClassroom = await Classroom.findOne({ course: courseId });
@@ -179,16 +178,19 @@ const handleStripeWebhook = async (req, res, next) => {
 			await courseClassroom.save();
 
 			// Add the course to the enrolledCourses array in the user model
-			user.enrolledCourses.push(courseId);
+			user.enrolledCourses.push({
+				course: courseId,
+				lastStudiedAt: new Date(), // Set initial study time to now
+			});
 			await user.save();
 
+			// console.log("course", course)
+			// console.log("[User details]", user)
+
 			const channel = client.channel("messaging", courseId);
-			// console.log(channel)
 			await channel.addMembers([
 				{ user_id: userId, channel_role: "channel_member" },
 			]);
-
-			// await Purchase.create({ courseId, userId });
 		} else {
 			return res
 				.status(200)
@@ -204,14 +206,14 @@ const handleStripeWebhook = async (req, res, next) => {
 
 const getEnrolledCoursesWithProgress = async (req, res) => {
 	try {
-		const userId = req.userId; // Assuming you have user information stored in req.user after authentication
+		const userId = req.userId;
 
 		// Find the user by their ID and populate the enrolledCourses field
 		const user = await User.findById(userId).populate({
-			path: "enrolledCourses",
+			path: "enrolledCourses.course",
 			populate: {
 				path: "tutor",
-				select: "name avatar", // Populate tutor field with name and avatar
+				select: "name avatar",
 			},
 		});
 
@@ -221,7 +223,9 @@ const getEnrolledCoursesWithProgress = async (req, res) => {
 
 		// Filter and process enrolled courses
 		const enrolledCoursesWithProgress = user.enrolledCourses
-			.map((course) => {
+			.map((enrollment) => {
+				const course = enrollment.course;
+
 				// Check if the course is published
 				if (!course.isPublished) {
 					return null;
@@ -268,9 +272,17 @@ const getEnrolledCoursesWithProgress = async (req, res) => {
 							};
 						}),
 					progress: progressPercentage,
+					lastStudiedAt: enrollment.lastStudiedAt,
 				};
 			})
-			.filter((course) => course !== null); // Filter out courses that are not published
+			.filter((course) => course !== null);
+
+		// Sort the courses by lastStudiedAt
+		enrolledCoursesWithProgress.sort((a, b) => {
+			if (!a.lastStudiedAt) return 1;
+			if (!b.lastStudiedAt) return -1;
+			return new Date(b.lastStudiedAt) - new Date(a.lastStudiedAt);
+		});
 
 		// Return the enrolled courses with progress
 		res.status(200).json({ enrolledCourses: enrolledCoursesWithProgress });
@@ -282,8 +294,7 @@ const getEnrolledCoursesWithProgress = async (req, res) => {
 
 const updateChapterProgress = async (req, res) => {
 	try {
-		const { userId } = req; // Assuming userId is extracted from the request object through authentication middleware
-		// const { isCompleted } = req.body;
+		const { userId } = req;
 		const { courseId, chapterId } = req.params;
 
 		if (!userId) {
@@ -314,6 +325,12 @@ const updateChapterProgress = async (req, res) => {
 			chapter.userProgress[userProgressIndex].isCompleted = true;
 		}
 
+		// Update lastStudiedAt for the course in user's enrolledCourses
+		await User.findOneAndUpdate(
+			{ _id: userId, "enrolledCourses.course": courseId },
+			{ $set: { "enrolledCourses.$.lastStudiedAt": new Date() } }
+		);
+
 		// Save the updated course
 		await course.save();
 
@@ -324,10 +341,139 @@ const updateChapterProgress = async (req, res) => {
 	}
 };
 
+const recordStudyTime = async (req, res) => {
+    try {
+        const { courseId: course, duration } = req.body;
+        const now = new Date();
+
+        // Get the start and end of the current day in UTC
+        const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+        const endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
+
+        // Update study time
+        let studyTime = await StudyTime.findOneAndUpdate(
+            {
+                user: req.userId,
+                course,
+                date: {
+                    $gte: startOfDay,
+                    $lt: endOfDay,
+                },
+            },
+            { 
+                $inc: { duration: duration },
+                $setOnInsert: { date: now }
+            },
+            { new: true, upsert: true }
+        );
+
+        // Update lastStudiedAt for the enrolled course
+        await User.findOneAndUpdate(
+            {
+                _id: req.userId,
+                'enrolledCourses.course': course
+            },
+            {
+                $set: { 'enrolledCourses.$.lastStudiedAt': now }
+            }
+        );
+
+        res.json(studyTime);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+};
+
+const getStudyTimeRecord = async (req, res) => {
+    try {
+        const { startDate, endDate, groupBy } = req.query;
+
+        const query = {
+            user: new mongoose.Types.ObjectId(req.userId),
+            date: {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate),
+            },
+        };
+
+        let groupByFormat;
+        if (groupBy === "day") {
+            groupByFormat = { $dateToString: { format: "%Y-%m-%d", date: "$date" } };
+        } else if (groupBy === "week") {
+            groupByFormat = {
+                $dateToString: {
+                    format: "%Y-W%V",
+                    date: {
+                        $dateFromParts: {
+                            isoWeekYear: { $isoWeekYear: "$date" },
+                            isoWeek: { $isoWeek: "$date" },
+                        },
+                    },
+                },
+            };
+        } else if (groupBy === "month") {
+            groupByFormat = { $dateToString: { format: "%Y-%m", date: "$date" } };
+        } else {
+            groupByFormat = { $dateToString: { format: "%Y-%m-%d", date: "$date" } };
+        }
+
+        const studySummary = await StudyTime.aggregate([
+            { $match: query },
+            {
+                $group: {
+                    _id: {
+                        date: groupByFormat,
+                        course: "$course",
+                    },
+                    totalDuration: { $sum: "$duration" },
+                },
+            },
+            {
+                $lookup: {
+                    from: "courses", // Assuming your course collection is named "courses"
+                    localField: "_id.course",
+                    foreignField: "_id",
+                    as: "courseDetails"
+                }
+            },
+            {
+                $unwind: "$courseDetails"
+            },
+            {
+                $group: {
+                    _id: "$_id.date",
+                    courses: {
+                        $push: {
+                            course: { $toString: "$_id.course" },
+                            courseTitle: "$courseDetails.title",
+                            duration: "$totalDuration",
+                        },
+                    },
+                    totalDuration: { $sum: "$totalDuration" },
+                },
+            },
+            { $sort: { _id: 1 } },
+        ]);
+
+        console.log(studySummary);
+
+        res.status(200).json(studySummary);
+    } catch (err) {
+        console.error("Error in getStudyTimeRecord:", err);
+        if (err instanceof mongoose.Error) {
+            console.error("Mongoose error:", err.message);
+        }
+        res.status(500).send("Server Error: " + err.message);
+    }
+};
+
 module.exports = {
 	browseAllCourses,
 	purchaseCourse,
 	getEnrolledCoursesWithProgress,
 	handleStripeWebhook,
 	updateChapterProgress,
+	recordStudyTime,
+	getStudyTimeRecord,
 };

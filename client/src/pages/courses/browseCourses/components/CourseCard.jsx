@@ -49,11 +49,11 @@ const CourseCard = ({
 					<Avatar
 						size="xs"
 						variant="circular"
-						alt={tutor.name}
-						src={tutor.avatar}
+						alt={tutor?.name}
+						src={tutor?.avatar}
 						className="border-2 border-white hover:z-10"
 					/>
-					<p className="text-xs text-muted-foreground">{tutor.name}</p>
+					<p className="text-xs text-muted-foreground">{tutor?.name}</p>
 				</div>
 				<h5
 					// variant="h6"

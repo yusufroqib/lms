@@ -46,7 +46,7 @@ const PostPage = () => {
 	} = useGetPostByIdQuery({ postId });
 
 	// console.log(!!result);
-	console.log(isFetching)
+	console.log(isFetching);
 
 	const {
 		data: mongoUser = {},
@@ -56,7 +56,7 @@ const PostPage = () => {
 		refetch,
 	} = useGetUserByIdQuery(userId);
 
-	if ( isLoading || isLoadingUser ) {
+	if (isLoading || isLoadingUser) {
 		return <Loading />;
 	}
 	// if (isError) return <div>{error.message}</div>;
@@ -69,80 +69,83 @@ const PostPage = () => {
 	if (isSuccess && result && mongoUser) {
 		return (
 			<>
-				<div className="flex-start w-full flex-col">
-					<div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
-						<Link
-							to={`/community/profile/${result?.author?._id}`}
-							className="flex items-center justify-start gap-1"
-						>
-							<img
-								src={result.author.avatar}
-								className="rounded-full"
-								width={22}
-								height={22}
-								alt="profile"
-							/>
-							<p className="paragraph-semibold text-dark300_light700">
-								{result?.author?.name}
-							</p>
-						</Link>
-						<div className="flex justify-end">
-							<Votes
-								type="Post"
-								itemId={result?._id}
-								userId={userId}
-								upvotes={result?.upvotes?.length}
-								hasupVoted={result.upvotes?.includes(userId)}
-								downvotes={result?.downvotes?.length}
-								hasdownVoted={result?.downvotes?.includes(userId)}
-								hasSaved={mongoUser?.saved.includes(result._id)}
-								refetch={refetch}
-							/>
+				<div className="bg-gray-100 p-3 rounded-lg">
+					<div className="flex-start w-full flex-col ">
+						<div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
+							<Link
+								to={`/community/profile/${result?.author?._id}`}
+								className="flex items-center justify-start gap-1"
+							>
+								<img
+									src={result.author.avatar}
+									className="rounded-full"
+									width={22}
+									height={22}
+									alt="profile"
+								/>
+								<p className="paragraph-semibold text-dark300_light700">
+									{result?.author?.name}
+								</p>
+							</Link>
+							<div className="flex justify-end">
+								<Votes
+									type="Post"
+									itemId={result?._id}
+									userId={userId}
+									upvotes={result?.upvotes?.length}
+									hasupVoted={result.upvotes?.includes(userId)}
+									downvotes={result?.downvotes?.length}
+									hasdownVoted={result?.downvotes?.includes(userId)}
+									hasSaved={mongoUser?.saved.includes(result._id)}
+									refetch={refetch}
+								/>
+							</div>
 						</div>
+						<h2 className="h2-semibold text-dark200_light900 mt-3.5 w-full text-left">
+							{result.title}
+						</h2>
 					</div>
-					<h2 className="h2-semibold text-dark200_light900 mt-3.5 w-full text-left">
-						{result.title}
-					</h2>
-				</div>
-				<div className="mb-8 mt-5 flex flex-wrap gap-4">
-					<Metric
-						imgUrl="/assets/icons/clock.svg"
-						alt="clock icon"
-						value={` posted ${getTimestamp(result.createdAt)}`}
-						title=""
-						textStyles="small-medium text-dark400_light800"
-					/>
-					<Metric
-						imgUrl="/assets/icons/message.svg"
-						alt="message"
-						value={formatAndDivideNumber(result.replies.length)}
-						title=" Replies"
-						textStyles="small-medium text-dark400_light800"
-					/>
-					<Metric
-						imgUrl="/assets/icons/eye.svg"
-						alt="eye"
-						value={formatAndDivideNumber(result.views)}
-						title=" Views"
-						textStyles="small-medium text-dark400_light800"
-					/>
-				</div>
-				<div className="border-gray-200   p-2">
-					<ParseHTML data={result.content} />
+					<div className="mb-8 mt-5 flex flex-wrap gap-4">
+						<Metric
+							imgUrl="/assets/icons/clock.svg"
+							alt="clock icon"
+							value={` posted ${getTimestamp(result.createdAt)}`}
+							title=""
+							textStyles="small-medium text-dark400_light800"
+						/>
+						<Metric
+							imgUrl="/assets/icons/message.svg"
+							alt="message"
+							value={formatAndDivideNumber(result.replies.length)}
+							title=" Replies"
+							textStyles="small-medium text-dark400_light800"
+						/>
+						<Metric
+							imgUrl="/assets/icons/eye.svg"
+							alt="eye"
+							value={formatAndDivideNumber(result.views)}
+							title=" Views"
+							textStyles="small-medium text-dark400_light800"
+						/>
+					</div>
+					<div className="border-gray-200   p-2">
+						<ParseHTML data={result.content} />
 
-					{/* <article className="markdown w-full min-w-full  ">
+						{/* <article className="markdown w-full min-w-full  ">
 						{parse(result.content)}
 					</article> */}
-				</div>
-				<div className="mt-8 flex flex-wrap gap-2">
-					{result.tags.map((tag) => (
-						<RenderTag
-							key={tag._id}
-							_id={tag._id}
-							name={tag.name}
-							showCount={false}
-						/>
-					))}
+					</div>
+					<div className="mt-8 flex flex-wrap gap-2">
+						{result.tags.map((tag) => (
+							<RenderTag
+								key={tag._id}
+								_id={tag._id}
+								name={tag.name}
+								showCount={false}
+								className={"background-light700_dark300"}
+							/>
+						))}
+					</div>
 				</div>
 
 				<AllReplies

@@ -12,7 +12,10 @@ const {
     deleteChapter,
     toggleChapterPublicationStatus,
     toggleCoursePublicationStatus,
-    deleteCourse
+    deleteCourse,
+	getTutorStats,
+	getTutorTopCourses,
+	getTutorEarnings
 } = require("../controllers/tutorController");
 const express = require("express");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -27,6 +30,24 @@ router.get(
 	verifyJWT,
 	verifyRoles(Admin, Tutor),
 	getAllTutorCourses
+);
+router.get(
+	"/stats",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	getTutorStats
+);
+router.get(
+	"/top-courses",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	getTutorTopCourses
+);
+router.get(
+	"/earnings",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	getTutorEarnings
 );
 router.put(
 	"/edit-course/:id",

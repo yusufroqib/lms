@@ -31,6 +31,8 @@ const RepliesTab = ({ searchParams, userId }) => {
 						author={item.author}
 						upvotes={item.upvotes.length}
 						createdAt={item.createdAt}
+						// className={"background-light700_dark300"}
+
 					/>
 				))}
 				<div className="mt-10">

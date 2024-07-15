@@ -57,7 +57,7 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 				{result.replies.map((reply) => (
 					<article
 						key={reply._id}
-						className="text-dark100_light900 light-border-2 border-b py-10"
+						className="text-dark100_light900 light-border-2 border-b py-6 px-5 rounded-md m-4 bg-gray-100"
 					>
 						<div className="mb-8 flex flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
 							<Link

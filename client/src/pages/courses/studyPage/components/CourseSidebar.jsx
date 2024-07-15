@@ -7,6 +7,7 @@ import { CourseSidebarItem } from "./CourseSidebarItem";
 import React from "react";
 
 const CourseSidebar = ({ course, progressCount, purchase }) => {
+	// console.log(course)
 	// console.log("Course: ", course);
 	// const { username, isTutor, isAdmin, _id: userId } = useAuth();
 	// if (!userId) {
@@ -37,7 +38,7 @@ const CourseSidebar = ({ course, progressCount, purchase }) => {
 						key={chapter._id}
 						id={chapter._id}
 						label={chapter.title}
-						isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
+						isCompleted={!!chapter.userProgress?.isCompleted}
 						courseId={course.id}
 						isLocked={!chapter.isFree && !purchase}
 					/>

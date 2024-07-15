@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { useLocation, useNavigate } from "react-router-dom";
 ;
 export const CourseSidebarItem = ({ label, id, isCompleted, courseId, isLocked, }) => {
+  console.log(isCompleted)
     const location = useLocation();
 	const { pathname } = location;
     const navigate = useNavigate()

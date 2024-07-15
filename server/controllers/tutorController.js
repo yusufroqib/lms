@@ -2,6 +2,8 @@ const Course = require("../models/CourseModel");
 const Category = require("../models/CategoryModel");
 const Classroom = require("../models/ClassroomModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
+const { default: mongoose } = require("mongoose");
+
 
 //Get all courses categories
 const getCategories = async (req, res) => {
@@ -94,7 +96,7 @@ const updateCourse = async (req, res) => {
 
 		res.status(200).json({ course: updatedCourse });
 	} catch (error) {
-		console.log(error)
+		console.log(error);
 		res.status(500).json({ message: error.message });
 	}
 };
@@ -542,6 +544,228 @@ const deleteCourse = async (req, res) => {
 	}
 };
 
+const getTutorStats = async (req, res) => {
+	try {
+		const { userId: tutorId } = req;
+
+		// Find all courses by the tutor
+		const courses = await Course.find({ tutor: tutorId });
+
+		// Calculate statistics
+		let totalEarnings = 0;
+		let publishedCoursesCount = 0;
+		let coursesSoldCount = 0;
+		const uniqueStudents = new Set();
+
+		courses.forEach((course) => {
+			// Total earnings
+			totalEarnings += course.purchasedBy.reduce(
+				(sum, purchase) => sum + purchase.amount,
+				0
+			);
+
+			// Published courses count
+			if (course.isPublished) {
+				publishedCoursesCount++;
+			}
+
+			// Courses sold count and unique students
+			course.purchasedBy.forEach((purchase) => {
+				coursesSoldCount++;
+				uniqueStudents.add(purchase.user.toString());
+			});
+		});
+
+		// Prepare the response
+		const stats = {
+			totalEarnings,
+			publishedCoursesCount,
+			coursesSoldCount,
+			totalUniqueStudents: uniqueStudents.size,
+		};
+
+		res.json(stats);
+	} catch (error) {
+		console.error("Error fetching tutor stats:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+const getTutorTopCourses = async (req, res) => {
+	try {
+		const { userId: tutorId } = req;
+
+		const topCourses = await Course.aggregate([
+			{
+				$match: {
+					tutor: new mongoose.Types.ObjectId(tutorId),
+					isPublished: true, // Only include published courses
+				},
+			},
+			{
+				$addFields: {
+					salesCount: {
+						$cond: {
+							if: { $isArray: "$purchasedBy" },
+							then: { $size: "$purchasedBy" },
+							else: 0,
+						},
+					},
+					totalValue: {
+						$cond: {
+							if: { $isArray: "$purchasedBy" },
+							then: {
+								$reduce: {
+									input: "$purchasedBy",
+									initialValue: 0,
+									in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] },
+								},
+							},
+							else: 0,
+						},
+					},
+				},
+			},
+			{
+				$sort: { totalValue: -1 },
+			},
+			{
+				$limit: 5,
+			},
+			{
+				$project: {
+					_id: 1,
+					title: 1,
+					courseImage: 1,
+					price: 1,
+					salesCount: 1,
+					totalValue: 1,
+				},
+			},
+		]);
+
+		res.json(topCourses);
+	} catch (error) {
+		console.error("Error fetching top courses for tutor:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+function parseDate(dateString) {
+    const [datePart, timePart] = dateString.split(' ');
+    const [timeOffset, time] = timePart.split('+');
+    return new Date(`${datePart}${time}`);
+}
+
+const getTutorEarnings = async (req, res) => {
+	try {
+		const { userId: tutorId } = req;
+		const { startDate, endDate } = req.query;
+
+		console.log('Incoming startDate:', startDate);
+		console.log('Incoming endDate:', endDate);
+
+		if (!mongoose.Types.ObjectId.isValid(tutorId)) {
+			return res.status(400).json({ error: "Invalid tutor ID" });
+		}
+
+		let startDateTime, endDateTime;
+
+		if (startDate && endDate) {
+			try {
+				const correctedStartDate = startDate.replace(' ', '+');
+                const correctedEndDate = endDate.replace(' ', '+');
+
+                startDateTime = new Date(correctedStartDate);
+                endDateTime = new Date(correctedEndDate);
+
+				// Check if the dates are valid
+				if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+					throw new Error("Invalid dates");
+				}
+			} catch (e) {
+				console.error("Date parsing error:", e.message);
+				// If dates are invalid, default to last 30 days
+				endDateTime = new Date();
+				startDateTime = new Date(endDateTime);
+				startDateTime.setDate(startDateTime.getDate() - 30);
+			}
+		} else {
+			// If dates are not provided, default to last 30 days
+			endDateTime = new Date();
+			startDateTime = new Date(endDateTime);
+			startDateTime.setDate(startDateTime.getDate() - 30);
+		}
+
+		console.log("Final startDateTime:", startDateTime);
+		console.log("Final endDateTime:", endDateTime);
+
+		const courses = await Course.aggregate([
+			{
+				$match: {
+					tutor: new mongoose.Types.ObjectId(tutorId),
+				},
+			},
+			{
+				$unwind: "$purchasedBy",
+			},
+			{
+				$match: {
+					"purchasedBy.date": {
+						$gte: startDateTime,
+						$lte: endDateTime,
+					},
+				},
+			},
+			{
+				$group: {
+					_id: {
+						date: {
+							$dateToString: { format: "%Y-%m-%d", date: "$purchasedBy.date" },
+						},
+						course: "$title",
+					},
+					earnings: { $sum: "$purchasedBy.amount" },
+				},
+			},
+			{
+				$group: {
+					_id: "$_id.date",
+					courseEarnings: {
+						$push: {
+							course: "$_id.course",
+							earnings: "$earnings",
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					date: "$_id",
+					courseEarnings: {
+						$arrayToObject: {
+							$map: {
+								input: "$courseEarnings",
+								as: "earning",
+								in: ["$$earning.course", "$$earning.earnings"],
+							},
+						},
+					},
+				},
+			},
+			{
+				$sort: { date: 1 },
+			},
+		]);
+
+		res.json(courses);
+	} catch (error) {
+		console.error("Error fetching tutor earnings:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
 module.exports = {
 	createTitle,
 	getAllTutorCourses,
@@ -557,4 +781,7 @@ module.exports = {
 	toggleChapterPublicationStatus,
 	toggleCoursePublicationStatus,
 	deleteCourse,
+	getTutorStats,
+	getTutorTopCourses,
+	getTutorEarnings,
 };

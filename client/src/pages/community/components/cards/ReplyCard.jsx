@@ -12,7 +12,7 @@ const ReplyCard = ({ _id, post, author, upvotes, createdAt }) => {
 	return (
 		<Link
 			to={`/community/posts/${post._id}/#${_id}`}
-			className="card-wrapper rounded-[10px] px-11 py-9"
+			className=" bg-gray-100 rounded-[10px] px-11 py-9"
 		>
 			<div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
 				<div>

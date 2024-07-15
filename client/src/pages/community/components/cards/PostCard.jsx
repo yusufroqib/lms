@@ -22,7 +22,7 @@ const PostCard = ({
 
 	const showActionButtons = userId && userId === author?._id;
 	return (
-		<div className="shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] card-wrapper rounded-[10px] p-9 sm:px-11">
+		<div className="shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] bg-gray-100  rounded-[10px] p-9 sm:px-11">
 			<div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
 				<div>
 					<span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
@@ -42,7 +42,12 @@ const PostCard = ({
 
 			<div className="mt-3.5 flex flex-wrap gap-2">
 				{tags.map((tag) => (
-					<RenderTag key={tag._id} _id={tag._id} name={tag.name} />
+					<RenderTag
+						key={tag._id}
+						_id={tag._id}
+						name={tag.name}
+						className={"background-light700_dark300"}
+					/>
 				))}
 			</div>
 

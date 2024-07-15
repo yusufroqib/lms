@@ -12,9 +12,6 @@ import { Breadcrumbs } from "@material-tailwind/react";
 import { Loader2 } from "lucide-react";
 
 const EnrolledCourses = () => {
-	const [dynamicSearchParams, setDynamicSearchParams] = useSearchParams();
-	const searchParams = dynamicSearchParams.toString();
-	const { data } = useGetCourseCategoriesQuery("");
 	// console.log(searchParams)
 
 	const {
@@ -35,8 +32,8 @@ const EnrolledCourses = () => {
 			</div>
 		);
 
-	if (data && courses) {
-		const categories = data?.ids.map((id) => data.entities[id]);
+	if (courses) {
+		// const categories = data?.ids.map((id) => data.entities[id]);
 		const allCourses = courses?.ids.map((id) => courses.entities[id]);
 		return (
 			<div>

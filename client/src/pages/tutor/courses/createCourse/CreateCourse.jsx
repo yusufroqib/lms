@@ -25,7 +25,7 @@ const formSchema = z.object({
 });
 
 const CreateCourse = () => {
-  const navigate = useNavigate()
+	const navigate = useNavigate();
 	const [createCourseTitle, { isLoading, isError, isSuccess, error }] =
 		useCreateCourseTitleMutation();
 
@@ -39,15 +39,15 @@ const CreateCourse = () => {
 	const { isSubmitting, isValid } = form.formState;
 
 	const onSubmit = async (values) => {
-    console.log(values)
+		console.log(values);
 		try {
-		  const {course} = await createCourseTitle(values).unwrap();
-      const courseId = course._id
-      navigate(`/tutors/edit-course/${courseId}`)
+			const { course } = await createCourseTitle(values).unwrap();
+			const courseId = course._id;
+			navigate(`/tutors/edit-course/${courseId}`);
 
-		  // console.log(response)
+			// console.log(response)
 		} catch {
-		  toast.error("Something went wrong");
+			toast.error("Something went wrong");
 		}
 	};
 
