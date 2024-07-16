@@ -10,7 +10,7 @@ const RenderTag = ({ _id, name, totalPosts, showCount, className }) => {
 				className={cn(
 					`subtle-medium ${
 						!className && "background-light800_dark300"
-					} text-light400_light500 rounded-md border-none px-4 py-2 uppercase`,
+					} text-light400_light500 hover:bg-gray-300 rounded-md border-none px-4 py-2 uppercase`,
 					className
 				)}
 			>

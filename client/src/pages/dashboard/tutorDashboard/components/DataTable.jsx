@@ -40,10 +40,18 @@ export function DataTable({ columns, data }) {
 	});
 	if (!data)
 		return (
-			<div>
-				{" "}
-				<p className="text-center mt-20">No data to display</p>
-			</div>
+            <div>
+            {" "}
+            <div className="flex items-center justify-end py-4 ">
+                <Link className="justify-end" to="/tutors/create-course">
+                    <Button>
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        New course
+                    </Button>
+                </Link>
+            </div>{" "}
+            <p className="text-center mt-20">No data to display</p>
+        </div>
 		);
 
 	return (

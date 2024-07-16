@@ -111,7 +111,12 @@ const TutorEarningsChart = ({ tutorId }) => {
 				)}
 			</div>
 			{isLoading && <p>Loading...</p>}
-			{error && <p>Error: {error.message}</p>}
+			{error && (
+				<div>
+					{" "}
+					<p className="text-center mt-20">No data to display</p>
+				</div>
+			)}
 
 			{processedData.length > 0 && (
 				<div>

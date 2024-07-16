@@ -24,12 +24,11 @@ import { useGetUserByIdQuery } from "@/features/users/usersApiSlice";
 import Reply from "../../components/forms/Reply";
 import ParseHTML from "../../components/ParseHTML";
 import Loading from "./components/Loading";
+import EditDeleteAction from "../../components/EditDeleteAction";
 
 const PostPage = () => {
 	const { postId } = useParams();
-	// const [result, setResult] = useState({});
-	// const [mongoUser, setMongoUser] = useState(null);
-	// const { userId: clerkId } = auth();
+
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { username, isTutor, isAdmin, _id: userId } = useAuth();
 	const filter_search = searchParams.get("filter");
@@ -46,7 +45,7 @@ const PostPage = () => {
 	} = useGetPostByIdQuery({ postId });
 
 	// console.log(!!result);
-	console.log(isFetching);
+	// console.log(isFetching);
 
 	const {
 		data: mongoUser = {},
@@ -67,6 +66,8 @@ const PostPage = () => {
 	}
 
 	if (isSuccess && result && mongoUser) {
+		const showActionButtons = userId && userId === result?.author?._id;
+
 		return (
 			<>
 				<div className="bg-gray-100 p-3 rounded-lg">
@@ -74,7 +75,7 @@ const PostPage = () => {
 						<div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
 							<Link
 								to={`/community/profile/${result?.author?._id}`}
-								className="flex items-center justify-start gap-1"
+								className="flex items-center justify-start gap-1 "
 							>
 								<img
 									src={result.author.avatar}
@@ -83,7 +84,7 @@ const PostPage = () => {
 									height={22}
 									alt="profile"
 								/>
-								<p className="paragraph-semibold text-dark300_light700">
+								<p className="paragraph-semibold text-dark300_light700 hover:text-blue-700">
 									{result?.author?.name}
 								</p>
 							</Link>
@@ -135,16 +136,20 @@ const PostPage = () => {
 						{parse(result.content)}
 					</article> */}
 					</div>
-					<div className="mt-8 flex flex-wrap gap-2">
-						{result.tags.map((tag) => (
-							<RenderTag
-								key={tag._id}
-								_id={tag._id}
-								name={tag.name}
-								showCount={false}
-								className={"background-light700_dark300"}
-							/>
-						))}
+					<div className="flex justify-between items-center">
+						<div className="mt-8 flex flex-wrap gap-2">
+							{result.tags.map((tag) => (
+								<RenderTag
+									key={tag._id}
+									_id={tag._id}
+									name={tag.name}
+									showCount={false}
+									className={"background-light700_dark300"}
+								/>
+							))}
+						</div>
+						{showActionButtons && <EditDeleteAction type="Post" itemId={postId} />}
+
 					</div>
 				</div>
 

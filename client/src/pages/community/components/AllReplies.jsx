@@ -72,7 +72,7 @@ const AllReplies = ({ postId, userId, totalReplies, page, filter }) => {
 									className="rounded-full object-cover max-sm:mt-0.5"
 								/>
 								<div className="flex flex-col sm:gap-2 sm:flex-row sm:items-center">
-									<p className="body-semibold text-dark300_light700">
+									<p className="body-semibold text-dark300_light700 hover:text-blue-700">
 										{reply.author.name}
 									</p>
 									<p className="small-regular text-light400_light500 ml-0.5 mt-0.5 line-clamp-1">

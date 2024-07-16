@@ -29,7 +29,7 @@ const PostCard = ({
 						{getTimestamp(createdAt)}
 					</span>
 					<Link to={`/community/posts/${_id}`}>
-						<h3 className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1">
+						<h3 className="sm:h3-semibold base-semibold text-dark200_light900 hover:text-blue-700 line-clamp-1 flex-1">
 							{title}
 						</h3>
 					</Link>
@@ -59,7 +59,7 @@ const PostCard = ({
 					title={` - posted ${getTimestamp(createdAt)}`}
 					href={`/profile/${author._id}`}
 					isAuthor
-					textStyles="body-medium text-dark400_light700"
+					textStyles="body-medium text-dark400_light700 hover:text-blue-800"
 				/>
 
 				<div className="flex items-center gap-3 max-sm:flex-wrap max-sm:justify-start">

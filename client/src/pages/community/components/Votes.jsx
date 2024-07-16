@@ -142,7 +142,7 @@ const Votes = ({
 						width={18}
 						height={18}
 						alt="upvote"
-						className="cursor-pointer"
+						className="cursor-pointer hover:scale-125"
 						onClick={() => handleVote("upvote")}
 					/>
 					<div className="flex-center background-light700_dark400 min-w-[18px] rounded-sm p-1">
@@ -161,7 +161,7 @@ const Votes = ({
 						width={18}
 						height={18}
 						alt="downvote"
-						className="cursor-pointer"
+						className="cursor-pointer hover:scale-125"
 						onClick={() => handleVote("downvote")}
 					/>
 					<div className="flex-center background-light700_dark400 min-w-[18px] rounded-sm p-1">
@@ -181,7 +181,7 @@ const Votes = ({
 					width={18}
 					height={18}
 					alt="star"
-					className="cursor-pointer"
+					className="cursor-pointer hover:scale-125"
 					onClick={handleSave}
 				/>
 			)}

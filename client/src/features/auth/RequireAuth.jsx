@@ -21,7 +21,6 @@ const RequireAuth = ({ allowedRoles }) => {
 	const location = useLocation();
 	// const dispatch = useDispatch();
 	const { roles, username } = useAuth();
-	console.log("rendering requireauth");
 	const [newUsername, setNewUsername] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [showModal, setShowModal] = useState(true);

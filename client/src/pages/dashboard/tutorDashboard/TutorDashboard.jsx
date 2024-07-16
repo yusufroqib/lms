@@ -72,7 +72,7 @@ const TutorDashboard = () => {
 					</div>
 					<div>
 						<h3 className="text-lg md:text-2xl xl:text-3xl">
-							${tutorStats?.totalEarnings?.toFixed(2)}
+							${tutorStats?.totalEarnings?.toFixed(2) ?? 0}
 						</h3>
 					</div>
 				</div>
@@ -84,8 +84,8 @@ const TutorDashboard = () => {
 						<p className="text-sm md:text-base lg:text-lg">Published Courses</p>
 					</div>
 					<div>
-                    <h3 className="text-lg md:text-2xl xl:text-3xl">
-                    {tutorStats?.publishedCoursesCount} courses
+						<h3 className="text-lg md:text-2xl xl:text-3xl">
+							{tutorStats?.publishedCoursesCount ?? 0} Courses
 						</h3>
 					</div>
 				</div>
@@ -97,8 +97,8 @@ const TutorDashboard = () => {
 						<p className="text-sm md:text-base lg:text-lg">Courses Sold</p>
 					</div>
 					<div>
-                    <h3 className="text-lg md:text-2xl xl:text-3xl">
-                    {tutorStats?.coursesSoldCount} sales
+						<h3 className="text-lg md:text-2xl xl:text-3xl">
+							{tutorStats?.coursesSoldCount ?? 0} Sales
 						</h3>
 					</div>
 				</div>
@@ -110,8 +110,8 @@ const TutorDashboard = () => {
 						<p className="text-sm md:text-base lg:text-lg">Students</p>
 					</div>
 					<div>
-                    <h3 className="text-lg md:text-2xl xl:text-3xl">
-                    {tutorStats?.totalUniqueStudents || 0} Student
+						<h3 className="text-lg md:text-2xl xl:text-3xl">
+							{tutorStats?.totalUniqueStudents || 0} Student
 							{tutorStats?.totalUniqueStudents === 1 ? null : "s"}
 						</h3>
 					</div>
@@ -128,7 +128,9 @@ const TutorDashboard = () => {
 								<div className="p-2 shadow-md rounded-md ">
 									<BookUp2 />
 								</div>
-								<h3 className="text-lg md:text-xl font-semibold">Top Courses</h3>
+								<h3 className="text-lg md:text-xl font-semibold">
+									Top Courses
+								</h3>
 							</div>
 							<Link
 								to={"/tutors/my-courses"}
@@ -138,27 +140,34 @@ const TutorDashboard = () => {
 							</Link>
 						</div>
 						<div className="mt-4 space-y-4">
-							{topCourses?.map((course, index) => (
-								<div
-									key={course._id}
-									className="grid grid-cols-4 items-center justify-between space-x-4 "
-								>
-									<div className=" col-span-3 flex flex-col">
-										<Link
-											to={`/courses/${course._id}/info`}
-											className=" text-base md:text-lg  "
-										>
-											<p className="truncate w-full">{course.title}</p>
-										</Link>
-										<div className="text-sm text-gray-500/70">
-											{course.salesCount} sales
+							{topCourses ? (
+								topCourses?.map((course, index) => (
+									<div
+										key={course._id}
+										className="grid grid-cols-4 items-center justify-between space-x-4 "
+									>
+										<div className=" col-span-3 flex flex-col">
+											<Link
+												to={`/courses/${course._id}/info`}
+												className=" text-base md:text-lg  "
+											>
+												<p className="truncate w-full">{course.title}</p>
+											</Link>
+											<div className="text-sm text-gray-500/70">
+												{course.salesCount} sales
+											</div>
+										</div>
+										<div className=" col-span-1 text-right">
+											${course.totalValue.toFixed(2)}
 										</div>
 									</div>
-									<div className=" col-span-1 text-right">
-										${course.totalValue.toFixed(2)}
-									</div>
+								))
+							) : (
+								<div>
+									{" "}
+									<p className="text-center mt-20">No data to display</p>
 								</div>
-							))}
+							)}
 						</div>
 					</div>
 				</div>
