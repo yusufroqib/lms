@@ -76,7 +76,6 @@ export default function StudentDashBoard() {
 		error,
 	} = useGetCoursesQuery({ searchParams: "" });
 
-
 	useEffect(() => {
 		if (isSuccess) {
 			setEnrolledCourses(courses?.ids.map((id) => courses.entities[id]));
@@ -179,16 +178,22 @@ export default function StudentDashBoard() {
 					</div>
 					<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
 						<div className="  lg:col-span-1 space-y-8">
-							{[...enrolledCourses, ...allRecommendedCourses]
-								.slice(0, splicedCoursesLength)
-								.map((enrolledCourse, index) => (
-									<EnrolledCourseCard
-										enrolledIds={enrolledIds}
-										key={enrolledCourse._id}
-										index={index}
-										enrolledCourse={enrolledCourse}
-									/>
-								))}
+							<div
+								className={`md:grid ${
+									enrolledCourses.length ? "md:grid-cols-2" : "md:grid-cols-3"
+								} gap-5 lg:block lg:gap-0 max-md:space-y-8 lg:space-y-8 `}
+							>
+								{[...enrolledCourses, ...allRecommendedCourses]
+									.slice(0, splicedCoursesLength)
+									.map((enrolledCourse, index) => (
+										<EnrolledCourseCard
+											enrolledIds={enrolledIds}
+											key={enrolledCourse._id}
+											index={index}
+											enrolledCourse={enrolledCourse}
+										/>
+									))}
+							</div>
 							<div className="flex justify-center">
 								{enrolledIds.length ? (
 									<Link to={"/courses/enrolled-courses"}>
@@ -204,13 +209,13 @@ export default function StudentDashBoard() {
 						<div className="max-lg:order-first lg:col-span-2  space-y-8">
 							<div className="grid grid-cols-2 gap-4">
 								<ProgressCard
-									cardCN="p-6 bg-green-100"
+									cardCN="p-3 md:p-6 bg-green-100"
 									courseLength={completedCourses.length}
 									cardText={"Completed Course"}
 									CardIcon={GraduationCapIcon}
 								/>
 								<ProgressCard
-									cardCN="p-6 bg-yellow-100"
+									cardCN="p-3 md:p-6 bg-yellow-100"
 									courseLength={inProgressCourses.length}
 									cardText={"Course in Progress"}
 									CardIcon={BookOpenIcon}

@@ -89,7 +89,7 @@ const StudyTimeCharts = () => {
 		<div>
 			<h2>Study Time Summary</h2>
 
-			<div className="flex justify-end">
+			<div className="flex justify-end max-md:my-4">
 				<Select
 					defaultValue={"day"}
 					onValueChange={(value) => setTimeRange(value)}

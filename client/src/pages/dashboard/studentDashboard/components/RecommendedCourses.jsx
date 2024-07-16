@@ -21,7 +21,7 @@ const RecommendedCourses = ({ items }) => {
 					{items.map((item) => (
 						<CarouselItem
 							key={item?.id}
-							className="pl-3 pr-3 basis-[70%] md:basis-1/2 lg:basis-1/3"
+							className="pl-3 pr-3 basis-[90%] sm:basis-[70%] md:basis-1/2 lg:basis-1/3"
 						>
 							<Link to={`/courses/${item?.id}/info`} key={item?.id}>
 								<CourseCard

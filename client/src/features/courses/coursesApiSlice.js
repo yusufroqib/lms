@@ -151,6 +151,21 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 		
 			
 		}),
+		getTutorCourseTransactions: builder.query({
+			query: () => ({
+				url: `/tutors/course-transactions`,
+				// params: { startDate, endDate, groupBy },
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+
+			transformResponse: (responseData) => {
+				return responseData
+				
+			},
+
+		}),
 		getStudyTime: builder.query({
 			query: ({ startDate, endDate, groupBy }) => ({
 				url: `/courses/study-time?startDate=${startDate}&endDate=${endDate}&groupBy=${groupBy}`,
@@ -358,6 +373,7 @@ export const {
 	useGetStudyTimeQuery,
 	useGetTutorStatsQuery,
 	useGetTutorTopCoursesQuery,
+	useGetTutorCourseTransactionsQuery,
 	useGetEnrolledCoursesQuery,
 	useCreateCourseTitleMutation,
 	useUpdateCourseMutation,

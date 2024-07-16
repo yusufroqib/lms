@@ -12,7 +12,7 @@ import {
 	Text,
 } from "recharts";
 import DatePicker from "react-datepicker";
-import { format, subDays } from "date-fns";
+import { format, subDays, addDays } from "date-fns";
 import { useGetTutorEarningsQuery } from "@/features/courses/coursesApiSlice";
 import { CustomInput } from "./CustomInput";
 
@@ -23,11 +23,10 @@ const TutorEarningsChart = ({ tutorId }) => {
 	]);
 	const [startDate, endDate] = dateRange;
 
-	const formattedStartDate = startDate
-		? format(startDate, "yyyy-MM-dd")
-		: null;
+	const formattedStartDate = startDate ? format(startDate, "yyyy-MM-dd") : null;
+	// Adjust the end date to be inclusive
 	const formattedEndDate = endDate
-		? format(endDate, "yyyy-MM-dd")
+		? format(addDays(endDate, 1), "yyyy-MM-dd")
 		: null;
 
 	const { data, isLoading, error } = useGetTutorEarningsQuery({
@@ -56,7 +55,8 @@ const TutorEarningsChart = ({ tutorId }) => {
 
 	const processedData = processData(data);
 
-	const getRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+	const getRandomColor = () =>
+		`#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
 	const generateColors = (keys) => {
 		const colors = {};
@@ -81,13 +81,13 @@ const TutorEarningsChart = ({ tutorId }) => {
 
 	// Function to format number to USD with 2 decimal places
 	const formatUSD = (value) => {
-		return `$${value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+		return `$${value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
 	};
 
 	// Calculate total sum
 	const totalSum = processedData.reduce((sum, item) => {
 		Object.values(item)?.forEach((val) => {
-			if (typeof val === 'number') {
+			if (typeof val === "number") {
 				sum += val;
 			}
 		});
@@ -96,7 +96,7 @@ const TutorEarningsChart = ({ tutorId }) => {
 
 	return (
 		<div className="w-full max-w-4xl mx-auto p-4">
-			<div className="mb-4">
+			<div className="mb-4 flex max-md:flex-col max-md:gap-3 justify-between">
 				<DatePicker
 					selectsRange={true}
 					startDate={startDate}
@@ -104,19 +104,23 @@ const TutorEarningsChart = ({ tutorId }) => {
 					onChange={handleDateChange}
 					customInput={<CustomInput />}
 				/>
+				{processedData.length > 0 && (
+					<h4 className="text-base md:text-lg font-medium">
+						Range Earnings: {formatUSD(totalSum)}
+					</h4>
+				)}
 			</div>
 			{isLoading && <p>Loading...</p>}
 			{error && <p>Error: {error.message}</p>}
 
 			{processedData.length > 0 && (
 				<div>
-					<p>Total Earnings: {formatUSD(totalSum)}</p>
 					<ResponsiveContainer width="100%" height={400}>
 						<BarChart data={processedData}>
 							<XAxis dataKey="date" />
 							<YAxis tickFormatter={formatUSD} />
 							<Tooltip formatter={(value) => formatUSD(value)} />
-							<Legend />
+							{/* <Legend /> */}
 							{courseTitles.map((courseTitle, index) => (
 								<Bar
 									key={courseTitle}

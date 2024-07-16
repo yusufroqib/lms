@@ -15,7 +15,8 @@ const {
     deleteCourse,
 	getTutorStats,
 	getTutorTopCourses,
-	getTutorEarnings
+	getTutorEarnings,
+	getTutorCourseTransactions
 } = require("../controllers/tutorController");
 const express = require("express");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -48,6 +49,12 @@ router.get(
 	verifyJWT,
 	verifyRoles(Admin, Tutor),
 	getTutorEarnings
+);
+router.get(
+	"/course-transactions",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	getTutorCourseTransactions
 );
 router.put(
 	"/edit-course/:id",

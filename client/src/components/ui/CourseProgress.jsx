@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils";
 ;
 const colorByVariant = {
     default: "text-sky-700",
-    success: "text-emerald-700",
+    light_gray: "text-gray-400",
+    success: "text-emerald-600",
 };
 const sizeByVariant = {
     default: "text-sm",

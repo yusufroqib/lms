@@ -4,7 +4,6 @@ const Classroom = require("../models/ClassroomModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
 const { default: mongoose } = require("mongoose");
 
-
 //Get all courses categories
 const getCategories = async (req, res) => {
 	try {
@@ -652,9 +651,9 @@ const getTutorTopCourses = async (req, res) => {
 };
 
 function parseDate(dateString) {
-    const [datePart, timePart] = dateString.split(' ');
-    const [timeOffset, time] = timePart.split('+');
-    return new Date(`${datePart}${time}`);
+	const [datePart, timePart] = dateString.split(" ");
+	const [timeOffset, time] = timePart.split("+");
+	return new Date(`${datePart}${time}`);
 }
 
 const getTutorEarnings = async (req, res) => {
@@ -662,8 +661,8 @@ const getTutorEarnings = async (req, res) => {
 		const { userId: tutorId } = req;
 		const { startDate, endDate } = req.query;
 
-		console.log('Incoming startDate:', startDate);
-		console.log('Incoming endDate:', endDate);
+		// console.log('Incoming startDate:', startDate);
+		// console.log('Incoming endDate:', endDate);
 
 		if (!mongoose.Types.ObjectId.isValid(tutorId)) {
 			return res.status(400).json({ error: "Invalid tutor ID" });
@@ -673,11 +672,11 @@ const getTutorEarnings = async (req, res) => {
 
 		if (startDate && endDate) {
 			try {
-				const correctedStartDate = startDate.replace(' ', '+');
-                const correctedEndDate = endDate.replace(' ', '+');
+				const correctedStartDate = startDate.replace(" ", "+");
+				const correctedEndDate = endDate.replace(" ", "+");
 
-                startDateTime = new Date(correctedStartDate);
-                endDateTime = new Date(correctedEndDate);
+				startDateTime = new Date(correctedStartDate);
+				endDateTime = new Date(correctedEndDate);
 
 				// Check if the dates are valid
 				if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
@@ -697,8 +696,8 @@ const getTutorEarnings = async (req, res) => {
 			startDateTime.setDate(startDateTime.getDate() - 30);
 		}
 
-		console.log("Final startDateTime:", startDateTime);
-		console.log("Final endDateTime:", endDateTime);
+		// console.log("Final startDateTime:", startDateTime);
+		// console.log("Final endDateTime:", endDateTime);
 
 		const courses = await Course.aggregate([
 			{
@@ -766,6 +765,38 @@ const getTutorEarnings = async (req, res) => {
 	}
 };
 
+const getTutorCourseTransactions = async (req, res) => {
+	try {
+		const { userId: tutorId } = req;
+
+		// Find courses by the tutor
+		const courses = await Course.find({ tutor: tutorId })
+			.populate("purchasedBy.user", "name email") // Populate student name and email
+			.exec();
+
+		// Prepare the transaction history data
+		const transactionHistory = courses.flatMap((course) =>
+			course.purchasedBy.map((purchase) => ({
+				courseTitle: course.title,
+				coursePrice: course.price,
+				studentName: purchase.user.name,
+				studentEmail: purchase.user.email,
+				amount: purchase.amount,
+				date: purchase.date,
+			}))
+		);
+
+		// Sort the transaction history by date in descending order
+		transactionHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+		console.log(transactionHistory);
+
+		res.json( transactionHistory );
+	} catch (error) {
+		console.error("[GET_TUTOR_TRANSACTION_HISTORY]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
 module.exports = {
 	createTitle,
 	getAllTutorCourses,
@@ -784,4 +815,5 @@ module.exports = {
 	getTutorStats,
 	getTutorTopCourses,
 	getTutorEarnings,
+	getTutorCourseTransactions,
 };
