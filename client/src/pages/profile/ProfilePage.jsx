@@ -18,25 +18,33 @@ import {
 	MapPin,
 } from "lucide-react";
 import {
+	getStorage,
+	ref,
+	uploadBytesResumable,
+	deleteObject,
+	getDownloadURL,
+} from "firebase/storage";
+import app from "@/firebase";
+import {
+	useChangePasswordMutation,
 	useGetMyDetailsQuery,
-	// useUpdateProfileMutation,
-	// useChangePasswordMutation,
+	useUpdateProfileMutation,
 } from "@/features/users/usersApiSlice";
 import { Badge } from "@/components/ui/badge";
 import useAuth from "@/hooks/useAuth";
+import toast from "react-hot-toast";
+import PasswordForm from "./components/PasswordForm";
+import { useRefreshMutation } from "@/features/auth/authApiSlice";
 
 export default function ProfilePage() {
+	const { _id: userId } = useAuth();
 	const { status } = useAuth();
 	const [isEditing, setIsEditing] = useState(false);
 	const [isChangingPassword, setIsChangingPassword] = useState(false);
 	const [avatarFile, setAvatarFile] = useState(null);
 	const [editedUser, setEditedUser] = useState(null);
-	const [passwords, setPasswords] = useState({
-		currentPassword: "",
-		newPassword: "",
-		confirmPassword: "",
-	});
-
+	// console.log(editedUser.avatar)
+	const [refresh] = useRefreshMutation();
 	const { user, isLoading } = useGetMyDetailsQuery("myDetails", {
 		selectFromResult: ({ data, isLoading }) => ({
 			user: Object.values(data?.entities ?? {})[0],
@@ -44,12 +52,56 @@ export default function ProfilePage() {
 		}),
 	});
 
-	// const [updateProfile] = useUpdateProfileMutation();
-	// const [changePassword] = useChangePasswordMutation();
+	const [updateProfile] = useUpdateProfileMutation();
+	const [changePassword] = useChangePasswordMutation();
 
 	useEffect(() => {
 		setEditedUser(user);
 	}, [user]);
+
+	const uploadImage = async (file) => {
+		const storage = getStorage(app);
+		const fileName = file.name;
+		const folderPath = `Users/${userId}/Avatar`;
+
+		// Check if there is an existing image URL
+		const existingImageUrl = user.avatar;
+
+		// If an existing image URL is found, delete the corresponding file from Firebase Storage
+		if (existingImageUrl) {
+			const existingImageRef = ref(storage, existingImageUrl);
+			try {
+				await deleteObject(existingImageRef);
+				console.log("Previous image deleted successfully");
+			} catch (error) {
+				console.error("Error deleting previous image:", error);
+			}
+		}
+
+		// Concatenate the folder path with the file name to create storage reference
+		const storageRef = ref(storage, `${folderPath}/${fileName}`);
+		const uploadTask = uploadBytesResumable(storageRef, file);
+		// setUploadTask(uploadTask);
+
+		return new Promise((resolve, reject) => {
+			// Removed the "state_changed" listener to stop tracking upload progress
+			uploadTask.on(
+				"state_changed",
+				null, // No longer handling state changes
+				(error) => {
+					reject(error); // Reject promise if there's an upload error
+				},
+				async () => {
+					try {
+						const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+						resolve(downloadURL); // Resolve promise with the download URL
+					} catch (error) {
+						reject(error); // Reject promise if there's an error getting the download URL
+					}
+				}
+			);
+		});
+	};
 
 	const handleEdit = () => setIsEditing(true);
 	const handleCancel = () => {
@@ -58,18 +110,53 @@ export default function ProfilePage() {
 		setAvatarFile(null);
 	};
 
+	// const handleSave = async () => {
+	// 	try {
+	// 		const formData = new FormData();
+	// 		Object.keys(editedUser).forEach((key) =>
+	// 			formData.append(key, editedUser[key])
+	// 		);
+	// 		if (avatarFile) formData.append("avatar", avatarFile);
+
+	// 		await updateProfile(formData).unwrap();
+	// 		setIsEditing(false);
+	// 	} catch (err) {
+	// 		console.error("Failed to save profile", err);
+	// 	}
+	// };
+
 	const handleSave = async () => {
 		try {
+			// await axios.patch(`/api/courses/${courseId}`, values);
+			let url;
+			if (avatarFile) url = await uploadImage(avatarFile);
 			const formData = new FormData();
-			Object.keys(editedUser).forEach((key) =>
-				formData.append(key, editedUser[key])
-			);
-			if (avatarFile) formData.append("avatar", avatarFile);
+			Object.keys(editedUser).forEach((key) => {
+				if (key !== "avatar") {
+					// Skip avatar here
+					formData.append(key, editedUser[key]);
+				}
+			});
+
+			// Only append the new avatar URL if it exists
+			if (url) {
+				formData.append("avatar", url);
+			} else if (editedUser.avatar) {
+				// If no new avatar was uploaded, use the existing one
+				formData.append("avatar", editedUser.avatar);
+			}
+			// console.log(url)
 
 			await updateProfile(formData).unwrap();
 			setIsEditing(false);
-		} catch (err) {
-			console.error("Failed to save profile", err);
+            await refresh().unwrap()
+
+			toast.success("Profile updated successfully");
+			// router.refresh();
+		} catch (error) {
+			console.log(error);
+			toast.error(error?.data?.message ?? "Something went wrong");
+			setAvatarFile(null);
 		}
 	};
 
@@ -85,29 +172,18 @@ export default function ProfilePage() {
 		}
 	};
 
-	const handlePasswordChange = (e) => {
-		setPasswords({ ...passwords, [e.target.name]: e.target.value });
-	};
-
-	const handlePasswordSubmit = async (e) => {
-		e.preventDefault();
-		if (passwords.newPassword !== passwords.confirmPassword) {
-			alert("New passwords don't match");
-			return;
-		}
+	const handlePasswordSubmit = async (passwords) => {
 		try {
 			await changePassword({
 				currentPassword: passwords.currentPassword,
 				newPassword: passwords.newPassword,
 			}).unwrap();
 			setIsChangingPassword(false);
-			setPasswords({
-				currentPassword: "",
-				newPassword: "",
-				confirmPassword: "",
-			});
+			toast.success("Password changed successfully");
 		} catch (err) {
+			toast.error(err?.data?.message ?? "Something went wrong");
 			console.error("Failed to change password", err);
+			throw err; // Re-throw the error so the PasswordForm can handle it
 		}
 	};
 
@@ -250,50 +326,10 @@ export default function ProfilePage() {
 							<Key className="mr-2 h-4 w-4" /> Change Password
 						</Button>
 					) : (
-						<form onSubmit={handlePasswordSubmit} className="mt-4 space-y-4">
-							<div>
-								<Label htmlFor="currentPassword">Current Password</Label>
-								<Input
-									id="currentPassword"
-									name="currentPassword"
-									type="password"
-									value={passwords.currentPassword}
-									onChange={handlePasswordChange}
-								/>
-							</div>
-							<div>
-								<Label htmlFor="newPassword">New Password</Label>
-								<Input
-									id="newPassword"
-									name="newPassword"
-									type="password"
-									value={passwords.newPassword}
-									onChange={handlePasswordChange}
-								/>
-							</div>
-							<div>
-								<Label htmlFor="confirmPassword">Confirm New Password</Label>
-								<Input
-									id="confirmPassword"
-									name="confirmPassword"
-									type="password"
-									value={passwords.confirmPassword}
-									onChange={handlePasswordChange}
-								/>
-							</div>
-							<div className="flex justify-end space-x-2">
-								<Button
-									type="button"
-									onClick={() => setIsChangingPassword(false)}
-									variant="outline"
-								>
-									<X className="mr-2 h-4 w-4" /> Cancel
-								</Button>
-								<Button type="submit">
-									<Save className="mr-2 h-4 w-4" /> Change Password
-								</Button>
-							</div>
-						</form>
+						<PasswordForm
+							onCancel={() => setIsChangingPassword(false)}
+							onSubmit={handlePasswordSubmit}
+						/>
 					)}
 				</CardContent>
 			</Card>

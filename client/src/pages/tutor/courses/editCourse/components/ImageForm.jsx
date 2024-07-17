@@ -15,11 +15,6 @@ import app from "../../../../../firebase";
 import { Progress } from "@material-tailwind/react";
 import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
 
-const formSchema = z.object({
-	courseImage: z.string().min(1, {
-		message: "Image is required",
-	}),
-});
 
 export const ImageForm = ({ initialData, courseId }) => {
 	const [isEditing, setIsEditing] = useState(false);

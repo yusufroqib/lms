@@ -30,7 +30,7 @@ const TutorDashboard = ({ setDashboardMode }) => {
 	const { data: courseTransactions, error } = useGetTutorCoursesSoldQuery();
 	const { data: tutorBalance, error: balanceError } = useGetTutorBalanceQuery();
 
-	// console.log(tutorBalance?.available[0]?.amount?.toFixed(2));
+	console.log(tutorBalance);
 
 	const { myDetails } = useGetMyDetailsQuery("myDetails", {
 		selectFromResult: ({
@@ -58,7 +58,7 @@ const TutorDashboard = ({ setDashboardMode }) => {
 				<Button
 					variant="outline"
 					className="flex gap-2 max-md:text-xs text-sm"
-					onClick={() => setDashboardMode('student')}
+					onClick={() => setDashboardMode("student")}
 				>
 					<Replace className="max-md:w-4 w-5" />
 					Switch to student&apos;s dashboard
@@ -87,7 +87,10 @@ const TutorDashboard = ({ setDashboardMode }) => {
 						Balance
 					</h1>
 					<h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white text-right">
-						${tutorBalance?.available[0]?.amount?.toFixed(2) ?? "0.00"}
+						$
+						{(
+							tutorBalance && tutorBalance?.available[0]?.amount / 100
+						)?.toFixed(2) ?? "0.00"}
 					</h1>
 				</div>
 			</div>

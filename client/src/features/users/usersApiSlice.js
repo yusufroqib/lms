@@ -76,6 +76,26 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 				return responseData;
 			},
 		}),
+		updateProfile: builder.mutation({
+			query: (formData) => ({
+				url: "/users/profile",
+				method: "PATCH",
+				body: formData,
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
+		changePassword: builder.mutation({
+			query: (formData) => ({
+				url: "/users/change-password",
+				method: "POST",
+				body: formData,
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
 		completeStripeConnectAccount: builder.mutation({
 			query: () => ({
 				url: "/tutors/stripe-connect/complete",
@@ -96,12 +116,15 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 			transformResponse: (responseData) => {
 				return responseData;
 			},
+			invalidatesTags: ["TutorBalance"],
 		}),
+		
 		getTutorBalance: builder.query({
 			query: () => "/tutors/balance",
 			transformResponse: (responseData) => {
 				return responseData;
 			},
+			providesTags: ["TutorBalance"],
 		}),
 		getPayoutDetails: builder.query({
 			query: () => "/tutors/payout-details",
@@ -129,6 +152,8 @@ export const {
 	useGetAllUsersQuery,
 	useGetTutorBalanceQuery,
 	useGetPayoutDetailsQuery,
+	useUpdateProfileMutation,
+	useChangePasswordMutation,
 	// useAddNewUserMutation,
 	useCreateStripeConnectAccountMutation,
 	useCompleteStripeConnectAccountMutation,

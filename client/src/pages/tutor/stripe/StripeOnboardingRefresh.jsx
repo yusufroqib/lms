@@ -4,8 +4,8 @@ import { useCreateStripeConnectAccountMutation } from "@/features/users/usersApi
 const StripeOnboardingRefresh = () => {
 	const [createStripeConnectAccount, { isLoading, error, isError }] =
 		useCreateStripeConnectAccountMutation();
-	console.log("isLoading", isLoading);
-	console.log("error", error);
+	// console.log("isLoading", isLoading);
+	// console.log("error", error);
 
 	useEffect(() => {
 		const refreshOnboarding = async () => {
@@ -22,7 +22,11 @@ const StripeOnboardingRefresh = () => {
 		refreshOnboarding();
 	}, []);
 
-	return <div>Refreshing your onboarding link...</div>;
+	return (
+		<div className="min-h-full flex justify-center items-center">
+			Refreshing your onboarding link...
+		</div>
+	);
 };
 
 export default StripeOnboardingRefresh;
