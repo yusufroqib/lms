@@ -76,6 +76,15 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 				return responseData;
 			},
 		}),
+		becomeTutor: builder.mutation({
+			query: () => ({
+				url: "/users/become-tutor",
+				method: "POST",
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
 		updateProfile: builder.mutation({
 			query: (formData) => ({
 				url: "/users/profile",
@@ -152,6 +161,7 @@ export const {
 	useGetAllUsersQuery,
 	useGetTutorBalanceQuery,
 	useGetPayoutDetailsQuery,
+	useBecomeTutorMutation,
 	useUpdateProfileMutation,
 	useChangePasswordMutation,
 	// useAddNewUserMutation,

@@ -651,45 +651,43 @@ const getTutorTopCourses = async (req, res) => {
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
-
-const createOrRefreshStripeConnectAccount = async (req, res) => {
+const generateStripeAccountLink = async (req, res) => {
 	try {
-		const userId = req.userId;
-		const user = await User.findById(userId);
-
-		if (!user) {
-			return res.status(404).json({ message: "User not found" });
-		}
-
-		if (!user.stripeAccountId) {
-			const account = await stripe.accounts.create({
-				type: "express",
-				country: "US", // Change this based on your requirements
-				email: user.email,
-				capabilities: {
-					card_payments: { requested: true },
-					transfers: { requested: true },
-				},
-			});
-
-			user.stripeAccountId = account.id;
-			await user.save();
-		}
-
-		const accountLink = await stripe.accountLinks.create({
-			account: user.stripeAccountId,
-			refresh_url: `${process.env.CLIENT_URL}/tutors/stripe-connect/refresh`,
-			return_url: `${process.env.CLIENT_URL}/tutors/stripe-connect/complete`,
-			type: "account_onboarding",
+	  const userId = req.userId;
+	  const user = await User.findById(userId);
+  
+	  let stripeAccountId = user.stripeAccountId;
+  
+	  if (!stripeAccountId) {
+		// Create a new account if it doesn't exist
+		const account = await stripe.accounts.create({
+		  type: 'express',
+		  country: 'US', // Change as needed
+		  email: user.email,
+		  capabilities: {
+			card_payments: {requested: true},
+			transfers: {requested: true},
+		  },
 		});
-
-		res.json({ url: accountLink.url });
+  
+		stripeAccountId = account.id;
+		user.stripeAccountId = stripeAccountId;
+		await user.save();
+	  }
+  
+	  const accountLink = await stripe.accountLinks.create({
+		account: stripeAccountId,
+		refresh_url: `${process.env.CLIENT_URL}/tutors/stripe-account/refresh`,
+		return_url: `${process.env.CLIENT_URL}/tutors/stripe-account/complete`,
+		type: 'account_onboarding',
+	  });
+  
+	  res.json({ url: accountLink.url });
 	} catch (error) {
-		console.error("[CREATE_OR_REFRESH_STRIPE_CONNECT_ACCOUNT]", error);
-		res.status(500).json({ message: "Internal server error" });
+	  console.error('[GENERATE_STRIPE_ACCOUNT_LINK]', error);
+	  res.status(500).json({ message: 'Internal server error' });
 	}
-};
-
+  };
 const completeStripeConnectOnboarding = async (req, res) => {
 	try {
 		const userId = req.userId;
@@ -977,7 +975,7 @@ module.exports = {
 	deleteChapter,
 	toggleChapterPublicationStatus,
 	toggleCoursePublicationStatus,
-	createOrRefreshStripeConnectAccount,
+	generateStripeAccountLink,
 	completeStripeConnectOnboarding,
 	getTutorBalance,
 	getPayoutDetails,
