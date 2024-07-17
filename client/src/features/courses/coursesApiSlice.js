@@ -151,7 +151,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 		
 			
 		}),
-		getTutorCourseTransactions: builder.query({
+		getTutorCoursesSold: builder.query({
 			query: () => ({
 				url: `/tutors/course-transactions`,
 				// params: { startDate, endDate, groupBy },
@@ -373,7 +373,7 @@ export const {
 	useGetStudyTimeQuery,
 	useGetTutorStatsQuery,
 	useGetTutorTopCoursesQuery,
-	useGetTutorCourseTransactionsQuery,
+	useGetTutorCoursesSoldQuery,
 	useGetEnrolledCoursesQuery,
 	useCreateCourseTitleMutation,
 	useUpdateCourseMutation,

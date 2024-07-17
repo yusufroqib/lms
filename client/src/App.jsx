@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import AuthPage from "./pages/auth/AuthPage";
 import SignUpOTP from "./pages/auth/SignUpOTPPage";
-import Dashboard from "./pages/dashboard/DashboardPage";
 import RootLayout from "./components/layouts/RootLayout";
 import { ROLES } from "../config/roles";
 import RequireAuth from "./features/auth/RequireAuth";
@@ -41,6 +40,11 @@ import MeetingPage from "./pages/classroom/liveClassroomApp/meeting/MeetingPage"
 import Home from "./pages/home/Home";
 import StudentDashBoard from "./pages/dashboard/studentDashboard/StudentDashboard";
 import TutorDashboard from "./pages/dashboard/tutorDashboard/TutorDashboard";
+import StripeOnboardingRefresh from "./pages/tutor/stripe/StripeOnboardingRefresh";
+import StripeOnboardingComplete from "./pages/tutor/stripe/StripeOnboardingComplete";
+import Withdraw from "./pages/tutor/withdraw/Withdraw";
+import DashboardPage from "./pages/dashboard/DashboardPage";
+import ProfilePage from "./pages/profile/ProfilePage";
 // import InProgress from "./pages/classroom/liveClassroomApp/ongoing/InProgress";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
@@ -56,9 +60,10 @@ function App() {
 				>
 					<Route element={<Prefetch />}>
 						<Route element={<RootLayout />}>
-							<Route path="/studentdash" element={<StudentDashBoard />} />
-							<Route path="/tutordash" element={<TutorDashboard />} />
-							<Route path="dashboard" element={<Dashboard />} />
+							{/* <Route path="/studentdash" element={<StudentDashBoard />} />
+							<Route path="/tutordash" element={<TutorDashboard />} /> */}
+							<Route path="dashboard" element={<DashboardPage />} />
+							<Route path="profile" element={<ProfilePage />} />
 							<Route path="messages" element={<Messages />} />
 							<Route path="courses">
 								<Route index element={<CoursesIndex />} />
@@ -76,6 +81,18 @@ function App() {
 								<Route
 									path="edit-course/:courseId/chapter/:chapterId"
 									element={<EditChapter />}
+								/>
+								<Route
+									path="stripe-connect/refresh"
+									element={<StripeOnboardingRefresh />}
+								/>
+								<Route
+									path="stripe-connect/complete"
+									element={<StripeOnboardingComplete />}
+								/>
+								<Route
+									path="withdraw"
+									element={<Withdraw />}
 								/>
 							</Route>
 							<Route path="community" element={<CommunityLayout />}>

@@ -24,6 +24,20 @@ const userSchema = new Schema(
 		avatar: String,
 		followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
 		following: [{ type: Schema.Types.ObjectId, ref: "User" }],
+		stripeAccountId: String,
+		stripeOnboardingComplete: { type: Boolean, default: false },
+		transactions: [
+			{
+				type: {
+					type: String,
+					enum: ["purchase", "payout"],
+				},
+				amount: Number,
+				courseId: { type: Schema.Types.ObjectId, ref: "Course" },
+				stripeTransactionId: String,
+				createdAt: { type: Date, default: Date.now },
+			},
+		],
 		roles: {
 			Student: {
 				type: String,
@@ -34,10 +48,12 @@ const userSchema = new Schema(
 		},
 		reputation: { type: Number, default: 0 },
 		saved: [{ type: Schema.Types.ObjectId, ref: "Post" }],
-		enrolledCourses: [{
-			course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
-			lastStudiedAt: { type: Date, default: null }
-		  }],
+		enrolledCourses: [
+			{
+				course: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+				lastStudiedAt: { type: Date, default: null },
+			},
+		],
 		createdCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 		refreshToken: [String],
 		points: [

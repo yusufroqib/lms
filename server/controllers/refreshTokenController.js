@@ -10,10 +10,10 @@ const app_id = process.env.STREAM_APP_ID;
 
 const handleRefreshToken = async (req, res) => {
 	const cookies = req.cookies;
-	console.log("[Cookies]", cookies)
+	// console.log("[Cookies]", cookies)
 	if (!cookies?.jwt) return res.sendStatus(401);
 	const refreshToken = cookies.jwt;
-	console.log("[refreshToken]", refreshToken)
+	// console.log("[refreshToken]", refreshToken)
 	res.clearCookie("jwt", {
 		httpOnly: true,
 		sameSite: "None",
@@ -21,7 +21,7 @@ const handleRefreshToken = async (req, res) => {
 	});
 
 	const foundUser = await User.findOne({ refreshToken }).exec();
-	console.log("[foundUser]", foundUser)
+	// console.log("[foundUser]", foundUser)
 
 
 	//Detected refresh token reuse!
@@ -39,7 +39,7 @@ const handleRefreshToken = async (req, res) => {
 				}).exec();
 				hackedUser.refreshToken = [];
 				const result = await hackedUser.save();
-				console.log("[hackedUser]", hackedUser)
+				// console.log("[hackedUser]", hackedUser)
 
 				// console.log(result);
 			}
@@ -64,9 +64,9 @@ const handleRefreshToken = async (req, res) => {
 			}
 			if (err || foundUser._id.toString() !== decoded._id) {
 				
-				console.log(foundUser._id.toString());
-				console.log( decoded._id);
-				console.log("_id not equals");
+				// console.log(foundUser._id.toString());
+				// console.log( decoded._id);
+				// console.log("_id not equals");
 
 				return res.sendStatus(403);
 			}

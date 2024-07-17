@@ -1,8 +1,10 @@
 const Course = require("../models/CourseModel");
 const Category = require("../models/CategoryModel");
 const Classroom = require("../models/ClassroomModel");
+const User = require("../models/userModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
 const { default: mongoose } = require("mongoose");
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 //Get all courses categories
 const getCategories = async (req, res) => {
@@ -650,11 +652,178 @@ const getTutorTopCourses = async (req, res) => {
 	}
 };
 
-function parseDate(dateString) {
-	const [datePart, timePart] = dateString.split(" ");
-	const [timeOffset, time] = timePart.split("+");
-	return new Date(`${datePart}${time}`);
-}
+const createOrRefreshStripeConnectAccount = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		if (!user.stripeAccountId) {
+			const account = await stripe.accounts.create({
+				type: "express",
+				country: "US", // Change this based on your requirements
+				email: user.email,
+				capabilities: {
+					card_payments: { requested: true },
+					transfers: { requested: true },
+				},
+			});
+
+			user.stripeAccountId = account.id;
+			await user.save();
+		}
+
+		const accountLink = await stripe.accountLinks.create({
+			account: user.stripeAccountId,
+			refresh_url: `${process.env.CLIENT_URL}/tutors/stripe-connect/refresh`,
+			return_url: `${process.env.CLIENT_URL}/tutors/stripe-connect/complete`,
+			type: "account_onboarding",
+		});
+
+		res.json({ url: accountLink.url });
+	} catch (error) {
+		console.error("[CREATE_OR_REFRESH_STRIPE_CONNECT_ACCOUNT]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const completeStripeConnectOnboarding = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		if (!user.stripeAccountId) {
+			return res
+				.status(400)
+				.json({ message: "No Stripe account found for this user" });
+		}
+
+		// Retrieve the account to check its status
+		const account = await stripe.accounts.retrieve(user.stripeAccountId);
+
+		if (account.details_submitted) {
+			// The account setup is complete
+			user.stripeOnboardingComplete = true;
+			await user.save();
+
+			res.json({ message: "Stripe account setup completed successfully" });
+		} else {
+			// The account setup is not complete
+			res.status(400).json({ message: "Stripe account setup is not complete" });
+		}
+	} catch (error) {
+		console.error("[COMPLETE_STRIPE_CONNECT_ONBOARDING]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const getTutorBalance = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		if (!user.stripeAccountId) {
+			return res.status(400).json({ message: "No connected Stripe account" });
+		}
+
+		const balance = await stripe.balance.retrieve({
+			stripeAccount: user.stripeAccountId,
+		});
+
+		res.json(balance);
+	} catch (error) {
+		console.error("[GET_TUTOR_BALANCE]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const getPayoutDetails = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		if (!user.stripeAccountId) {
+			return res
+				.status(400)
+				.json({ message: "No Stripe account found for this user" });
+		}
+
+		// Retrieve the balance from Stripe
+		const balance = await stripe.balance.retrieve({
+			stripeAccount: user.stripeAccountId,
+		});
+
+		// Get the available balance in the default currency (usually USD)
+		const availableBalance =
+			balance.available.find((bal) => bal.currency === "usd").amount / 100;
+
+		// Retrieve the default bank account (assuming the user has set one up)
+		const bankAccounts = await stripe.accounts.listExternalAccounts(
+			user.stripeAccountId,
+			{ object: "bank_account", limit: 1 }
+		);
+
+		let bankAccount = null;
+		if (bankAccounts.data.length > 0) {
+			const { last4, bank_name } = bankAccounts.data[0];
+			bankAccount = { last4, bank_name };
+		}
+
+		res.json({ availableBalance, bankAccount });
+	} catch (error) {
+		console.error("[GET_PAYOUT_DETAILS]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const initiatePayout = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const { amount } = req.body;
+		const user = await User.findById(userId);
+
+		if (!user.stripeAccountId) {
+			return res
+				.status(400)
+				.json({ message: "No Stripe account found for this user" });
+		}
+
+		// Create a payout
+		const payout = await stripe.payouts.create(
+			{
+				amount: Math.round(amount * 100), // Convert to cents
+				currency: "usd",
+			},
+			{
+				stripeAccount: user.stripeAccountId,
+			}
+		);
+
+		res.json({ message: "Payout initiated successfully", payoutId: payout.id });
+	} catch (error) {
+		console.error("[INITIATE_PAYOUT]", error);
+		res.status(500).json({ message: "Failed to initiate payout" });
+	}
+};
+
+const getTransactionHistory = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId).populate("transactions.courseId");
+
+		res.json(user.transactions);
+	} catch (error) {
+		console.error("[GET_TRANSACTION_HISTORY]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
 
 const getTutorEarnings = async (req, res) => {
 	try {
@@ -672,11 +841,8 @@ const getTutorEarnings = async (req, res) => {
 
 		if (startDate && endDate) {
 			try {
-				const correctedStartDate = startDate.replace(" ", "+");
-				const correctedEndDate = endDate.replace(" ", "+");
-
-				startDateTime = new Date(correctedStartDate);
-				endDateTime = new Date(correctedEndDate);
+				startDateTime = new Date(startDate);
+				endDateTime = new Date(endDate);
 
 				// Check if the dates are valid
 				if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
@@ -765,7 +931,7 @@ const getTutorEarnings = async (req, res) => {
 	}
 };
 
-const getTutorCourseTransactions = async (req, res) => {
+const getTutorCoursesSold = async (req, res) => {
 	try {
 		const { userId: tutorId } = req;
 
@@ -788,9 +954,9 @@ const getTutorCourseTransactions = async (req, res) => {
 
 		// Sort the transaction history by date in descending order
 		transactionHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
-		console.log(transactionHistory);
+		// console.log(transactionHistory);
 
-		res.json( transactionHistory );
+		res.json(transactionHistory);
 	} catch (error) {
 		console.error("[GET_TUTOR_TRANSACTION_HISTORY]", error);
 		res.status(500).json({ message: "Internal server error" });
@@ -811,9 +977,15 @@ module.exports = {
 	deleteChapter,
 	toggleChapterPublicationStatus,
 	toggleCoursePublicationStatus,
+	createOrRefreshStripeConnectAccount,
+	completeStripeConnectOnboarding,
+	getTutorBalance,
+	getPayoutDetails,
+	initiatePayout,
+	getTransactionHistory,
 	deleteCourse,
 	getTutorStats,
 	getTutorTopCourses,
 	getTutorEarnings,
-	getTutorCourseTransactions,
+	getTutorCoursesSold,
 };

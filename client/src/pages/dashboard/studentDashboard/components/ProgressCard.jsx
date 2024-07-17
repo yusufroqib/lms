@@ -6,7 +6,7 @@ const ProgressCard = ({cardCN, courseLength, cardText, CardIcon}) => {
 		<Card className={cardCN}>
 			<div className="flex items-center justify-between">
 				<div>
-					<div className="text-xllg:text-3xl font-bold">{courseLength}</div>
+					<div className="text-xl lg:text-3xl font-bold">{courseLength}</div>
 					<div className="text-sm text-gray-500">{cardText}</div>
 				</div>
 				<CardIcon className="w-8 h-8 max-md:hidden text-blue-500" />

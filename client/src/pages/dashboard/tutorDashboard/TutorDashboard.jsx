@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import {
 	BookCheck,
 	BookUp2,
 	CircleDollarSign,
 	Receipt,
+	Replace,
 	Users,
 } from "lucide-react";
 import { Book } from "lucide-react";
 import {
-	useGetTutorCourseTransactionsQuery,
+	useGetTutorCoursesSoldQuery,
 	useGetTutorStatsQuery,
 	useGetTutorTopCoursesQuery,
 } from "@/features/courses/coursesApiSlice";
@@ -16,13 +17,20 @@ import { Link } from "react-router-dom";
 import TutorEarningsChart from "./components/TutorEarningChart";
 import { DataTable } from "./components/DataTable";
 import { columns } from "./components/Columns";
-import { useGetMyDetailsQuery } from "@/features/users/usersApiSlice";
+import {
+	useGetMyDetailsQuery,
+	useGetTutorBalanceQuery,
+} from "@/features/users/usersApiSlice";
+import { Button } from "@/components/ui/button";
 
-const TutorDashboard = () => {
+const TutorDashboard = ({ setDashboardMode }) => {
+	// const [balance, setBalance] = useState(0)
 	const { data: tutorStats, isLoading } = useGetTutorStatsQuery();
 	const { data: topCourses } = useGetTutorTopCoursesQuery();
-	const { data: courseTransactions, error } =
-		useGetTutorCourseTransactionsQuery();
+	const { data: courseTransactions, error } = useGetTutorCoursesSoldQuery();
+	const { data: tutorBalance, error: balanceError } = useGetTutorBalanceQuery();
+
+	// console.log(tutorBalance?.available[0]?.amount?.toFixed(2));
 
 	const { myDetails } = useGetMyDetailsQuery("myDetails", {
 		selectFromResult: ({
@@ -42,24 +50,46 @@ const TutorDashboard = () => {
 		}),
 	});
 
-	console.log(courseTransactions);
+	// console.log(courseTransactions);
 
 	return (
 		<div className="flex-1 p-8  space-y-6">
+			<div className="flex justify-end">
+				<Button
+					variant="outline"
+					className="flex gap-2 max-md:text-xs text-sm"
+					onClick={() => setDashboardMode('student')}
+				>
+					<Replace className="max-md:w-4 w-5" />
+					Switch to student&apos;s dashboard
+				</Button>
+			</div>
 			<div
 				style={{
-					backgroundImage: ` linear-gradient(rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.05)), url(/tutor-bg.jpg)`,
+					backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.05)), url(/tutor-bg.jpg)`,
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 				}}
-				className="bg-slate-300 p-8 lg:p-14 rounded-3xl space-y-2 lg:space-y-5 "
+				className="bg-slate-300 p-8 lg:p-14 rounded-3xl space-y-2 lg:space-y-5 flex justify-between items-center max-xl:flex-col-reverse max-xl:items-stretch"
 			>
-				<h1 className="text-2xl md:text-3xl lg:text-5xl font-semibold text-white">
-					Hi, {myDetails?.name}
-				</h1>
-				<h1 className="text-xs md:text-lg text-white/60  lg:text-xl">
-					See what happened with your courses and students
-				</h1>
+				<div className="max-xl:w-full max-xl:flex max-xl:justify-start">
+					<div>
+						<h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white">
+							Hi, {myDetails?.name}
+						</h1>
+						<h1 className="text-xs md:text-lg text-white/60 xl:text-xl">
+							See what happened with your courses and students
+						</h1>
+					</div>
+				</div>
+				<div className="flex flex-col gap-2  max-xl:w-full max-xl:flex max-xl:justify-end max-xl:mb-4">
+					<h1 className="text-xl md:text-2xl xl:text-3xl font-semibold text-white  text-right max-md:hidden">
+						Balance
+					</h1>
+					<h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white text-right">
+						${tutorBalance?.available[0]?.amount?.toFixed(2) ?? "0.00"}
+					</h1>
+				</div>
 			</div>
 
 			<div className="grid grid-cols-2 xl:grid-cols-4 gap-5 ">
@@ -149,7 +179,7 @@ const TutorDashboard = () => {
 										<div className=" col-span-3 flex flex-col">
 											<Link
 												to={`/courses/${course._id}/info`}
-												className=" text-base md:text-lg  "
+												className=" text-base md:text-lg hover:text-blue-600 "
 											>
 												<p className="truncate w-full">{course.title}</p>
 											</Link>

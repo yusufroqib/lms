@@ -51,22 +51,6 @@ const StudyTimeCharts = () => {
 		groupBy: timeRange,
 	});
 
-	//   console.log(studyData)
-
-	//   const chartData = useMemo(() => {
-	//     if (!studyData) return [];
-	//     return studyData.map(item => ({
-	//       name: item._id,
-	//       Total: item.totalDuration,
-	//       ...item.courses?.reduce((acc, course) => {
-	//         acc[course.course] = course.duration;
-	//         return acc;
-	//       }, {})
-	//     }));
-	//   }, [studyData]);
-
-	//   console.log(chartData)
-
 	const formatDuration = (seconds) => {
 		const hours = Math.floor(seconds / 3600);
 		const minutes = Math.floor((seconds % 3600) / 60);
@@ -87,7 +71,7 @@ const StudyTimeCharts = () => {
 
 	return (
 		<div>
-			<h2>Study Time Summary</h2>
+			<h2 className="font-semibold text-xl">Study Time Summary</h2>
 
 			<div className="flex justify-end max-md:my-4">
 				<Select
@@ -108,27 +92,7 @@ const StudyTimeCharts = () => {
 			</div>
 
 			<CourseChart formatDuration={formatDuration} data={studyData} />
-			{/* <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={chartData}>
-          <XAxis dataKey="name" />
-          <YAxis tickFormatter={formatDuration} />
-          <Tooltip formatter={formatDuration} />
-          <Legend />
-          <Bar dataKey="Total" fill="#8884d8" name="Total Duration" />
-          {Object.keys(chartData[0] || {})
-            .filter(key => key !== 'name' && key !== 'Total')
-            .map((course, index) => (
-              <Bar 
-                key={course} 
-                dataKey={course} 
-                fill={`#${Math.floor(Math.random()*16777215).toString(16)}`} 
-                name={`Course ${index + 1}`} 
-                radius={4}
-              />
-            ))
-          }
-        </BarChart>
-      </ResponsiveContainer> */}
+			
 		</div>
 	);
 };

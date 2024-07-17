@@ -22,29 +22,49 @@ const TutorEarningsChart = ({ tutorId }) => {
 		new Date(),
 	]);
 	const [startDate, endDate] = dateRange;
-
+  
 	const formattedStartDate = startDate ? format(startDate, "yyyy-MM-dd") : null;
 	// Adjust the end date to be inclusive
 	const formattedEndDate = endDate
-		? format(addDays(endDate, 1), "yyyy-MM-dd")
-		: null;
-
+  ? format(addDays(endDate, 1), "yyyy-MM-dd")
+  : null;
+  
+  // console.log(formattedStartDate)
 	const { data, isLoading, error } = useGetTutorEarningsQuery({
-		tutorId,
 		startDate: formattedStartDate,
 		endDate: formattedEndDate,
 	});
+
+	const truncateText = (text, maxLength = 20) => {
+		return text.length > maxLength
+			? text.substring(0, maxLength) + "..."
+			: text;
+	};
 
 	const handleDateChange = (update) => {
 		setDateRange(update);
 	};
 
+	// const processData = (data) => {
+	// 	if (!data) return [];
+	// 	return data.map((item) => {
+	// 		const courseEarnings = {};
+	// 		Object.keys(item.courseEarnings).forEach((courseTitle) => {
+	// 			courseEarnings[courseTitle] = item.courseEarnings[courseTitle];
+	// 		});
+	// 		return {
+	// 			date: item.date,
+	// 			...courseEarnings,
+	// 		};
+	// 	});
+	// };
 	const processData = (data) => {
 		if (!data) return [];
 		return data.map((item) => {
 			const courseEarnings = {};
 			Object.keys(item.courseEarnings).forEach((courseTitle) => {
-				courseEarnings[courseTitle] = item.courseEarnings[courseTitle];
+				courseEarnings[truncateText(courseTitle)] =
+					item.courseEarnings[courseTitle];
 			});
 			return {
 				date: item.date,
@@ -66,11 +86,21 @@ const TutorEarningsChart = ({ tutorId }) => {
 		return colors;
 	};
 
+	// const getCourseTitles = (data) => {
+	// 	const titles = new Set();
+	// 	data?.forEach((item) => {
+	// 		Object.keys(item?.courseEarnings)?.forEach((title) => {
+	// 			titles.add(title);
+	// 		});
+	// 	});
+	// 	return Array.from(titles);
+	// };
+
 	const getCourseTitles = (data) => {
 		const titles = new Set();
 		data?.forEach((item) => {
 			Object.keys(item?.courseEarnings)?.forEach((title) => {
-				titles.add(title);
+				titles.add(truncateText(title));
 			});
 		});
 		return Array.from(titles);
@@ -99,6 +129,9 @@ const TutorEarningsChart = ({ tutorId }) => {
 			<div className="mb-4 flex max-md:flex-col max-md:gap-3 justify-between">
 				<DatePicker
 					selectsRange={true}
+          dateFormat="d/MM/YYYY"
+          // dateFormat="MMMM eeee d, yyyy h:mm aa"
+
 					startDate={startDate}
 					endDate={endDate}
 					onChange={handleDateChange}
@@ -122,16 +155,24 @@ const TutorEarningsChart = ({ tutorId }) => {
 				<div>
 					<ResponsiveContainer width="100%" height={400}>
 						<BarChart data={processedData}>
-							<XAxis dataKey="date" />
-							<YAxis tickFormatter={formatUSD} />
+							<XAxis dataKey="date" tick={{ fontSize: 13 }} />
+							<YAxis tickFormatter={formatUSD} tick={{ fontSize: 13 }} />
 							<Tooltip formatter={(value) => formatUSD(value)} />
-							{/* <Legend /> */}
+							<Legend
+								formatter={(value) => (
+									<span className="text-sm" title={value}>
+										{value}
+									</span>
+								)}
+							/>{" "}
+						
 							{courseTitles.map((courseTitle, index) => (
 								<Bar
 									key={courseTitle}
 									dataKey={courseTitle}
 									stackId="a"
 									fill={colors[courseTitle]}
+									name={courseTitle} // This will be used in the tooltip
 								/>
 							))}
 							<ReferenceLine y={0} stroke="#000" />

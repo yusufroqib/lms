@@ -34,9 +34,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 				},
 			}),
 			transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
-			providesTags: (result, error, arg) => [
-				{ type: "Classroom", id: "LIST" },
-			],
+			providesTags: (result, error, arg) => [{ type: "Classroom", id: "LIST" }],
 		}),
 		getAllUsers: builder.query({
 			query: ({ searchParams }) => `/community/users/all-users?${searchParams}`,
@@ -68,16 +66,49 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 					...initialUserData,
 				},
 			}),
-		
 		}),
-		// deleteUser: builder.mutation({
-		// 	query: ({ id }) => ({
-		// 		url: `/users`,
-		// 		method: "DELETE",
-		// 		body: { id },
-		// 	}),
-		// 	invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
-		// }),
+		createStripeConnectAccount: builder.mutation({
+			query: () => ({
+				url: "/tutors/stripe-connect",
+				method: "POST",
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
+		completeStripeConnectAccount: builder.mutation({
+			query: () => ({
+				url: "/tutors/stripe-connect/complete",
+				method: "POST",
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
+		initiatePayout: builder.mutation({
+			query: ({ amount }) => ({
+				url: "/tutors/initiate-payout",
+				method: "POST",
+				body: {
+					amount,
+				},
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
+		getTutorBalance: builder.query({
+			query: () => "/tutors/balance",
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
+		getPayoutDetails: builder.query({
+			query: () => "/tutors/payout-details",
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
 		getUserById: builder.query({
 			query: (userId) => `/community/users/${userId}`,
 			transformResponse: (responseData) => responseData, // You may need to adjust this based on the response format
@@ -96,9 +127,14 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 export const {
 	useGetMyDetailsQuery,
 	useGetAllUsersQuery,
-	useAddNewUserMutation,
+	useGetTutorBalanceQuery,
+	useGetPayoutDetailsQuery,
+	// useAddNewUserMutation,
+	useCreateStripeConnectAccountMutation,
+	useCompleteStripeConnectAccountMutation,
+	useInitiatePayoutMutation,
 	useCreateUsernameMutation,
-	useDeleteUserMutation,
+	// useDeleteUserMutation,
 	useGetUserByIdQuery,
 	useGetUserInfoQuery,
 	useGetMyClassroomsQuery,

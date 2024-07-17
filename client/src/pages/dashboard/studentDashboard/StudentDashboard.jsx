@@ -32,14 +32,22 @@ import {
 	useGetEnrolledCoursesQuery,
 } from "@/features/courses/coursesApiSlice";
 import { useEffect, useState } from "react";
-import { BookOpenIcon, GraduationCapIcon, Loader2 } from "lucide-react";
+import {
+	BookOpenIcon,
+	GraduationCapIcon,
+	Loader2,
+	Replace,
+} from "lucide-react";
 import EnrolledCourseCard from "./components/EnrolledCourseCard";
 import ProgressCard from "./components/ProgressCard";
 import StudyTimeCharts from "./components/StudyTimeCharts";
 import RecommendedCourses from "./components/RecommendedCourses";
 import { useGetMyDetailsQuery } from "@/features/users/usersApiSlice";
+import useAuth from "@/hooks/useAuth";
 
-export default function StudentDashBoard() {
+export default function StudentDashBoard({ setDashboardMode }) {
+	const { status } = useAuth();
+
 	const [completedCourses, setCompletedCourses] = useState([]);
 	const [inProgressCourses, setInProgressCourses] = useState([]);
 	const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -161,6 +169,18 @@ export default function StudentDashBoard() {
 		return (
 			<div className="flex min-h-screen">
 				<div className="flex-1 p-8  space-y-8">
+					{status === "Tutor" && (
+						<div className="flex justify-end">
+							<Button
+								variant="outline"
+								className="flex gap-2 max-md:text-xs text-sm"
+								onClick={() => setDashboardMode("tutor")}
+							>
+								<Replace className="max-md:w-4 w-5" />
+								Switch to tutor&apos;s dashboard
+							</Button>
+						</div>
+					)}
 					<div
 						style={{
 							backgroundImage: ` linear-gradient(rgba(0, 0, 128, 0.15), rgba(0, 0, 126, 0.1)), url(/line-background.svg)`,
@@ -221,21 +241,6 @@ export default function StudentDashBoard() {
 									CardIcon={BookOpenIcon}
 								/>
 							</div>
-							{/* <Card className="p-6 bg-gray-100">
-							<div className="flex items-center justify-between mb-4">
-								<h2 className="text-xl font-bold">Course Activity</h2>
-								<Select>
-									<SelectTrigger className="text-muted-foreground">
-										<SelectValue placeholder="Monthly" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="monthly">Monthly</SelectItem>
-										<SelectItem value="weekly">Weekly</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-							<BarchartChart className="w-full aspect-[4/3]" />
-						</Card> */}
 
 							<StudyTimeCharts />
 						</div>
