@@ -125,7 +125,7 @@ const Withdraw = () => {
 									<Input
 										type="number"
 										id="amount"
-                                        disabled={!payoutDetails.availableBalance}
+										disabled={!payoutDetails.availableBalance}
 										value={amount}
 										onChange={(e) => setAmount(e.target.value)}
 										step="0.01"
@@ -142,10 +142,12 @@ const Withdraw = () => {
 								disabled={
 									!payoutDetails.bankAccount ||
 									isInitiatingPayout ||
-									!payoutDetails.availableBalance
+									!payoutDetails.availableBalance ||
+									payoutDetails?.availableBalance < amount
 								}
 							>
-								{!payoutDetails.availableBalance
+								{!payoutDetails.availableBalance ||
+								payoutDetails?.availableBalance < amount
 									? "Insufficient Balance"
 									: "Initiate Withdrawal"}
 							</Button>

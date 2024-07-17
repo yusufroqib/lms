@@ -35,7 +35,29 @@ const loggedInUser = async (req, res) => {
 		res.status(500).json({ error: error.message });
 	}
 };
-
+const becomeTutor = async (req, res) => {
+	try {
+	  const userId = req.user.id; // Assuming you have authentication middleware that sets req.user
+	  const user = await User.findById(userId);
+  
+	  if (!user) {
+		return res.status(404).json({ message: 'User not found' });
+	  }
+  
+	  if (user.roles.Tutor) {
+		return res.status(400).json({ message: 'User is already a tutor' });
+	  }
+  
+	  // Update user role to Tutor
+	  user.roles.Tutor = 'Tutor';
+	  await user.save();
+  
+	  res.status(200).json({ message: 'User is now a tutor' });
+	} catch (error) {
+	  console.error('Error in becomeTutor:', error);
+	  res.status(500).json({ message: 'Internal server error' });
+	}
+  };
 const updateProfile = async (req, res) => {
     try {
         const userId = req.userId;
@@ -63,7 +85,7 @@ const updateProfile = async (req, res) => {
             updateObject.avatar = Array.isArray(avatar) ? avatar[avatar.length - 1] : avatar;
         }
 
-		console.log(updateObject)
+		// console.log(updateObject)
 
         // Find the user and update their profile
         const updatedUser = await User.findByIdAndUpdate(
@@ -141,6 +163,7 @@ module.exports = {
 	createUsername,
 	loggedInUser,
 	videocall,
+	becomeTutor,
 	updateProfile,
 	changePassword,
 };

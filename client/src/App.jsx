@@ -45,6 +45,7 @@ import StripeOnboardingComplete from "./pages/tutor/stripe/StripeOnboardingCompl
 import Withdraw from "./pages/tutor/withdraw/Withdraw";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import ProfilePage from "./pages/profile/ProfilePage";
+import NotFoundPage from "./components/NotFoundPage";
 // import InProgress from "./pages/classroom/liveClassroomApp/ongoing/InProgress";
 // import EditCourse from "./pages/tutor/course/editCourses/EditCourse";
 
@@ -131,6 +132,7 @@ function App() {
 					</Route>
 				</Route>
 			</Route>
+			<Route path="*" element={<NotFoundPage/>} />
 			{/* End Protected Routes */}
 		</Routes>
 	);

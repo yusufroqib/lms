@@ -17,7 +17,7 @@ const {
 	getTutorTopCourses,
 	getTutorEarnings,
 	getTutorCoursesSold,
-	createOrRefreshStripeConnectAccount,
+	generateStripeAccountLink,
 	completeStripeConnectOnboarding,
 	getTutorBalance,
 	initiatePayout,
@@ -82,7 +82,7 @@ router.post(
 	"/stripe-connect",
 	verifyJWT,
 	verifyRoles(Admin, Tutor),
-	createOrRefreshStripeConnectAccount
+	generateStripeAccountLink
 );
 router.post(
 	"/stripe-connect/complete",
@@ -91,7 +91,7 @@ router.post(
 	completeStripeConnectOnboarding
 );
 
-// router.post("/stripe-connect/refresh", createOrRefreshStripeConnectAccount);
+// router.post("/stripe-connect/refresh", generateStripeAccountLink);
 router.delete(
 	"/edit-course/:id",
 	verifyJWT,

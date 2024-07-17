@@ -5,11 +5,13 @@ import useAuth from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSendLogoutMutation } from "@/features/auth/authApiSlice";
 import { Wallet } from "lucide-react";
+import BecomeTutorDialog from "@/components/BecomeTutor";
 
 const DropdownUser = () => {
 	const { fullName, image, status } = useAuth();
 	const [sendLogout] = useSendLogoutMutation();
 	const navigate = useNavigate();
+	const [openBecomeTutor, setOpenBecomeTutor] = useState(false);
 
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const trigger = useRef(null);
@@ -50,6 +52,7 @@ const DropdownUser = () => {
 
 	return (
 		<div className="relative">
+			<BecomeTutorDialog open={openBecomeTutor} setOpen={setOpenBecomeTutor} />
 			<Link
 				ref={trigger}
 				onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -128,7 +131,10 @@ const DropdownUser = () => {
 					{status === "Student" && (
 						<li>
 							<Link
-								onClick={() => setDropdownOpen(false)}
+								onClick={() => {
+									setDropdownOpen(false);
+									setOpenBecomeTutor(true);
+								}}
 								to="#"
 								className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-blue-500 lg:text-base"
 							>
