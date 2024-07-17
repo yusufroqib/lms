@@ -5,11 +5,13 @@ const coursesAdapter = createEntityAdapter({});
 const tutorCoursesAdapter = createEntityAdapter({});
 const courseCategoriesAdapter = createEntityAdapter({});
 const enrolledCoursesAdapter = createEntityAdapter({});
+const studyTimeSummaryAdapter = createEntityAdapter({});
 
 const initialState = coursesAdapter.getInitialState();
 const tutorInitialState = tutorCoursesAdapter.getInitialState();
 const enrolledInitialState = enrolledCoursesAdapter.getInitialState();
 const courseCategoriesInitialState = courseCategoriesAdapter.getInitialState();
+const studyTimeSummaryInitialState = studyTimeSummaryAdapter.getInitialState();
 
 export const coursesApiSlice = apiSlice.injectEndpoints({
 	endpoints: (builder) => ({
@@ -81,6 +83,30 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				} else return [{ type: "TutorCourse", id: "LIST" }];
 			},
 		}),
+		getTutorStats: builder.query({
+			query: () => ({
+				url: `/tutors/stats`,
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
+		getTutorTopCourses: builder.query({
+			query: () => ({
+				url: `/tutors/top-courses`,
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
+
+		// get courses that the user is enrolled in
 		getEnrolledCourses: builder.query({
 			query: () => ({
 				url: `/courses/all-enrolled`,
@@ -93,7 +119,10 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 					course.id = course._id;
 					return course;
 				});
-				return enrolledCoursesAdapter.setAll(enrolledInitialState, enrolledCourses);
+				return enrolledCoursesAdapter.setAll(
+					enrolledInitialState,
+					enrolledCourses
+				);
 			},
 
 			providesTags: (result, error, arg) => {
@@ -105,8 +134,71 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				} else return [{ type: "EnrolledCourse", id: "LIST" }];
 			},
 		}),
-		// getCourseWithProgress:
+		getTutorEarnings: builder.query({
+			query: ({ startDate, endDate }) => ({
+				url: `/tutors/earnings?startDate=${startDate}&endDate=${endDate}`,
+				// params: { startDate, endDate, groupBy },
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
 
+			transformResponse: (responseData) => {
+				return responseData
+				
+			},
+
+		
+			
+		}),
+		getTutorCoursesSold: builder.query({
+			query: () => ({
+				url: `/tutors/course-transactions`,
+				// params: { startDate, endDate, groupBy },
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+
+			transformResponse: (responseData) => {
+				return responseData
+				
+			},
+
+		}),
+		getStudyTime: builder.query({
+			query: ({ startDate, endDate, groupBy }) => ({
+				url: `/courses/study-time?startDate=${startDate}&endDate=${endDate}&groupBy=${groupBy}`,
+				// params: { startDate, endDate, groupBy },
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+
+			transformResponse: (responseData) => {
+				return responseData
+				// console.log(responseData)
+				// const summary = responseData.map((item) => {
+				// 	item.id = item._id;
+				// 	return item;
+				// });
+				// // console.log(summary);
+				// return studyTimeSummaryAdapter.setAll(
+				// 	studyTimeSummaryInitialState,
+				// 	summary
+				// );
+			},
+
+			providesTags: (result, error, arg) => {
+				if (result?.ids) {
+					return [
+						{ type: "StudyTimeSummary", id: "LIST" },
+						...result.ids.map((id) => ({ type: "StudyTimeSummary", id })),
+					];
+				} else return [{ type: "StudyTimeSummary", id: "LIST" }];
+			},
+			
+		}),
 		createCourseTitle: builder.mutation({
 			query: (data) => ({
 				url: "/tutors/create-title",
@@ -245,18 +337,28 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			],
 		}),
 		purchaseCourse: builder.mutation({
-			query: ({courseId}) => ({
+			query: ({ courseId }) => ({
 				url: `/courses/${courseId}/purchase`,
 				method: "POST",
-				
+			}),
+			invalidatesTags: [{ type: "Course", id: "LIST" }],
+		}),
+
+		recordStudyTime: builder.mutation({
+			query: ({ courseId, duration }) => ({
+				url: `/courses/study-time`,
+				method: "POST",
+				body: {
+					courseId,
+					duration,
+				},
 			}),
 			invalidatesTags: [{ type: "Course", id: "LIST" }],
 		}),
 		updateChapterProgress: builder.mutation({
-			query: ({courseId, chapterId}) => ({
+			query: ({ courseId, chapterId }) => ({
 				url: `/courses/${courseId}/chapter/${chapterId}/progress`,
 				method: "PUT",
-				
 			}),
 			invalidatesTags: [{ type: "EnrolledCourse", id: "LIST" }],
 		}),
@@ -267,6 +369,11 @@ export const {
 	useGetCoursesQuery,
 	useGetCourseCategoriesQuery,
 	useGetTutorCoursesQuery,
+	useGetTutorEarningsQuery,
+	useGetStudyTimeQuery,
+	useGetTutorStatsQuery,
+	useGetTutorTopCoursesQuery,
+	useGetTutorCoursesSoldQuery,
 	useGetEnrolledCoursesQuery,
 	useCreateCourseTitleMutation,
 	useUpdateCourseMutation,
@@ -281,7 +388,8 @@ export const {
 	useDeleteChapterAttachmentMutation,
 	useToggleCoursePublishMutation,
 	usePurchaseCourseMutation,
-	useUpdateChapterProgressMutation
+	useUpdateChapterProgressMutation,
+	useRecordStudyTimeMutation,
 } = coursesApiSlice;
 
 // export const selectallCoursesResult = coursesApiSlice.endpoints.getCourses.select();

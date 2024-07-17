@@ -7,9 +7,6 @@ import { selectCurrentToken } from "./authSlice"
 import { Loader2 } from "lucide-react"
 
 const PersistLogin = () => {
-    console.log('rendering persistLogin')
-
-
     const [persist] = usePersist()
     const token = useSelector(selectCurrentToken)
     const effectRan = useRef(false)
@@ -31,10 +28,9 @@ const PersistLogin = () => {
         if (effectRan.current === true || process.env.NODE_ENV !== 'development') { // React 18 Strict Mode
 
             const verifyRefreshToken = async () => {
-                // console.log('verifying refresh token')
                 try {
                     //const response = 
-                    await refresh()
+                    await refresh().unwrap()
                     //const { accessToken } = response.data
                     setTrueSuccess(true)
                 }
@@ -66,10 +62,7 @@ const PersistLogin = () => {
         content = (
             <Navigate to="/auth" state={{from: location}} replace/>
 
-            // <p className='errmsg'>
-            //     {`${error?.data?.message} - `}
-            //     <Link to="/auth">Please login again</Link>.
-            // </p>
+        
         )
     } else if (isSuccess && trueSuccess) { //persist: yes, token: yes
         // console.log('success')

@@ -1,8 +1,6 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
-
 const { connect } = require("getstream");
-
 const api_key = process.env.STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
 const app_id = process.env.STREAM_APP_ID;
@@ -38,6 +36,93 @@ const loggedInUser = async (req, res) => {
 	}
 };
 
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { name, username, bio, avatar } = req.body;
+        // console.log(req.body);
+
+        // Check if the new username already exists (excluding the current user)
+        if (username) {
+            const existingUser = await User.findOne({
+                username,
+                _id: { $ne: userId },
+            });
+            if (existingUser) {
+                return res.status(400).json({ message: "Username already exists" });
+            }
+        }
+
+        // Prepare the update object
+        const updateObject = {};
+        if (name) updateObject.name = name;
+        if (username) updateObject.username = username;
+        if (bio) updateObject.bio = bio;
+        if (avatar) {
+            // If avatar is an array, take the last element (which should be the Firebase URL)
+            updateObject.avatar = Array.isArray(avatar) ? avatar[avatar.length - 1] : avatar;
+        }
+
+		console.log(updateObject)
+
+        // Find the user and update their profile
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            updateObject,
+            { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json(updatedUser);
+    } catch (error) {
+        console.error("Profile update error:", error);
+        if (error.name === "ValidationError") {
+            return res
+                .status(400)
+                .json({ message: "Validation error", error: error.message });
+        }
+        res
+            .status(500)
+            .json({ message: "Error updating profile", error: error.message });
+    }
+};
+const changePassword = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const { currentPassword, newPassword } = req.body;
+
+		// Find the user
+		const user = await User.findById(userId).select("+password");
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		// Check if the current password is correct
+		const isMatch = await bcrypt.compare(currentPassword, user.password);
+		if (!isMatch) {
+			return res.status(400).json({ message: "Current password is incorrect" });
+		}
+
+		// Hash the new password
+		const salt = await bcrypt.genSalt(10);
+		const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+		// Update the user's password
+		user.password = hashedPassword;
+		await user.save();
+
+		res.json({ message: "Password updated successfully" });
+	} catch (error) {
+		console.error("Password change error:", error);
+		res
+			.status(500)
+			.json({ message: "Error changing password", error: error.message });
+	}
+};
+
 const videocall = async (req, res) => {
 	try {
 		const { api_key, user_id } = req.query;
@@ -52,4 +137,10 @@ const videocall = async (req, res) => {
 	}
 };
 
-module.exports = {createUsername, loggedInUser, videocall };
+module.exports = {
+	createUsername,
+	loggedInUser,
+	videocall,
+	updateProfile,
+	changePassword,
+};

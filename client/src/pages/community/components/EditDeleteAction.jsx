@@ -41,7 +41,7 @@ const EditDeleteAction = ({ type, itemId }) => {
 					alt="Edit"
 					width={14}
 					height={14}
-					className="cursor-pointer object-contain"
+					className="cursor-pointer object-contain hover:scale-125"
 					onClick={handleEdit}
 				/>
 			)}
@@ -51,7 +51,7 @@ const EditDeleteAction = ({ type, itemId }) => {
 				alt="Delete"
 				width={14}
 				height={14}
-				className="cursor-pointer object-contain"
+				className="cursor-pointer object-contain hover:scale-125"
 				onClick={handleDelete}
 			/>
 		</div>

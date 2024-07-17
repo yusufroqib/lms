@@ -39,6 +39,8 @@ const StudyIndex = () => {
 				isError,
 			}),
 		});
+		
+		console.log(course)
 
 	useEffect(() => {
 		if (course && isSuccess) {

@@ -133,7 +133,11 @@ const signUp = async (req, res) => {
 		if (existingUsername)
 			return res.status(400).json({ error: "Username already taken" });
 
-		const hashedPassword = await bcrypt.hash(password, 12);
+		const salt = await bcrypt.genSalt(10);
+
+
+		const hashedPassword = await bcrypt.hash(password, salt);
+		// const hashedPassword = await bcrypt.hash(password, 12);
 		const user = { name, username, email, password: hashedPassword };
 
 		const activationToken = createActivationToken(user);
@@ -299,8 +303,10 @@ const passwordResetConfirmed = async (req, res) => {
 		}
 
 		const { email } = decoded.user;
+		const salt = await bcrypt.genSalt(10);
 
-		const hashedPassword = await bcrypt.hash(password, 12);
+		// const hashedPassword = await bcrypt.hash(password, 12);
+		const hashedPassword = await bcrypt.hash(password, salt);
 
 		const user = await User.findOneAndUpdate(
 			{ email },
@@ -482,4 +488,5 @@ module.exports = {
 	passwordReset,
 	confirmPasswordResetOTP,
 	passwordResetConfirmed,
+	
 };

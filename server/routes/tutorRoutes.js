@@ -6,13 +6,23 @@ const {
 	updateCourseCategory,
 	createChapter,
 	reorderChapters,
-    updateChapter,
-    addAttachmentToChapter,
-    deleteAttachmentFromChapter,
-    deleteChapter,
-    toggleChapterPublicationStatus,
-    toggleCoursePublicationStatus,
-    deleteCourse
+	updateChapter,
+	addAttachmentToChapter,
+	deleteAttachmentFromChapter,
+	deleteChapter,
+	toggleChapterPublicationStatus,
+	toggleCoursePublicationStatus,
+	deleteCourse,
+	getTutorStats,
+	getTutorTopCourses,
+	getTutorEarnings,
+	getTutorCoursesSold,
+	createOrRefreshStripeConnectAccount,
+	completeStripeConnectOnboarding,
+	getTutorBalance,
+	initiatePayout,
+	getTransactionHistory,
+	getPayoutDetails,
 } = require("../controllers/tutorController");
 const express = require("express");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -28,12 +38,60 @@ router.get(
 	verifyRoles(Admin, Tutor),
 	getAllTutorCourses
 );
+router.get("/stats", verifyJWT, verifyRoles(Admin, Tutor), getTutorStats);
+router.get(
+	"/top-courses",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	getTutorTopCourses
+);
+router.get("/earnings", verifyJWT, verifyRoles(Admin, Tutor), getTutorEarnings);
+router.get("/balance", verifyJWT, verifyRoles(Admin, Tutor), getTutorBalance);
+router.get(
+	"/payout-details",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	getPayoutDetails
+);
+router.get(
+	"/transactions-history",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	getTransactionHistory
+);
+router.get(
+	"/course-transactions",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	getTutorCoursesSold
+);
 router.put(
 	"/edit-course/:id",
 	verifyJWT,
 	verifyRoles(Admin, Tutor),
 	updateCourse
 );
+router.post(
+	"/initiate-payout",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	initiatePayout
+);
+
+router.post(
+	"/stripe-connect",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	createOrRefreshStripeConnectAccount
+);
+router.post(
+	"/stripe-connect/complete",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	completeStripeConnectOnboarding
+);
+
+// router.post("/stripe-connect/refresh", createOrRefreshStripeConnectAccount);
 router.delete(
 	"/edit-course/:id",
 	verifyJWT,
@@ -66,37 +124,37 @@ router.put(
 );
 
 router.put(
-    "/edit-course/:courseId/chapter/:chapterId",
-    verifyJWT,
-    verifyRoles(Admin, Tutor),
-    updateChapter
+	"/edit-course/:courseId/chapter/:chapterId",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	updateChapter
 );
 
 router.delete(
-    "/edit-course/:courseId/chapter/:chapterId",
-    verifyJWT,
-    verifyRoles(Admin, Tutor),
-    deleteChapter
+	"/edit-course/:courseId/chapter/:chapterId",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	deleteChapter
 );
 
 router.put(
-    "/edit-course/:courseId/chapter/:chapterId/toggle-publish",
-    verifyJWT,
-    verifyRoles(Admin, Tutor),
-    toggleChapterPublicationStatus
+	"/edit-course/:courseId/chapter/:chapterId/toggle-publish",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	toggleChapterPublicationStatus
 );
 
 router.put(
-    "/edit-course/:courseId/chapter/:chapterId/attachment",
-    verifyJWT,
-    verifyRoles(Admin, Tutor),
-    addAttachmentToChapter
+	"/edit-course/:courseId/chapter/:chapterId/attachment",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	addAttachmentToChapter
 );
 router.delete(
-    "/edit-course/:courseId/chapter/:chapterId/attachment",
-    verifyJWT,
-    verifyRoles(Admin, Tutor),
-    deleteAttachmentFromChapter
+	"/edit-course/:courseId/chapter/:chapterId/attachment",
+	verifyJWT,
+	verifyRoles(Admin, Tutor),
+	deleteAttachmentFromChapter
 );
 
 module.exports = router;

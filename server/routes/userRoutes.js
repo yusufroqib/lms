@@ -1,10 +1,14 @@
 const express = require("express");
-const {createUsername, loggedInUser, videocall } = require("../controllers/userController");
+const multer = require('multer');
+const upload = multer();
+const {createUsername, loggedInUser, videocall, updateProfile, changePassword } = require("../controllers/userController");
 const verifyJWT = require("../middleware/verifyJWT");
 const router = express.Router();
 
 router.get("/me", verifyJWT, loggedInUser);
 router.put("/username", verifyJWT, createUsername);
+router.patch("/profile", verifyJWT, upload.none(), updateProfile);
+router.post("/change-password", verifyJWT, changePassword);
 router.get("/videocall",  videocall);
 
 

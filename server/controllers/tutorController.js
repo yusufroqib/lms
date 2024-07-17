@@ -1,7 +1,10 @@
 const Course = require("../models/CourseModel");
 const Category = require("../models/CategoryModel");
 const Classroom = require("../models/ClassroomModel");
+const User = require("../models/userModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
+const { default: mongoose } = require("mongoose");
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 //Get all courses categories
 const getCategories = async (req, res) => {
@@ -94,7 +97,7 @@ const updateCourse = async (req, res) => {
 
 		res.status(200).json({ course: updatedCourse });
 	} catch (error) {
-		console.log(error)
+		console.log(error);
 		res.status(500).json({ message: error.message });
 	}
 };
@@ -542,6 +545,424 @@ const deleteCourse = async (req, res) => {
 	}
 };
 
+const getTutorStats = async (req, res) => {
+	try {
+		const { userId: tutorId } = req;
+
+		// Find all courses by the tutor
+		const courses = await Course.find({ tutor: tutorId });
+
+		// Calculate statistics
+		let totalEarnings = 0;
+		let publishedCoursesCount = 0;
+		let coursesSoldCount = 0;
+		const uniqueStudents = new Set();
+
+		courses.forEach((course) => {
+			// Total earnings
+			totalEarnings += course.purchasedBy.reduce(
+				(sum, purchase) => sum + purchase.amount,
+				0
+			);
+
+			// Published courses count
+			if (course.isPublished) {
+				publishedCoursesCount++;
+			}
+
+			// Courses sold count and unique students
+			course.purchasedBy.forEach((purchase) => {
+				coursesSoldCount++;
+				uniqueStudents.add(purchase.user.toString());
+			});
+		});
+
+		// Prepare the response
+		const stats = {
+			totalEarnings,
+			publishedCoursesCount,
+			coursesSoldCount,
+			totalUniqueStudents: uniqueStudents.size,
+		};
+
+		res.json(stats);
+	} catch (error) {
+		console.error("Error fetching tutor stats:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+const getTutorTopCourses = async (req, res) => {
+	try {
+		const { userId: tutorId } = req;
+
+		const topCourses = await Course.aggregate([
+			{
+				$match: {
+					tutor: new mongoose.Types.ObjectId(tutorId),
+					isPublished: true, // Only include published courses
+				},
+			},
+			{
+				$addFields: {
+					salesCount: {
+						$cond: {
+							if: { $isArray: "$purchasedBy" },
+							then: { $size: "$purchasedBy" },
+							else: 0,
+						},
+					},
+					totalValue: {
+						$cond: {
+							if: { $isArray: "$purchasedBy" },
+							then: {
+								$reduce: {
+									input: "$purchasedBy",
+									initialValue: 0,
+									in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] },
+								},
+							},
+							else: 0,
+						},
+					},
+				},
+			},
+			{
+				$sort: { totalValue: -1 },
+			},
+			{
+				$limit: 5,
+			},
+			{
+				$project: {
+					_id: 1,
+					title: 1,
+					courseImage: 1,
+					price: 1,
+					salesCount: 1,
+					totalValue: 1,
+				},
+			},
+		]);
+
+		res.json(topCourses);
+	} catch (error) {
+		console.error("Error fetching top courses for tutor:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+const createOrRefreshStripeConnectAccount = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		if (!user.stripeAccountId) {
+			const account = await stripe.accounts.create({
+				type: "express",
+				country: "US", // Change this based on your requirements
+				email: user.email,
+				capabilities: {
+					card_payments: { requested: true },
+					transfers: { requested: true },
+				},
+			});
+
+			user.stripeAccountId = account.id;
+			await user.save();
+		}
+
+		const accountLink = await stripe.accountLinks.create({
+			account: user.stripeAccountId,
+			refresh_url: `${process.env.CLIENT_URL}/tutors/stripe-connect/refresh`,
+			return_url: `${process.env.CLIENT_URL}/tutors/stripe-connect/complete`,
+			type: "account_onboarding",
+		});
+
+		res.json({ url: accountLink.url });
+	} catch (error) {
+		console.error("[CREATE_OR_REFRESH_STRIPE_CONNECT_ACCOUNT]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const completeStripeConnectOnboarding = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		if (!user.stripeAccountId) {
+			return res
+				.status(400)
+				.json({ message: "No Stripe account found for this user" });
+		}
+
+		// Retrieve the account to check its status
+		const account = await stripe.accounts.retrieve(user.stripeAccountId);
+
+		if (account.details_submitted) {
+			// The account setup is complete
+			user.stripeOnboardingComplete = true;
+			await user.save();
+
+			res.json({ message: "Stripe account setup completed successfully" });
+		} else {
+			// The account setup is not complete
+			res.status(400).json({ message: "Stripe account setup is not complete" });
+		}
+	} catch (error) {
+		console.error("[COMPLETE_STRIPE_CONNECT_ONBOARDING]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const getTutorBalance = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		if (!user.stripeAccountId) {
+			return res.status(400).json({ message: "No connected Stripe account" });
+		}
+
+		const balance = await stripe.balance.retrieve({
+			stripeAccount: user.stripeAccountId,
+		});
+
+		res.json(balance);
+	} catch (error) {
+		console.error("[GET_TUTOR_BALANCE]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const getPayoutDetails = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		if (!user.stripeAccountId) {
+			return res
+				.status(400)
+				.json({ message: "No Stripe account found for this user" });
+		}
+
+		// Retrieve the balance from Stripe
+		const balance = await stripe.balance.retrieve({
+			stripeAccount: user.stripeAccountId,
+		});
+
+		// Get the available balance in the default currency (usually USD)
+		const availableBalance =
+			balance.available.find((bal) => bal.currency === "usd").amount / 100;
+
+		// Retrieve the default bank account (assuming the user has set one up)
+		const bankAccounts = await stripe.accounts.listExternalAccounts(
+			user.stripeAccountId,
+			{ object: "bank_account", limit: 1 }
+		);
+
+		let bankAccount = null;
+		if (bankAccounts.data.length > 0) {
+			const { last4, bank_name } = bankAccounts.data[0];
+			bankAccount = { last4, bank_name };
+		}
+
+		res.json({ availableBalance, bankAccount });
+	} catch (error) {
+		console.error("[GET_PAYOUT_DETAILS]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const initiatePayout = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const { amount } = req.body;
+		const user = await User.findById(userId);
+
+		if (!user.stripeAccountId) {
+			return res
+				.status(400)
+				.json({ message: "No Stripe account found for this user" });
+		}
+
+		// Create a payout
+		const payout = await stripe.payouts.create(
+			{
+				amount: Math.round(amount * 100), // Convert to cents
+				currency: "usd",
+			},
+			{
+				stripeAccount: user.stripeAccountId,
+			}
+		);
+
+		res.json({ message: "Payout initiated successfully", payoutId: payout.id });
+	} catch (error) {
+		console.error("[INITIATE_PAYOUT]", error);
+		res.status(500).json({ message: "Failed to initiate payout" });
+	}
+};
+
+const getTransactionHistory = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const user = await User.findById(userId).populate("transactions.courseId");
+
+		res.json(user.transactions);
+	} catch (error) {
+		console.error("[GET_TRANSACTION_HISTORY]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+const getTutorEarnings = async (req, res) => {
+	try {
+		const { userId: tutorId } = req;
+		const { startDate, endDate } = req.query;
+
+		// console.log('Incoming startDate:', startDate);
+		// console.log('Incoming endDate:', endDate);
+
+		if (!mongoose.Types.ObjectId.isValid(tutorId)) {
+			return res.status(400).json({ error: "Invalid tutor ID" });
+		}
+
+		let startDateTime, endDateTime;
+
+		if (startDate && endDate) {
+			try {
+				startDateTime = new Date(startDate);
+				endDateTime = new Date(endDate);
+
+				// Check if the dates are valid
+				if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+					throw new Error("Invalid dates");
+				}
+			} catch (e) {
+				console.error("Date parsing error:", e.message);
+				// If dates are invalid, default to last 30 days
+				endDateTime = new Date();
+				startDateTime = new Date(endDateTime);
+				startDateTime.setDate(startDateTime.getDate() - 30);
+			}
+		} else {
+			// If dates are not provided, default to last 30 days
+			endDateTime = new Date();
+			startDateTime = new Date(endDateTime);
+			startDateTime.setDate(startDateTime.getDate() - 30);
+		}
+
+		// console.log("Final startDateTime:", startDateTime);
+		// console.log("Final endDateTime:", endDateTime);
+
+		const courses = await Course.aggregate([
+			{
+				$match: {
+					tutor: new mongoose.Types.ObjectId(tutorId),
+				},
+			},
+			{
+				$unwind: "$purchasedBy",
+			},
+			{
+				$match: {
+					"purchasedBy.date": {
+						$gte: startDateTime,
+						$lte: endDateTime,
+					},
+				},
+			},
+			{
+				$group: {
+					_id: {
+						date: {
+							$dateToString: { format: "%Y-%m-%d", date: "$purchasedBy.date" },
+						},
+						course: "$title",
+					},
+					earnings: { $sum: "$purchasedBy.amount" },
+				},
+			},
+			{
+				$group: {
+					_id: "$_id.date",
+					courseEarnings: {
+						$push: {
+							course: "$_id.course",
+							earnings: "$earnings",
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					date: "$_id",
+					courseEarnings: {
+						$arrayToObject: {
+							$map: {
+								input: "$courseEarnings",
+								as: "earning",
+								in: ["$$earning.course", "$$earning.earnings"],
+							},
+						},
+					},
+				},
+			},
+			{
+				$sort: { date: 1 },
+			},
+		]);
+
+		res.json(courses);
+	} catch (error) {
+		console.error("Error fetching tutor earnings:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+const getTutorCoursesSold = async (req, res) => {
+	try {
+		const { userId: tutorId } = req;
+
+		// Find courses by the tutor
+		const courses = await Course.find({ tutor: tutorId })
+			.populate("purchasedBy.user", "name email") // Populate student name and email
+			.exec();
+
+		// Prepare the transaction history data
+		const transactionHistory = courses.flatMap((course) =>
+			course.purchasedBy.map((purchase) => ({
+				courseTitle: course.title,
+				coursePrice: course.price,
+				studentName: purchase.user.name,
+				studentEmail: purchase.user.email,
+				amount: purchase.amount,
+				date: purchase.date,
+			}))
+		);
+
+		// Sort the transaction history by date in descending order
+		transactionHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+		// console.log(transactionHistory);
+
+		res.json(transactionHistory);
+	} catch (error) {
+		console.error("[GET_TUTOR_TRANSACTION_HISTORY]", error);
+		res.status(500).json({ message: "Internal server error" });
+	}
+};
+
 module.exports = {
 	createTitle,
 	getAllTutorCourses,
@@ -556,5 +977,15 @@ module.exports = {
 	deleteChapter,
 	toggleChapterPublicationStatus,
 	toggleCoursePublicationStatus,
+	createOrRefreshStripeConnectAccount,
+	completeStripeConnectOnboarding,
+	getTutorBalance,
+	getPayoutDetails,
+	initiatePayout,
+	getTransactionHistory,
 	deleteCourse,
+	getTutorStats,
+	getTutorTopCourses,
+	getTutorEarnings,
+	getTutorCoursesSold,
 };
