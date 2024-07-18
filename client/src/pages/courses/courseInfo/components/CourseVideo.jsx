@@ -1,7 +1,7 @@
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePurchaseCourseMutation } from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -27,10 +27,12 @@ const CourseVideo = ({
 
 	useEffect(() => {
 		setCanStudy(isPurchased || _id === tutorId);
-	}, [_id, tutorId]);
+	}, [_id, tutorId, isPurchased]);
 
 	// console.log(courseId);
 	const handlePurchase = async () => {
+		if (canStudy) return;
+
 		try {
 			const response = await purchaseCourse({ courseId }).unwrap();
 			window.location.assign(response.url);
