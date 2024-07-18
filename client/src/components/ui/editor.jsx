@@ -1,5 +1,7 @@
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import Editor from "ckeditor5-custom-build";
+// import Editor from "ckeditor5-custom-build";
+import  "../../../ckeditor5/build/ckeditor"
+
 
 import React from "react";
 
@@ -131,7 +133,7 @@ function RTEditor({ name, value, setValue, editorRef, field }) {
 	return (
 		<CKEditor
 			className="min-h-200"
-			editor={Editor}
+			editor={ClassicEditor}
 			data={value}
 			config={editorConfig}
 			onReady={(editor) => {
