@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { setAuthScreen } from "@/features/authScreenSlice";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/features/auth/authApiSlice";
 import { setCredentials } from "@/features/auth/authSlice";
 import toast from "react-hot-toast";
@@ -126,11 +126,13 @@ const Login = () => {
 	return (
 		<div className="flex flex-col bg-[#dfdfe6] justify-center items-center min-h-screen ">
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
-				<img
-					className="w-80 mb-6"
-					src="/learniverse-full.svg"
-					alt="learniverse-full"
-				/>
+				<Link to="/">
+					<img
+						className="w-80 mb-6"
+						src="/learniverse-full.svg"
+						alt="learniverse-full"
+					/>
+				</Link>
 				<div className="w-full px-6 py-6 bg-white dark:bg-gray-900 shadow-md rounded-md sm:rounded-lg max-w-sm">
 					<div className="text-center text-4xl font-bold mb-3">
 						<h1 className=" text-slate-600">Login</h1>
@@ -146,7 +148,6 @@ const Login = () => {
 							<div className="flex flex-col items-start">
 								<input
 									type="text"
-									
 									name="username"
 									placeholder="Email or Username"
 									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"

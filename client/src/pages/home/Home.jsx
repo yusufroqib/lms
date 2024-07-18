@@ -25,14 +25,23 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import { useDispatch } from "react-redux";
+import { setAuthScreen } from "@/features/authScreenSlice";
 
 export default function Home() {
+	const dispatch = useDispatch();
+	const isLogin = localStorage.getItem("isLogin");
+
+	const handleRegister = () => {
+		dispatch(setAuthScreen("signup"));
+		// navigate("/auth");
+	};
 
 	return (
 		<div className="flex flex-col min-h-[100dvh] bg-gray-200 ">
-			<Navbar/>
+			<Navbar />
 			{/* <header className="bg-background sticky top-0 z-50 border-b">
 				<div className="container flex items-center justify-between py-4 px-4 md:px-6">
 					<Link to="#" className="flex items-center gap-2" prefetch={false}>
@@ -77,29 +86,48 @@ export default function Home() {
 				</div>
 			</header> */}
 			<main className="flex-1 ">
-				<section className="bg-muted py-12 md:py-24 lg:py-32">
+				<section className="bg-muted py-10 md:py-12 lg:py-20">
 					<div className="container grid md:grid-cols-2 gap-8 items-center mx-auto">
-						<div className="space-y-4">
-							<h1 className="text-4xl font-bold text-gray-800">
+						<div className="space-y-4 max-md:text-center">
+							<h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-800">
 								Empower Your Learning Community
 							</h1>
-							<p className="text-gray-800 text-lg">
+							<p className="text-gray-800 text-lg lg:text-xl xl:text-2xl">
 								Discover a comprehensive LMS platform that fosters engagement,
 								collaboration, and personalized learning experiences.
 							</p>
-							<div className="flex gap-4">
-								<Button
-									variant="solid"
-									className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-								>
-									Get Started
-								</Button>
-								<Button
+							<div className=" gap-4 max-md:mx-auto">
+								{!(isLogin === "true") ? (
+									<Link to="/auth" onClick={handleRegister}>
+										<Button
+											variant="success"
+											size="lg"
+											className={"lg:h-14 text-lg lg:text-xl"}
+											// className="text-primary hover:bg-primary-foreground/90"
+										>
+											Get Started
+										</Button>
+									</Link>
+								) : (
+									<nav className=" max-md:mx-auto gap-6">
+										{/* <div className="grid gap-2 py-6"> */}
+										<Link to="/dashboard">
+											<Button
+												size="lg"
+												className={"lg:h-14 text-lg lg:text-xl"}
+												variant={"default"}
+											>
+												Dashboard
+											</Button>
+										</Link>
+									</nav>
+								)}
+								{/* <Button
 									variant="outline"
 									className="text-primary-foreground border-primary-foreground hover:bg-primary-foreground/10"
 								>
 									Learn More
-								</Button>
+								</Button> */}
 							</div>
 						</div>
 						<img
@@ -141,8 +169,9 @@ export default function Home() {
 										Unlock Knowledge, Master Skills
 									</h3>
 									<p className="text-muted-foreground text-center">
-									Discover a diverse range of courses from top tutors and enjoy a seamless learning experience with our user-friendly
-									platform.
+										Discover a diverse range of courses from top tutors and
+										enjoy a seamless learning experience with our user-friendly
+										platform.
 									</p>
 								</CardContent>
 							</Card>
@@ -256,8 +285,11 @@ export default function Home() {
 			<footer className="bg-muted py-6 md:py-8">
 				<div className="container flex flex-col md:flex-row items-center justify-between gap-4">
 					<div className="flex items-center gap-2">
-						<CloudyIcon className="h-12 w-12 text-blue-500" />
-						<span className="font-bold text-lg">LMS Platform</span>
+						<img
+							className="w-60 "
+							src="/learniverse-full.svg"
+							alt="learniverse-full"
+						/>
 					</div>
 					<nav className="flex items-center gap-4 md:gap-6">
 						<Link
@@ -283,7 +315,7 @@ export default function Home() {
 						</Link>
 					</nav>
 					<p className="text-xs text-muted-foreground">
-						&copy; 2024 LMS Platform. All rights reserved.
+						&copy; 2024 Learniverse. All rights reserved.
 					</p>
 				</div>
 			</footer>
