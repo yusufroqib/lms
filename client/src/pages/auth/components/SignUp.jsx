@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 // import { Button } from "@material-tailwind/react";
 import { setAuthScreen } from "@/features/authScreenSlice";
 import { useSignUpMutation } from "@/features/auth/authApiSlice";
-import { setSignUpToken } from "@/features/auth/authSlice";
+import { setSignUpEmail, setSignUpToken } from "@/features/auth/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import GoogleButton from "./GoogleButton";
@@ -32,6 +32,8 @@ const SignUp = () => {
 			const { activationToken } = await signUp(data).unwrap();
 			// console.log(res)
 			dispatch(setSignUpToken({ activationToken }));
+			dispatch(setSignUpEmail({signUpEmail: data.email}))
+
 			// console.log(activationToken);
 			setData({
 				...data,

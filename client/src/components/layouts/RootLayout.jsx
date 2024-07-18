@@ -29,7 +29,7 @@ const RootLayout = () => {
 						)}
 
 						<main className="flex flex-1">
-							<div className="w-full">
+							<div className="w-full bg-white">
 								<Outlet /> {/* Render nested child routes */}
 							</div>
 						
