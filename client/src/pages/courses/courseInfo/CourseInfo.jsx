@@ -165,6 +165,8 @@ const CourseInfo = () => {
 										courseId={course._id}
 										isPurchased={isPurchased}
 										firstChapter={course.chapters[0]}
+										tutorId={course.tutor._id}
+
 									/>
 								</div>
 							)}
