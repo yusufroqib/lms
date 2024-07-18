@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
 const { connect } = require("getstream");
 const api_key = process.env.STREAM_API_KEY;
