@@ -15,7 +15,8 @@ import DatePicker from "react-datepicker";
 import { format, subDays, addDays } from "date-fns";
 import { useGetTutorEarningsQuery } from "@/features/courses/coursesApiSlice";
 import { CustomInput } from "./CustomInput";
-
+const TUTOR_SHARE = import.meta.env.VITE_TUTOR_SHARE
+// console.log(TUTOR_SHARE)
 const TutorEarningsChart = ({ tutorId }) => {
 	const [dateRange, setDateRange] = useState([
 		subDays(new Date(), 30),
@@ -64,7 +65,7 @@ const TutorEarningsChart = ({ tutorId }) => {
 			const courseEarnings = {};
 			Object.keys(item.courseEarnings).forEach((courseTitle) => {
 				courseEarnings[truncateText(courseTitle)] =
-					item.courseEarnings[courseTitle];
+					item.courseEarnings[courseTitle] * Number(TUTOR_SHARE);
 			});
 			return {
 				date: item.date,

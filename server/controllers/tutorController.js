@@ -653,41 +653,41 @@ const getTutorTopCourses = async (req, res) => {
 };
 const generateStripeAccountLink = async (req, res) => {
 	try {
-	  const userId = req.userId;
-	  const user = await User.findById(userId);
-  
-	  let stripeAccountId = user.stripeAccountId;
-  
-	  if (!stripeAccountId) {
-		// Create a new account if it doesn't exist
-		const account = await stripe.accounts.create({
-		  type: 'express',
-		  country: 'US', // Change as needed
-		  email: user.email,
-		  capabilities: {
-			card_payments: {requested: true},
-			transfers: {requested: true},
-		  },
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		let stripeAccountId = user.stripeAccountId;
+
+		if (!stripeAccountId) {
+			// Create a new account if it doesn't exist
+			const account = await stripe.accounts.create({
+				type: "express",
+				country: "US", // Change as needed
+				email: user.email,
+				capabilities: {
+					card_payments: { requested: true },
+					transfers: { requested: true },
+				},
+			});
+
+			stripeAccountId = account.id;
+			user.stripeAccountId = stripeAccountId;
+			await user.save();
+		}
+
+		const accountLink = await stripe.accountLinks.create({
+			account: stripeAccountId,
+			refresh_url: `${process.env.CLIENT_URL}/tutors/stripe-connect/refresh`,
+			return_url: `${process.env.CLIENT_URL}/tutors/stripe-connect/complete`,
+			type: "account_onboarding",
 		});
-  
-		stripeAccountId = account.id;
-		user.stripeAccountId = stripeAccountId;
-		await user.save();
-	  }
-  
-	  const accountLink = await stripe.accountLinks.create({
-		account: stripeAccountId,
-		refresh_url: `${process.env.CLIENT_URL}/tutors/stripe-account/refresh`,
-		return_url: `${process.env.CLIENT_URL}/tutors/stripe-account/complete`,
-		type: 'account_onboarding',
-	  });
-  
-	  res.json({ url: accountLink.url });
+
+		res.json({ url: accountLink.url });
 	} catch (error) {
-	  console.error('[GENERATE_STRIPE_ACCOUNT_LINK]', error);
-	  res.status(500).json({ message: 'Internal server error' });
+		console.error("[GENERATE_STRIPE_ACCOUNT_LINK]", error);
+		res.status(500).json({ message: "Internal server error" });
 	}
-  };
+};
 const completeStripeConnectOnboarding = async (req, res) => {
 	try {
 		const userId = req.userId;
@@ -804,6 +804,18 @@ const initiatePayout = async (req, res) => {
 			}
 		);
 
+		user.transactions.push({
+			type: "payout",
+			amount: payout.amount / 100, // Convert cents to dollars
+			stripeTransactionId: payout.id,
+			status: "initiated",
+			createdAt: new Date(payout.created * 1000), // Convert Unix timestamp to Date
+		});
+
+		await user.save();
+
+		console.log("payout initiated", payout);
+
 		res.json({ message: "Payout initiated successfully", payoutId: payout.id });
 	} catch (error) {
 		console.error("[INITIATE_PAYOUT]", error);
@@ -827,9 +839,6 @@ const getTutorEarnings = async (req, res) => {
 	try {
 		const { userId: tutorId } = req;
 		const { startDate, endDate } = req.query;
-
-		// console.log('Incoming startDate:', startDate);
-		// console.log('Incoming endDate:', endDate);
 
 		if (!mongoose.Types.ObjectId.isValid(tutorId)) {
 			return res.status(400).json({ error: "Invalid tutor ID" });

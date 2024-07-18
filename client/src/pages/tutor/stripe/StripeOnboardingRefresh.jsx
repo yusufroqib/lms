@@ -23,7 +23,7 @@ const StripeOnboardingRefresh = () => {
 	}, []);
 
 	return (
-		<div className="min-h-full flex justify-center items-center">
+		<div className="min-h-full flex justify-center items-center text-lg">
 			Refreshing your onboarding link...
 		</div>
 	);

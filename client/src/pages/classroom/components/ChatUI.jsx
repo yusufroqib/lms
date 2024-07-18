@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Channel, Window, MessageList, MessageInput, useChatContext, useChannelStateContext, MESSAGE_ACTIONS, } from 'stream-chat-react';
 import { IconButton, Icon } from '@stream-io/video-react-sdk';
-const CHANNEL_TYPE = 'videocall';
+const CHANNEL_TYPE = 'vidcall';
 const ALLOWED_MESSAGE_ACTIONS = [
     MESSAGE_ACTIONS.edit,
     MESSAGE_ACTIONS.delete,

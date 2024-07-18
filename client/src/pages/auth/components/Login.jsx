@@ -1,17 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-// import { Button } from "@material-tailwind/react";
 import { setAuthScreen } from "@/features/authScreenSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/features/auth/authApiSlice";
 import { setCredentials } from "@/features/auth/authSlice";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import GoogleButton from "./GoogleButton";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-
 
 const Login = () => {
 	const dispatch = useDispatch();
@@ -36,7 +33,6 @@ const Login = () => {
 	};
 
 	const validatePassword = (value) => {
-		// Perform password validation here
 		const isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value);
 		setIsValidPassword(isValid);
 	};
@@ -48,7 +44,7 @@ const Login = () => {
 			password: e.target.value,
 		});
 		setPwd(value);
-		validatePassword(value); // Call validatePassword function
+		validatePassword(value);
 	};
 
 	const handleInputFocus = () => {
@@ -56,8 +52,12 @@ const Login = () => {
 			errorMessageRef.current.style.display = "none";
 		}
 	};
-	
-	
+
+	useEffect(() => {
+		if (inputRef.current) {
+			inputRef.current.focus();
+		}
+	}, []);
 
 	useEffect(() => {
 		if (!inputRef.current) return;
@@ -83,22 +83,18 @@ const Login = () => {
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		try {
-			const { accessToken,  } = await 
-				login(data).unwrap()
-			// console.log(res)
+			const { accessToken } = await login(data).unwrap();
 			dispatch(setCredentials({ accessToken }));
-			// dispatch(setLoggedUser({loggedUser}))
-			// console.log(loggedUser);
+			localStorage.setItem("isLogin", "true");
 			navigate(from, { replace: true });
 			setData({
 				...data,
 				user: "",
 				password: "",
 			});
-			// navigate('/dash')
 		} catch (err) {
-			console.log(err)
-			toast.error(err.data?.error || err.data?.message)
+			console.log(err);
+			toast.error(err.data?.error || err.data?.message);
 			if (!err.status) {
 				console.log("No Server Response");
 			} else if (err.status === 400) {
@@ -108,7 +104,6 @@ const Login = () => {
 			} else {
 				console.log(err.data?.message);
 			}
-			// errRef.current.focus();
 		}
 	};
 
@@ -117,14 +112,14 @@ const Login = () => {
 	if (isLoading) {
 		buttonText = (
 			<>
-				<Loader2 key="loader" className="mr-2 h-4 w-4 animate-spin" /> Logging in
+				<Loader2 key="loader" className="mr-2 h-4 w-4 animate-spin" /> Logging
+				in
 			</>
 		);
 	}
 
 	const { ...allData } = data;
 
-	// Disable submit button until all fields are filled in
 	const canSubmit =
 		[...Object.values(allData)].every(Boolean) && isValidPassword;
 
@@ -151,10 +146,11 @@ const Login = () => {
 							<div className="flex flex-col items-start">
 								<input
 									type="text"
+									
 									name="username"
 									placeholder="Email or Username"
 									className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 placeholder-gray-300 valid:[&:not(:placeholder-shown)]:border-green-500 [&:not(:placeholder-shown):not(:focus):invalid~span]:block invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-400"
-									// autoComplete="off"
+									ref={inputRef}
 									required
 									pattern="^(?!\s+$).{3,}$"
 									onChange={(e) => {
@@ -189,7 +185,6 @@ const Login = () => {
 										} ${
 											pwd.length > 0 && isValidPassword && "border-green-500"
 										}`}
-										ref={inputRef}
 										autoComplete="off"
 										onFocus={handleInputFocus}
 										required
@@ -229,6 +224,7 @@ const Login = () => {
 							>
 								{buttonText}
 							</Button>
+							{/* </Button> */}
 						</div>
 					</form>
 					<div className="mt-4 text-zinc-600 text-md dark:text-zinc-300">
@@ -246,7 +242,7 @@ const Login = () => {
 						<hr className="w-full h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 					</div>
 					<div className="my-6 space-y-2">
-				<GoogleButton/>
+						<GoogleButton />
 					</div>
 				</div>
 			</div>

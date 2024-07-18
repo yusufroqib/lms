@@ -33,6 +33,7 @@ const userSchema = new Schema(
 					enum: ["purchase", "payout"],
 				},
 				amount: Number,
+				status: String,
 				courseId: { type: Schema.Types.ObjectId, ref: "Course" },
 				stripeTransactionId: String,
 				createdAt: { type: Date, default: Date.now },

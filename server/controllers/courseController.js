@@ -141,7 +141,7 @@ const purchaseCourse = async (req, res) => {
 	}
 };
 
-const handleStripeWebhook = async (req, res, next) => {
+const handleStripeWebhook = async (req, res) => {
 	try {
 		const { body, headers } = req;
 		const signature = headers["stripe-signature"];
@@ -154,6 +154,7 @@ const handleStripeWebhook = async (req, res, next) => {
 				process.env.STRIPE_WEBHOOK_SECRET
 			);
 		} catch (error) {
+			console.log(error);
 			return res.status(400).send(`Webhook Error: ${error.message}`);
 		}
 
@@ -161,11 +162,12 @@ const handleStripeWebhook = async (req, res, next) => {
 		const userId = session?.metadata?.userId;
 		const courseId = session?.metadata?.courseId;
 
-		const course = await Course.findById(courseId);
 		const courseClassroom = await Classroom.findOne({ course: courseId });
 		const client = createStreamChatClient();
 
 		const user = await User.findById(userId);
+
+		// console.log(event.type);
 
 		if (event.type === "checkout.session.completed") {
 			const session = event.data.object;
@@ -182,18 +184,6 @@ const handleStripeWebhook = async (req, res, next) => {
 			}
 
 			const totalAmount = course.price;
-			const platformFee = totalAmount * 0.10; // 10% platform fee
-			const tutorShare = totalAmount * 0.90; // 90% for the tutor
-
-			// Create a transfer to the tutor's Stripe account
-			const transfer = await stripe.transfers.create({
-				amount: Math.round(tutorShare * 100), // Convert to cents
-				currency: "usd",
-				destination: tutor.stripeAccountId,
-				transfer_group: `${course._id}-${session.id}`,
-			});
-
-			console.log("Transfer created:", transfer.id);
 
 			// Record the transaction for the student (purchase)
 			user.transactions.push({
@@ -201,17 +191,9 @@ const handleStripeWebhook = async (req, res, next) => {
 				amount: totalAmount,
 				courseId: course._id,
 				stripeTransactionId: session.id,
+				status: "completed",
 			});
 			await user.save();
-
-			// Record the transaction for the tutor (payout)
-			tutor.transactions.push({
-				type: "payout",
-				amount: tutorShare,
-				courseId: course._id,
-				stripeTransactionId: transfer.id,
-			});
-			await tutor.save();
 
 			// Update course and user as before
 			course.purchasedBy.push({ user: userId, amount: totalAmount });
@@ -221,20 +203,54 @@ const handleStripeWebhook = async (req, res, next) => {
 			await courseClassroom.save();
 
 			// Add the course to the enrolledCourses array in the user model
-
 			user.enrolledCourses.push({
 				course: courseId,
 				lastStudiedAt: new Date(),
 			});
 			await user.save();
 
-			// console.log("course", course)
-			// console.log("[User details]", user)
-
 			const channel = client.channel("messaging", courseId);
 			await channel.addMembers([
 				{ user_id: userId, channel_role: "channel_member" },
 			]);
+		} else if (
+			event.type === "payout.paid" ||
+			event.type === "payout.failed" ||
+			event.type === "payout.pending" ||
+			event.type === "payout.updated"
+		) {
+			const payout = event.data.object;
+			const status = payout.status;
+			const payoutId = payout.id;
+
+			// console.log("payout webhook", payout);
+
+			// Find the user with the transaction that has the payout ID
+			const user = await User.findOne({
+				"transactions.stripeTransactionId": payoutId,
+			});
+
+			// console.log("User found:", user ? user._id : "No user found");
+
+			if (user) {
+				// Find the existing transaction
+				const existingTransaction = user.transactions.find(
+					(transaction) => transaction.stripeTransactionId === payoutId
+				);
+
+				// console.log("Existing transaction:", existingTransaction);
+
+				if (existingTransaction) {
+					// Update the existing transaction
+					existingTransaction.status = status;
+				} else {
+					console.log("No existing transaction found, this shouldn't happen.");
+				}
+
+				await user.save();
+			} else {
+				console.log(`No user found with payout ID: ${payoutId}`);
+			}
 		} else {
 			return res
 				.status(200)
@@ -522,6 +538,86 @@ const getStudyTimeRecord = async (req, res) => {
 	}
 };
 
+const getReviews = async (req, res) => {
+	try {
+		const { courseId } = req.params;
+		const page = parseInt(req.query.page) || 1;
+		const limit = 10; // Number of reviews per page
+
+		const course = await Course.findById(courseId)
+			.populate({
+				path: "reviews.user",
+				select: "name avatar",
+			})
+			.select("reviews")
+			.slice("reviews", [(page - 1) * limit, limit]);
+
+		if (!course) {
+			return res.status(404).json({ message: "Course not found" });
+		}
+
+		const totalReviews = course.reviews.length;
+		const hasMore = totalReviews > page * limit;
+
+		res.json({
+			reviews: course.reviews,
+			hasMore,
+		});
+	} catch (error) {
+		console.error("Error fetching reviews:", error);
+		res.status(500).json({ message: "Server error" });
+	}
+};
+
+const addReview = async (req, res) => {
+	try {
+		const { courseId } = req.params;
+		const { rating, comment } = req.body;
+		const userId = req.userId;
+
+		const course = await Course.findById(courseId);
+		if (!course) {
+			return res.status(404).json({ message: "Course not found" });
+		}
+
+		// Check if user has purchased the course
+		const hasPurchased = course.purchasedBy.some(
+			(purchase) => purchase.user.toString() === userId.toString()
+		);
+		if (!hasPurchased) {
+			return res
+				.status(403)
+				.json({ message: "You must purchase the course to leave a review" });
+		}
+
+		// Check if user has already reviewed
+		const existingReview = course.reviews.find(
+			(review) => review.user.toString() === userId.toString()
+		);
+		if (existingReview) {
+			return res
+				.status(400)
+				.json({ message: "You have already reviewed this course" });
+		}
+
+		course.reviews.push({ user: userId, rating, comment });
+
+		// Update course average rating
+		const totalRatings = course.reviews.reduce(
+			(sum, review) => sum + review.rating,
+			0
+		);
+		course.ratings = totalRatings / course.reviews.length;
+
+		await course.save();
+
+		res.json({ message: "Review added successfully" });
+	} catch (error) {
+		console.error("Error adding review:", error);
+		res.status(500).json({ message: "Server error" });
+	}
+};
+
 module.exports = {
 	browseAllCourses,
 	purchaseCourse,
@@ -530,4 +626,6 @@ module.exports = {
 	updateChapterProgress,
 	recordStudyTime,
 	getStudyTimeRecord,
+	getReviews,
+	addReview,
 };

@@ -415,6 +415,7 @@ const login = async (req, res) => {
 						image: foundUser.avatar,
 						roles: roles,
 						streamToken: streamToken,
+						stripeAccountId: foundUser.stripeAccountId
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,

@@ -23,7 +23,6 @@ const handleRefreshToken = async (req, res) => {
 	const foundUser = await User.findOne({ refreshToken }).exec();
 	// console.log("[foundUser]", foundUser)
 
-
 	//Detected refresh token reuse!
 	if (!foundUser) {
 		jwt.verify(
@@ -63,7 +62,6 @@ const handleRefreshToken = async (req, res) => {
 				const result = await foundUser.save();
 			}
 			if (err || foundUser._id.toString() !== decoded._id) {
-				
 				// console.log(foundUser._id.toString());
 				// console.log( decoded._id);
 				// console.log("_id not equals");
@@ -91,6 +89,7 @@ const handleRefreshToken = async (req, res) => {
 						image: foundUser.avatar,
 						roles: roles,
 						streamToken: streamToken,
+						stripeAccountId: foundUser.stripeAccountId,
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,

@@ -64,26 +64,7 @@ const CourseCard = ({
 				</h5>
 			</CardBody>
 			<CardFooter className="p-3">
-				{/* <div className="flex items-center -space-x-3">
-					<Tooltip content="Natali Craig">
-						<Avatar
-							size="sm"
-							variant="circular"
-							alt="natali craig"
-							src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1061&q=80"
-							className="border-2 border-white hover:z-10"
-						/>
-					</Tooltip>
-					<Tooltip content="Tania Andrew">
-						<Avatar
-							size="sm"
-							variant="circular"
-							alt="tania andrew"
-							src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-							className="border-2 border-white hover:z-10"
-						/>
-					</Tooltip>
-				</div> */}
+				
 				<div className="my-3 flex items-center gap-x-2 text-sm md:text-xs">
 					<div className="flex items-center gap-x-1 text-slate-500">
 						<IconBadge size="sm" icon={BookOpen} />
@@ -96,7 +77,7 @@ const CourseCard = ({
 					<div className="flex gap-1 items-center">
 						<FaStar className="text-yellow-400" />{" "}
 						<p className="text-xs text-muted-foreground">
-							4.24 Based on 123 Reviews
+							{averageRating} Based on {reviews.length} Reviews
 						</p>
 					</div>
 					<p className="text-lg md:text-md font-medium text-slate-700">

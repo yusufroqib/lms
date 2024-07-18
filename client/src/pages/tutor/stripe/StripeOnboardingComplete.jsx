@@ -39,20 +39,20 @@ const StripeOnboardingComplete = () => {
 
 	if (status === "loading") {
 		return (
-			<div className="min-h-full flex justify-center items-center">
+			<div className="min-h-full flex justify-center items-center text-lg">
 				Completing your Stripe account setup...
 			</div>
 		);
 	} else if (status === "success") {
 		return (
-			<div className="min-h-full flex justify-center items-center">
+			<div className="min-h-full flex justify-center items-center text-lg">
 				Your Stripe account has been successfully set up! Redirecting to
 				dashboard...
 			</div>
 		);
 	} else {
 		return (
-			<div className="min-h-full flex justify-center items-center">
+			<div className="min-h-full flex justify-center items-center text-lg">
 				There was an error setting up your Stripe account. Please try again
 				later.
 			</div>

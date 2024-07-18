@@ -6,6 +6,7 @@ import { usePurchaseCourseMutation } from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import useAuth from "@/hooks/useAuth";
 
 // import {loadStripe} from '@stripe/stripe-js';
 
@@ -13,13 +14,17 @@ const CourseVideo = ({
 	previewVideoUrl,
 	price,
 	courseImage,
+	tutorId,
 	courseId,
 	isPurchased,
 	firstChapter,
 }) => {
+	const { _id } = useAuth();
 	const navigate = useNavigate();
 	const [purchaseCourse, { isLoading, isError, isSuccess, error }] =
 		usePurchaseCourseMutation();
+
+	const isCourseOwner = tutorId === _id;
 
 	// console.log(courseId);
 	const handlePurchase = async () => {
@@ -86,7 +91,7 @@ const CourseVideo = ({
 				>
 					{price ? formatPrice(price) : "Free"}
 				</p>
-				{isPurchased ? (
+				{isPurchased || isCourseOwner ? (
 					<Button
 						onClick={handleStudy}
 						size="lg"

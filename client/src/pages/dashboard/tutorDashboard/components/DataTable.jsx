@@ -38,6 +38,7 @@ export function DataTable({ columns, data }) {
 			columnFilters,
 		},
 	});
+    // console.log(data)
 	if (!data)
 		return (
             <div>
