@@ -15,6 +15,7 @@ export const CourseProgressButton = ({
 	courseId,
 	isCompleted,
 	nextChapterId,
+	isTutor,
 }) => {
 	// const router = useRouter();
 	// const confetti = useConfettiStore();
@@ -25,6 +26,7 @@ export const CourseProgressButton = ({
 
 	const onClick = async () => {
 		try {
+			if (isTutor) return;
 			setIsLoading(true);
 			// await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
 			//     isCompleted: !isCompleted
@@ -55,7 +57,7 @@ export const CourseProgressButton = ({
 			onClick={onClick}
 			disabled={isLoading || isCompleted}
 			type="button"
-			variant={isCompleted ?  "success" : "outline"}
+			variant={isCompleted ? "success" : "outline"}
 			className="w-full md:w-auto"
 		>
 			{isCompleted ? "Completed" : "Mark as complete"}

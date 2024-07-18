@@ -11,7 +11,7 @@ import { useDispatch } from "react-redux";
 import { useUpdateChapterProgressMutation } from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
 
-const ChapterContents = ({ nextChapterId, chapter, purchase }) => {
+const ChapterContents = ({ nextChapterId, chapter, purchase, isTutor }) => {
 	const { courseId } = useParams();
 	const dispatch = useDispatch();
 	const [isLoading, setIsLoading] = useState(false);
@@ -41,19 +41,19 @@ const ChapterContents = ({ nextChapterId, chapter, purchase }) => {
 			// await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
 			//     isCompleted: !isCompleted
 			// });
-			if (!isCompleted)
+			if (!isCompleted && !isTutor)
 				await updateCourseProgress({
 					courseId,
 					chapterId: chapter._id,
 				}).unwrap();
-			if (!isCompleted && !nextChapterId) {
+			if (!isCompleted && !nextChapterId && !isTutor) {
 				// confetti.onOpen();
 				dispatch(openConfetti());
 			}
 			if (nextChapterId) {
 				navigate(`/study/${courseId}/chapter/${nextChapterId}`);
 			}
-			if (!isCompleted) toast.success("Progress updated");
+			if (!isCompleted && !isTutor) toast.success("Progress updated");
 			// router.refresh();
 		} catch {
 			toast.error("Something went wrong");
@@ -68,10 +68,16 @@ const ChapterContents = ({ nextChapterId, chapter, purchase }) => {
 			{userProgress?.isCompleted && (
 				<Banner variant="success" label="You already completed this chapter." />
 			)}
-			{isLocked && (
+			{isLocked && !isTutor && (
 				<Banner
 					variant="warning"
 					label="You need to purchase this course to watch this chapter."
+				/>
+			)}
+			{isTutor && (
+				<Banner
+					variant="warning"
+					label="You are viewing your own course. No study time will be recorded."
 				/>
 			)}
 			<div className="flex flex-col max-w-4xl mx-auto pb-10">
@@ -87,12 +93,15 @@ const ChapterContents = ({ nextChapterId, chapter, purchase }) => {
 				<div>
 					<div className="p-4 flex flex-col md:flex-row items-center justify-between">
 						<h2 className="text-2xl font-semibold mb-2">{chapter.title}</h2>
-						<CourseProgressButton
-							chapterId={chapter._id}
-							courseId={courseId}
-							nextChapterId={nextChapterId}
-							isCompleted={!!userProgress?.isCompleted}
-						/>
+						{purchase && (
+							<CourseProgressButton
+								chapterId={chapter._id}
+								courseId={courseId}
+								nextChapterId={nextChapterId}
+								isCompleted={!!userProgress?.isCompleted}
+								isTutor={isTutor}
+							/>
+						)}
 					</div>
 					<Separator />
 					<div className="p-4">

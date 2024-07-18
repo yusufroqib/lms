@@ -1,11 +1,15 @@
 import React from "react";
 import { CourseNavbar } from "./components/CourseNavbar";
 import CourseSidebar from "./components/CourseSidebar";
-import { useGetEnrolledCoursesQuery } from "@/features/courses/coursesApiSlice";
-import { useNavigate, useParams } from "react-router-dom";
+import {
+	useGetEnrolledCoursesQuery,
+	useGetTutorCoursesQuery,
+} from "@/features/courses/coursesApiSlice";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import ChapterContents from "./components/ChapterContents";
 import useStudyTimeTracker from "@/hooks/useStudyTimeTracker";
+import { Loader2 } from "lucide-react";
 
 const StudyPage = () => {
 	const { courseId, chapterId } = useParams();
@@ -15,7 +19,7 @@ const StudyPage = () => {
 
 	// console.log(duration)
 
-	const { course, isLoading, isFetching, isSuccess, isError } =
+	const { purchasedCourse, isLoading, isFetching, isSuccess, isError } =
 		useGetEnrolledCoursesQuery("enrolledCourses", {
 			selectFromResult: ({
 				data,
@@ -25,7 +29,7 @@ const StudyPage = () => {
 				isError,
 				error,
 			}) => ({
-				course: data?.entities[courseId],
+				purchasedCourse: data?.entities[courseId],
 				isLoading,
 				isSuccess,
 				isFetching,
@@ -34,21 +38,49 @@ const StudyPage = () => {
 			}),
 		});
 
-	// console.log(course)
+	const {
+		tutorCourse,
+		isSuccess: isTutorSuccess,
+		isLoading: isTutorLoading,
+	} = useGetTutorCoursesQuery("tutorCourses", {
+		selectFromResult: ({
+			data,
+			isLoading,
+			isSuccess,
+			isFetching,
+			isError,
+			error,
+		}) => ({
+			tutorCourse: data?.entities[courseId],
+			isLoading,
+			isSuccess,
+			isFetching,
+			error,
+			isError,
+		}),
+	});
+
+	let course = purchasedCourse || tutorCourse;
+
+	// console.log(course);
 
 	// console.log(course);
 
 	// if(!course) return <div>Loading...</div>
 	if (isError) return <div>Error</div>;
-	if (isLoading || isFetching) return <div>Loading...</div>;
+	if (isLoading || isFetching) return <div className="flex min-h-[80vh] justify-center items-center">
+	<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
+</div>
 
-	if ((!course && isSuccess) || isError) {
-		navigate("/courses/search");
+	if ((!course && isSuccess && !isTutorLoading ) || (isError && !isTutorLoading && !isLoading)) {
+		// navigate("/courses/search");
+		return <Navigate to={"/courses/search"} />;
 	}
 	// if(isSuccess) console.log(course)
 
-	if (!!course && isSuccess) {
+	if (!!course && (isSuccess || isTutorSuccess)) {
 		const isPurchased = course.purchasedBy.some((item) => item.user === _id);
+		const isTutor = course.tutor === _id;
 		// console.log('TTTTTTTTTT', isPurchased)\
 		const chapter = course.chapters.find(
 			(chapter) => chapter._id === chapterId
@@ -72,6 +104,7 @@ const StudyPage = () => {
 						course={{ ...course }}
 						progressCount={course.progress}
 						purchase={isPurchased}
+						isTutor={isTutor}
 					/>
 				</div>
 				<main className="md:pl-80 pt-[80px] bg-white h-full">
@@ -79,6 +112,7 @@ const StudyPage = () => {
 						chapter={chapter}
 						nextChapterId={nextChapterId}
 						purchase={isPurchased}
+						isTutor={isTutor}
 					/>
 				</main>
 			</div>

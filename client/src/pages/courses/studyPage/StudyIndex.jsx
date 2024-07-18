@@ -3,25 +3,23 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useGetEnrolledCoursesQuery } from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 const StudyIndex = () => {
 	const { courseId } = useParams();
-	const [searchParams, setSearchParams] = useSearchParams()
+	const [searchParams, setSearchParams] = useSearchParams();
 
-	const purchaseSuccess = searchParams.get('success')
-
-	
+	const purchaseSuccess = searchParams.get("success");
 
 	useEffect(() => {
-		if(!!purchaseSuccess){
-			toast.success('Course purchased successfully')
+		if (!!purchaseSuccess) {
+			toast.success("Course purchased successfully");
 		}
-	}, [purchaseSuccess])
-	
+	}, [purchaseSuccess]);
 
 	// console.log(courseId);
 	const navigate = useNavigate();
-	const { course, isLoading, isFetching, isSuccess, isError } =
+	const { purchasedCourse, isLoading, isFetching, isSuccess, isError } =
 		useGetEnrolledCoursesQuery("enrolledCourses", {
 			selectFromResult: ({
 				data,
@@ -31,7 +29,7 @@ const StudyIndex = () => {
 				isError,
 				error,
 			}) => ({
-				course: data?.entities[courseId],
+				purchasedCourse: data?.entities[courseId],
 				isLoading,
 				isSuccess,
 				isFetching,
@@ -39,8 +37,31 @@ const StudyIndex = () => {
 				isError,
 			}),
 		});
-		
-		console.log(course)
+
+	const {
+		tutorCourse,
+		isSuccess: isTutorSuccess,
+		isLoading: isTutorLoading,
+	} = useGetTutorCoursesQuery("tutorCourses", {
+		selectFromResult: ({
+			data,
+			isLoading,
+			isSuccess,
+			isFetching,
+			isError,
+			error,
+		}) => ({
+			tutorCourse: data?.entities[courseId],
+			isLoading,
+			isSuccess,
+			isFetching,
+			error,
+			isError,
+		}),
+	});
+
+	// console.log(course);
+	let course = purchasedCourse || tutorCourse;
 
 	useEffect(() => {
 		if (course && isSuccess) {
@@ -48,12 +69,27 @@ const StudyIndex = () => {
 			navigate(`/study/${courseId}/chapter/${firstChapterId}`);
 		}
 
-		if ((!course && isSuccess) || isError) {
+		if (
+			(!course && isSuccess && !isTutorLoading) ||
+			(isError && !isTutorLoading && !isLoading)
+		) {
 			navigate("/courses/search");
 		}
-	}, [isError, isSuccess, navigate, courseId, course]);
+	}, [
+		isError,
+		isSuccess,
+		navigate,
+		courseId,
+		course,
+		isTutorLoading,
+		isLoading,
+	]);
 
-	return null; // or any loading indicator if needed
+	return (
+		<div className="flex min-h-[80vh] justify-center items-center">
+			<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
+		</div>
+	); // or any loading indicator if needed
 };
 
 export default StudyIndex;
