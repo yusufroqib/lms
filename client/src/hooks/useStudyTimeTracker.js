@@ -23,7 +23,7 @@ const useStudyTimeTracker = (courseId) => {
             // console.log(response)
 
 			;
-			console.log("Backend updated with 30 seconds");
+			// console.log("Backend updated with 30 seconds");
 		} catch (error) {
 			console.error("Error updating study time:", error);
 			const failedUpdates = JSON.parse(

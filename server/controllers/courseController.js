@@ -7,8 +7,7 @@ const { createStreamChatClient } = require("../utils/createStreamChatClient");
 const StudyTime = require("../models/StudyTimeModel");
 const { default: mongoose } = require("mongoose");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
-const clientUrl = process.env.CLIENT_URL
-
+const clientUrl = process.env.CLIENT_URL;
 
 const browseAllCourses = async (req, res) => {
 	try {
@@ -406,7 +405,16 @@ const updateChapterProgress = async (req, res) => {
 const recordStudyTime = async (req, res) => {
 	try {
 		const { courseId: course, duration } = req.body;
+		const userId = req.userId;
+		const foundCourse = await Course.findById(course)
+		console.log(foundCourse)
+		
 		const now = new Date();
+		if (foundCourse?.tutor?.toString() === userId) {
+			return res
+				.status(204)
+				.json({ message: "Tutor can't record study time for their own course" });
+		}
 
 		// Get the start and end of the current day in UTC
 		const startOfDay = new Date(
