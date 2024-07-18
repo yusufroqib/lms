@@ -1,7 +1,7 @@
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useState } from "react";
 import { usePurchaseCourseMutation } from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -23,30 +23,22 @@ const CourseVideo = ({
 	const navigate = useNavigate();
 	const [purchaseCourse, { isLoading, isError, isSuccess, error }] =
 		usePurchaseCourseMutation();
+	const [canStudy, setCanStudy] = useState(false);
 
-	const isCourseOwner = tutorId === _id;
+	useEffect(() => {
+		setCanStudy(isPurchased || _id === tutorId);
+	}, [_id, tutorId]);
 
 	// console.log(courseId);
 	const handlePurchase = async () => {
 		try {
-			// console.log(values);
 			const response = await purchaseCourse({ courseId }).unwrap();
-			// console.log(sessionId)
-
-			// const result = stripe.redirectToCheckout({
-			// 	sessionId: sessionId.id,
-			// });
-
 			window.location.assign(response.url);
-
-			// await axios.patch(`/api/courses/${courseId}`, values);
-			// toast.success("Course purchased successfully");
-
-			// router.refresh();
 		} catch {
 			toast.error("Something went wrong");
 		}
 	};
+
 	const handleStudy = async () => {
 		try {
 			navigate(`/study/${courseId}/chapter/${firstChapter._id}`);
@@ -91,7 +83,7 @@ const CourseVideo = ({
 				>
 					{price ? formatPrice(price) : "Free"}
 				</p>
-				{isPurchased || isCourseOwner ? (
+				{canStudy ? (
 					<Button
 						onClick={handleStudy}
 						size="lg"
