@@ -17,6 +17,8 @@ const courseRoutes = require("./routes/courseRoutes");
 const classroomRoutes = require("./routes/classroomRoutes");
 const communityRoutes = require("./routes/communityRoutes");
 const webhookRoute = require("./routes/webhookRoute");
+const homeHTMLContent = require("./utils/homeHTMLContent");
+// const webhookRoute = require("./routes/webhookRoute");
 require("./config/passport-setup");
 
 dotenv.config();
@@ -60,7 +62,11 @@ app.use(cookieParser());
 // app.use(bodyParser.raw({ type: 'application/json' }));
 
 
-
+app.get('/', (req, res) => {
+	
+	res.send(homeHTMLContent);
+  });
+  
 app.use("/auth", authRoutes);
 app.use("/api", webhookRoute);
 app.use("/refresh", refreshRoute);
