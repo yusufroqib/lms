@@ -1,7 +1,7 @@
 const Course = require("../models/CourseModel");
 const Category = require("../models/CategoryModel");
 const Classroom = require("../models/ClassroomModel");
-const User = require("../models/userModel");
+const User = require("../models/UserModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
 const { default: mongoose } = require("mongoose");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);

@@ -1,6 +1,6 @@
 const Course = require("../models/CourseModel");
 const Category = require("../models/CategoryModel");
-const User = require("../models/userModel");
+const User = require("../models/UserModel");
 const StripeCustomer = require("../models/StripeCustomerModel");
 const Classroom = require("../models/ClassroomModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
