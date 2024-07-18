@@ -7,6 +7,8 @@ const { createStreamChatClient } = require("../utils/createStreamChatClient");
 const StudyTime = require("../models/StudyTimeModel");
 const { default: mongoose } = require("mongoose");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
+const clientUrl = process.env.CLIENT_URL
+
 
 const browseAllCourses = async (req, res) => {
 	try {
@@ -126,8 +128,8 @@ const purchaseCourse = async (req, res) => {
 			customer: stripeCustomer.stripeCustomerId,
 			line_items,
 			mode: "payment",
-			success_url: `http://localhost:5173/study/${courseId}?success=1`,
-			cancel_url: `http://localhost:5173/courses/${courseId}/info?cancelled=1`,
+			success_url: `${clientUrl}/study/${courseId}?success=1`,
+			cancel_url: `${clientUrl}/courses/${courseId}/info?cancelled=1`,
 			metadata: {
 				courseId,
 				userId,
