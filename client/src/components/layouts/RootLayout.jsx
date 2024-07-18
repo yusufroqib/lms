@@ -1,7 +1,7 @@
 import { useGetMyDetailsQuery } from "@/features/users/usersApiSlice";
 import React, { useEffect, useState } from "react";
 import Header from "../layouts/Header/index";
-import Sidebar from "./Sidebar/index";
+import Sidebar from "./sidebar/index";
 import { Outlet, useLocation, useParams } from "react-router-dom";
 import { StreamChatProvider } from "@/context/StreamChatContext";
 
