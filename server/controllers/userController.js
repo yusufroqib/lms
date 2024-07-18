@@ -37,7 +37,7 @@ const loggedInUser = async (req, res) => {
 };
 const becomeTutor = async (req, res) => {
 	try {
-	  const userId = req.user.id; // Assuming you have authentication middleware that sets req.user
+	  const userId = req.userId; 
 	  const user = await User.findById(userId);
   
 	  if (!user) {
@@ -111,6 +111,8 @@ const updateProfile = async (req, res) => {
             .json({ message: "Error updating profile", error: error.message });
     }
 };
+
+
 const changePassword = async (req, res) => {
 	try {
 		const userId = req.userId;

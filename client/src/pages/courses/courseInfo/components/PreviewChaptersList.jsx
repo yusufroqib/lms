@@ -5,14 +5,18 @@ import { Lock } from "lucide-react";
 import React, { useState } from "react";
 import PreviewDialog from "./PreviewDialog";
 import toast from "react-hot-toast";
+import useAuth from "@/hooks/useAuth";
 
-const PreviewChaptersList = ({ chapters, isPurchased }) => {
+const PreviewChaptersList = ({ chapters, isPurchased, tutorId }) => {
+	const { username, isTutor, isAdmin, _id } = useAuth();
 	const [clickedId, setClickedId] = useState("");
 	const [chapter, setChapter] = useState(null);
 	const [open, setOpen] = useState(false);
 
+	const isCourseOwner = tutorId === _id
+
 	const handleClick = (chapter) => {
-		if (!chapter.isFree && !isPurchased) {
+		if (!chapter.isFree && !isPurchased && !isCourseOwner) {
 			return toast.error("This chapter is not free for preview");
 		}
 		setClickedId(chapter._id);
@@ -33,7 +37,7 @@ const PreviewChaptersList = ({ chapters, isPurchased }) => {
 					)}
 				>
 					{chapter.title}
-					{!chapter.isFree && !isPurchased && (
+					{!chapter.isFree && !isPurchased && !isCourseOwner&& (
 						<div>
 							<Lock
 								size={22}
@@ -44,7 +48,7 @@ const PreviewChaptersList = ({ chapters, isPurchased }) => {
 							/>
 						</div>
 					)}
-					{chapter.isFree && !isPurchased && (
+					{chapter.isFree && !isPurchased && !isCourseOwner && (
 						<div className="ml-auto pr-2 flex items-center gap-x-2">
 							<Badge>Free</Badge>
 						</div>

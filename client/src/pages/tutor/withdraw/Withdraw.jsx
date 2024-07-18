@@ -36,6 +36,8 @@ const Withdraw = () => {
 		setError("Failed to fetch payout details. Please try again later.");
 	}
 
+    // console.log(payoutDetails)
+
 	// useEffect(() => {
 	// 	const fetchPayoutDetails = async () => {
 	// 		try {

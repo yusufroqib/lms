@@ -146,13 +146,7 @@ export default function StudentDashBoard({ setDashboardMode }) {
 		}
 	}, [isSuccess, courses, enrolledCourses]);
 
-	// let enrolledCourses = [];
-
-	// if (courses) {
-	// 	enrolledCourses = courses?.ids.map((id) => courses.entities[id]);
-	// }
-
-	// console.log(enrolledCourses);
+	
 
 	if (!courses || !coursesList)
 		return (

@@ -108,7 +108,7 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }) => {
 		} catch (error) {
 			// console.log(error.code);
 			if (error?.code === "storage/canceled") {
-                toggleEdit();
+				toggleEdit();
 				return toast.error("Upload Cancelled");
 			}
 			toast.error("Something went wrong");
@@ -118,6 +118,32 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }) => {
 			setIsUploading(false);
 			setUploadTask(null);
 		}
+	};
+	const handleChange = (e) => {
+		const file = e.target.files[0];
+		if (!file) {
+			return;
+		}
+
+		const fileURL = URL.createObjectURL(file);
+		const video = document.createElement("video");
+
+		video.preload = "metadata";
+		video.onloadedmetadata = function () {
+			URL.revokeObjectURL(fileURL); // Free memory
+			const duration = video.duration;
+			console.log(duration)
+			if (duration > 1800) {
+				// Limit to 1 minute
+				toast.error("Video exceeds the maximum allowed duration of 30 minutes.");
+				setVid(null);
+
+			} else {
+				setVid(file);
+				// Proceed with the upload or other operations
+			}
+		};
+		video.src = fileURL;
 	};
 
 	const handleCancel = () => {
@@ -171,7 +197,7 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }) => {
 						type="file"
 						name="courseVideo"
 						accept="video/*"
-						onChange={(e) => setVid(e.target.files[0])}
+						onChange={(e) => handleChange(e)}
 						className="file-input file-input-bordered w-full "
 					/>
 					<div className="text-xs text-muted-foreground mt-4">

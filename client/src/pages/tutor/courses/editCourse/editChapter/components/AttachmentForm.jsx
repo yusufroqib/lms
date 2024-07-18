@@ -32,15 +32,22 @@ export const AttachmentForm = ({ initialData, courseId, chapterId }) => {
 	const [updateChapterAttachment] = useUpdateChapterAttachmentMutation(); // Ensure you have the appropriate mutation hook
 	const [deleteChapterAttachment] = useDeleteChapterAttachmentMutation(); // Ensure you have the appropriate mutation hook
 
-
 	const toggleEdit = () => {
 		setIsEditing((prevIsEditing) => !prevIsEditing);
 	};
 
 	const handleFileChange = (e) => {
+		const maxSize = 5 * 1024 * 1024; // 5MB in bytes
 		const selectedFile = e.target.files[0];
-		setFile(selectedFile);
-		setFileName(selectedFile.name); // Update file name
+
+		if (selectedFile && selectedFile.size > maxSize) {
+			toast.error("File size exceeds 5MB. Please select a smaller file.");
+			setFile(null);
+			setFileName(""); // Update file name
+		} else {
+			setFile(selectedFile);
+			setFileName(selectedFile.name); // Update file name
+		}
 	};
 
 	const uploadFile = async () => {
@@ -110,7 +117,7 @@ export const AttachmentForm = ({ initialData, courseId, chapterId }) => {
 		} catch (error) {
 			console.error("Error uploading file:", error);
 			if (error?.code === "storage/canceled") {
-                toggleEdit();
+				toggleEdit();
 				return toast.error("Upload Cancelled");
 			}
 			toast.error("Error uploading file");
@@ -210,10 +217,12 @@ export const AttachmentForm = ({ initialData, courseId, chapterId }) => {
 						type="file"
 						name="fileUpload"
 						onChange={handleFileChange}
+						accept="image/*, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt"
 						className="file-input file-input-bordered w-full "
 					/>
 					<div className="text-xs text-muted-foreground mt-4">
 						Add anything your students might need to complete this chapter.
+						(e.g. images, word documents, etc.)
 					</div>
 
 					{!isUploading && file && (

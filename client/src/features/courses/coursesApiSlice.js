@@ -59,6 +59,32 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				);
 			},
 		}),
+		getCourseReviews: builder.query({
+			query: ({courseId, page}) => ({
+				url: `/courses/${courseId}/reviews?page=${page}`,
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
+		addCourseReview: builder.mutation({
+			query: ({courseId, ...userReview}) => ({
+				url: `/courses/${courseId}/reviews`,
+				method: "POST",
+				body: userReview,
+				validateStatus: (response, result) => {
+					return response.status === 200 && !result.isError;
+				},
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+			invalidatesTags: ["Course"],
+		}),
+		
 		getTutorCourses: builder.query({
 			query: () => ({
 				url: `/tutors/all-courses`,
@@ -146,10 +172,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			transformResponse: (responseData) => {
 				return responseData
 				
-			},
-
-		
-			
+			},			
 		}),
 		getTutorCoursesSold: builder.query({
 			query: () => ({
@@ -369,6 +392,8 @@ export const {
 	useGetCoursesQuery,
 	useGetCourseCategoriesQuery,
 	useGetTutorCoursesQuery,
+	useGetCourseReviewsQuery,
+	useAddCourseReviewMutation,
 	useGetTutorEarningsQuery,
 	useGetStudyTimeQuery,
 	useGetTutorStatsQuery,

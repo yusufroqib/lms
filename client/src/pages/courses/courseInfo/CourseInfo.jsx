@@ -20,6 +20,7 @@ import {
 import PreviewChaptersList from "./components/PreviewChaptersList";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import ReviewsTab from "./components/ReviewsTab";
 
 const data = [
 	{
@@ -41,16 +42,14 @@ const CourseInfo = () => {
 	const { username, isTutor, isAdmin, _id } = useAuth();
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	const [activeTab, setActiveTab] = React.useState("overview");
-	const [searchParams, setSearchParams] = useSearchParams()
-	const purchaseError = searchParams.get('cancelled')
+	const [searchParams, setSearchParams] = useSearchParams();
+	const purchaseError = searchParams.get("cancelled");
 
-useEffect(() => {
-
-	if(!!purchaseError){
-		toast.error('Course purchase was unsuccessful')
-	}
-}, [purchaseError])
-
+	useEffect(() => {
+		if (!!purchaseError) {
+			toast.error("Course purchase was unsuccessful");
+		}
+	}, [purchaseError]);
 
 	const { course, isLoading, isFetching, isSuccess, isError } =
 		useGetCoursesQuery("allCourses", {
@@ -85,10 +84,18 @@ useEffect(() => {
 		};
 	}, []);
 
+	const hasPurchased = course?.purchasedBy?.some(
+		(item) => item?.user === _id
+	);
+
+
+
 	if (isLoading) {
-		return <div className="flex min-h-[80vh] justify-center items-center">
+		return (
+			<div className="flex min-h-[80vh] justify-center items-center">
 				<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
 			</div>
+		);
 	} else if (isSuccess && !course) {
 		return <Navigate to={"/dashboard"} />;
 	}
@@ -96,20 +103,21 @@ useEffect(() => {
 		const isPurchased = course.purchasedBy.some((item) => item.user === _id);
 		return (
 			<>
-			<div className="sticky top-19 bg-white  z-99">
-
-				<div className="p-3 ">
-					<Breadcrumbs className='bg-transparent ' separator=">">
-						<Link to="/dashboard" className="opacity-60">
-							Dashboard
-						</Link>
-						<Link to="/courses/search" className="opacity-60">
-							All Courses
-						</Link>
-						<Link disabled href="#">Course Info</Link>
-					</Breadcrumbs>
+				<div className="sticky top-19 bg-white  z-99">
+					<div className="p-3 ">
+						<Breadcrumbs className="bg-transparent " separator=">">
+							<Link to="/dashboard" className="opacity-60">
+								Dashboard
+							</Link>
+							<Link to="/courses/search" className="opacity-60">
+								All Courses
+							</Link>
+							<Link disabled href="#">
+								Course Info
+							</Link>
+						</Breadcrumbs>
+					</div>
 				</div>
-			</div>
 				<div className=" flex overflow-hidden">
 					<div className="w-full xl:w-3/5 h-full overflow-y-auto   p-6 pr-8 z-9">
 						<div className=" h-full">
@@ -133,8 +141,12 @@ useEffect(() => {
 								</p>
 								{Number(course.averageRating) ? (
 									<div className="flex items-center gap-2 font-bold text-blue-gray-500">
-										<Rating className=" rating-svg" value={4} readonly />
-										<Typography>({Number(course.averageRating)})</Typography>
+										<Rating
+											className=" rating-svg"
+											value={Number(course?.averageRating)}
+											readonly
+										/>
+										<Typography>({course.averageRating})</Typography>
 									</div>
 								) : (
 									<div className=" text-blue-gray-500 italic">
@@ -195,6 +207,7 @@ useEffect(() => {
 														<PreviewChaptersList
 															chapters={course.chapters}
 															isPurchased={isPurchased}
+															tutorId={course.tutor._id}
 														/>
 													</div>
 												</div>
@@ -202,7 +215,7 @@ useEffect(() => {
 										</TabPanel>
 										<TabPanel key={"reviews"} value={"reviews"}>
 											<div className="">
-												{/* {parse(course.description)} */}
+												<ReviewsTab hasPurchased={hasPurchased}/>
 											</div>
 										</TabPanel>
 									</TabsBody>
@@ -218,6 +231,7 @@ useEffect(() => {
 								previewVideoUrl={course.previewVideoUrl}
 								courseId={course._id}
 								isPurchased={isPurchased}
+								tutorId={course.tutor._id}
 								firstChapter={course.chapters[0]}
 							/>
 						</div>

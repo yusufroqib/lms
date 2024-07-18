@@ -10,7 +10,7 @@ const Content = () => {
 			<div className="flex flex-col mt-10 gap-30">
 				<div className="grid grid-cols-7 gap-2 px-30">
 					<div className="col-span-3">
-						<img src="/unlock-knowledge.svg" alt="unlock knowledge" />
+						<img src="/Mediamodifier-Design.svg" alt="unlock knowledge" />
 					</div>
 					<div className="col-end-8 col-span-4">
 						<ContentCard />

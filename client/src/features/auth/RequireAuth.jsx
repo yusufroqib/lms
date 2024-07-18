@@ -19,30 +19,27 @@ import { useRefreshMutation } from "./authApiSlice";
 
 const RequireAuth = ({ allowedRoles }) => {
 	const location = useLocation();
-	// const dispatch = useDispatch();
 	const { roles, username } = useAuth();
 	const [newUsername, setNewUsername] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [showModal, setShowModal] = useState(true);
-	const [createUsername,] = useCreateUsernameMutation();
-	const [refresh] = useRefreshMutation()
+	const [createUsername] = useCreateUsernameMutation();
+	const [refresh] = useRefreshMutation();
 
 	const handleSubmit = async () => {
 		try {
-			setIsLoading(true)
+			setIsLoading(true);
 			await createUsername({ username: newUsername }).unwrap();
-			await refresh().unwrap()
+			await refresh().unwrap();
 			toast.success("Username created successfully");
 		} catch (error) {
 			console.log(error);
 			toast.error(error.data.error);
 		} finally {
-			setIsLoading(false)
+			setIsLoading(false);
 		}
-		// setShowModal(false)
 	};
 
-	// if (!username) return <p>No Username</p>;
 	let buttonText = "Continue";
 
 	if (isLoading) {
@@ -56,7 +53,6 @@ const RequireAuth = ({ allowedRoles }) => {
 
 	const content = !username ? (
 		<AlertDialog open={showModal}>
-			{/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>Create a username</AlertDialogTitle>
@@ -87,6 +83,10 @@ const RequireAuth = ({ allowedRoles }) => {
 	) : (
 		<Navigate to="/auth" state={{ from: location }} replace />
 	);
+
+	if (!roles.some((role) => allowedRoles.includes(role))) {
+		localStorage.setItem("isLogin", "false");
+	}
 
 	return content;
 };

@@ -13,7 +13,6 @@ const BrowseCourses = () => {
 	const [dynamicSearchParams, setDynamicSearchParams] = useSearchParams();
 	const searchParams = dynamicSearchParams.toString();
 	const { data } = useGetCourseCategoriesQuery("");
-	console.log(searchParams)
 
 	const {
 		data: courses,

@@ -3,6 +3,7 @@ import {
 	BookCheck,
 	BookUp2,
 	CircleDollarSign,
+	Loader2,
 	Receipt,
 	Replace,
 	Users,
@@ -22,6 +23,8 @@ import {
 	useGetTutorBalanceQuery,
 } from "@/features/users/usersApiSlice";
 import { Button } from "@/components/ui/button";
+
+const TUTOR_SHARE = import.meta.env.VITE_TUTOR_SHARE;
 
 const TutorDashboard = ({ setDashboardMode }) => {
 	// const [balance, setBalance] = useState(0)
@@ -51,6 +54,14 @@ const TutorDashboard = ({ setDashboardMode }) => {
 	});
 
 	// console.log(courseTransactions);
+
+	if (isLoading) {
+		return (
+			<div className="flex min-h-[80vh] justify-center items-center">
+				<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex-1 p-8  space-y-6">
@@ -105,7 +116,7 @@ const TutorDashboard = ({ setDashboardMode }) => {
 					</div>
 					<div>
 						<h3 className="text-lg md:text-2xl xl:text-3xl">
-							${tutorStats?.totalEarnings?.toFixed(2) ?? 0}
+							${(tutorStats?.totalEarnings * TUTOR_SHARE)?.toFixed(2) ?? 0}
 						</h3>
 					</div>
 				</div>
@@ -191,7 +202,7 @@ const TutorDashboard = ({ setDashboardMode }) => {
 											</div>
 										</div>
 										<div className=" col-span-1 text-right">
-											${course.totalValue.toFixed(2)}
+											${(course.totalValue * Number(TUTOR_SHARE)).toFixed(2)}
 										</div>
 									</div>
 								))
