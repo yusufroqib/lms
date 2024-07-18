@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setAuthScreen } from "@/features/authScreenSlice";
 import { useSignUpMutation } from "@/features/auth/authApiSlice";
 import { setSignUpToken } from "@/features/auth/authSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import GoogleButton from "./GoogleButton";
 import { Loader2 } from "lucide-react";
@@ -86,11 +86,13 @@ const SignUp = () => {
 	return (
 		<div className="flex flex-col bg-[#dfdfe6] justify-center items-center min-h-screen">
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
-				<img
-					className="w-80 mb-6"
-					src="/learniverse-full.svg"
-					alt="learniverse-full"
-				/>
+				<Link to="/">
+					<img
+						className="w-80 mb-6"
+						src="/learniverse-full.svg"
+						alt="learniverse-full"
+					/>
+				</Link>
 				<div className="w-full px-6 py-6 bg-white dark:bg-gray-900 shadow-md rounded-md sm:rounded-lg max-w-sm">
 					<div className="text-center text-4xl font-bold mb-3">
 						<h1 className=" text-slate-600">Sign Up</h1>
