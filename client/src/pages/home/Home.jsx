@@ -283,7 +283,7 @@ export default function Home() {
 				</section>
 			</main>
 			<footer className="bg-muted py-6 md:py-8">
-				<div className="container flex flex-col md:flex-row items-center justify-between gap-4">
+				<div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
 					<div className="flex items-center gap-2">
 						<img
 							className="w-60 "

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 // import OtpInput from "react-otp-input";
 import OtpInput from "react18-input-otp";
@@ -7,6 +7,7 @@ import { useVerifySignUpOTPMutation } from "@/features/auth/authApiSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	selectCurrentActivationToken,
+	selectCurrentSignUpEmail,
 	// setUser,
 } from "@/features/auth/authSlice";
 import toast from "react-hot-toast";
@@ -17,6 +18,7 @@ const SignUpOTP = () => {
 	const [seconds, setSeconds] = useState(60); // Initial countdown duration in seconds
 	const [verifySignUpOTP, { isLoading }] = useVerifySignUpOTPMutation();
 	const activationToken = useSelector(selectCurrentActivationToken);
+	const signUpEmail = useSelector(selectCurrentSignUpEmail);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -47,14 +49,14 @@ const SignUpOTP = () => {
 	const verifyOTP = async (e) => {
 		e.preventDefault();
 		try {
-			 await verifySignUpOTP({
+			await verifySignUpOTP({
 				activation_code: otp,
 				activation_token: activationToken,
 			}).unwrap();
 
-			toast.success("Account activated successfully")
+			toast.success("Account activated successfully");
 
-			navigate("/dashboard")
+			navigate("/dashboard");
 
 			// console.log(res)
 			// dispatch(setUser({ user }));
@@ -83,6 +85,10 @@ const SignUpOTP = () => {
 		// console.log(data);
 	};
 
+	if (!signUpEmail) {
+		return <Navigate to={"/auth"} />;
+	}
+
 	return (
 		<div className="flex flex-col bg-[#dfdfe6] justify-center items-center min-h-screen ">
 			<div className="flex flex-col items-center py-10 sm:justify-center w-full">
@@ -96,7 +102,7 @@ const SignUpOTP = () => {
 						<h1 className=" text-slate-600">OTP Verification</h1>
 					</div>
 					<h4 className="text-center mb-6">
-						Enter the OTP you received at <strong>yusufroqib@gmail.com</strong>
+						Enter the OTP you received at <strong>{signUpEmail}</strong>
 					</h4>
 					<form
 						onSubmit={verifyOTP}
