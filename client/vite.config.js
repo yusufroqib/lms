@@ -14,14 +14,13 @@ export default defineConfig({
 		include: ["ckeditor5-custom-build", "postcss-nesting"],
 	},
 	build: {
-		commonjsOptions: { exclude: ["ckeditor5-custom-build"], include: [] },
+		// commonjsOptions: { exclude: ["ckeditor5-custom-build"], include: [] },
 		sourcemap: true,
 		rollupOptions: {
 			onwarn(warning, defaultHandler) {
 				if (warning.code === "SOURCEMAP_ERROR") {
 					return;
 				}
-
 				defaultHandler(warning);
 			},
 		},
