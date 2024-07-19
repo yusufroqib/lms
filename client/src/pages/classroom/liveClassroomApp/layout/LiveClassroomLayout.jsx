@@ -50,7 +50,6 @@ const LiveClassroomLayout = ({ children }) => {
 		return (
 			<StreamVideoProvider>
 				<StreamChatProvider>
-
 					<main className="relative bg-dark-2">
 						{!location.pathname.includes("meeting") && <Navbar />}
 

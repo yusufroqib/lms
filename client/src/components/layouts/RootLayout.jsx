@@ -13,14 +13,14 @@ const RootLayout = () => {
 	return (
 		<StreamChatProvider>
 			<div className="dark:bg-boxdark-2 dark:text-bodydark">
-				<div className="flex h-screen overflow-hidden">
+				<div className="flex h-[100dvh] overflow-hidden">
 					{!classroomId && (
 						<Sidebar
 							sidebarOpen={sidebarOpen}
 							setSidebarOpen={setSidebarOpen}
 						/>
 					)}
-					<div className="relative flex flex-1 flex-col min-h-screen overflow-y-auto overflow-x-hidden">
+					<div className="relative flex flex-1 flex-col min-h-[100dvh] overflow-y-auto overflow-x-hidden">
 						{!classroomId && (
 							<Header
 								sidebarOpen={sidebarOpen}
