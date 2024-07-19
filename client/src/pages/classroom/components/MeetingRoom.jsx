@@ -103,127 +103,119 @@ const MeetingRoom = () => {
 
 	return (
 		<div className="rd__call">
-			<div className="rd__main-call-panel">
-				<ActiveCallHeader />
+		<div className="rd__main-call-panel">
+		<ActiveCallHeader
+					
+				/>
 
 				<PermissionRequests />
-				{/* <section className="relative h-screen w-full overflow-hidden pt-4 text-white"> */}
-				{/* <div className="relative flex size-full items-center justify-center"> */}
-				<div className={`rd__layout`}>
-					{/* <div className=" flex size-full max-w-[1000px] items-center"> */}
-					<div className="rd__layout__stage-container">
-						<CallLayout />
-					</div>
+		{/* <section className="relative h-screen w-full overflow-hidden pt-4 text-white"> */}
+			{/* <div className="relative flex size-full items-center justify-center"> */}
+			<div className="rd__layout">
+				{/* <div className=" flex size-full max-w-[1000px] items-center"> */}
+				<div className="rd__layout__stage-container">
+					<CallLayout />
+				</div>
 
-					<div
-						className={clsx("rd__sidebar", showSidebar && "rd__sidebar--open")}
-					>
-						{showSidebar && (
-							<div className="rd__sidebar__container">
-								{showParticipants && (
-									<div
-										// className={cn("h-[calc(100vh-86px)]  ml-2")}
-										className="rd__participants"
-									>
-										<CallParticipantsList
-											onClose={() => setSidebarContent(null)}
+				<div
+					className={clsx("rd__sidebar", showSidebar && "rd__sidebar--open")}
+				>
+					{showSidebar && (
+						<div className="rd__sidebar__container">
+							{showParticipants && (
+								<div
+									// className={cn("h-[calc(100vh-86px)]  ml-2")}
+									className="rd__participants"
+								>
+									<CallParticipantsList
+										onClose={() => setSidebarContent(null)}
+									/>
+								</div>
+							)}
+							{showChat && (
+								<ChatWrapper chatClient={chatClient}>
+									<div className="str-video__chat">
+										<ChatUI
+											onClose={() => {
+												setSidebarContent(null);
+											}}
+											channelId={activeCall.id}
 										/>
 									</div>
-								)}
-								{showChat && (
-									<ChatWrapper chatClient={chatClient}>
-										<div className="str-video__chat">
-											<ChatUI
-												onClose={() => {
-													setSidebarContent(null);
-												}}
-												channelId={activeCall.id}
-											/>
-										</div>
-									</ChatWrapper>
-								)}
-							</div>
-						)}
-					</div>
-				</div>
-				{/* video layout and call controls */}
-				<div className="rd__notifications">
-					<RecordingInProgressNotification />
-				</div>
-				<div
-					className={`fixed bottom-0 flex flex-wrap w-full items-center justify-center gap-1 ${
-						sidebarContent && "max-sm:hidden"
-					}`}
-				>
-					<CallControls
-						onLeave={() => navigate(`/classrooms/${classroomId}`)}
-					/>
-
-					<DropdownMenu>
-						<div className="flex items-center">
-							<DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
-								<LayoutList size={20} className="text-white" />
-							</DropdownMenuTrigger>
-						</div>
-						<DropdownMenuContent className="border-dark-1 bg-dark-1 text-white">
-							{["Grid", "Speaker-Left", "Speaker-Right", "Speaker-Bottom"].map(
-								(item, index) => (
-									<div key={index}>
-										<DropdownMenuItem
-											onClick={() => setLayout(item.toLowerCase())}
-										>
-											{item}
-										</DropdownMenuItem>
-										<DropdownMenuSeparator className="border-dark-1" />
-									</div>
-								)
-							)}
-						</DropdownMenuContent>
-					</DropdownMenu>
-					<CallStatsButton />
-					{/* <RecordCallConfirmationButton /> */}
-
-					{/* <CancelCallConfirmButton onLeave={() => navigate(`/classrooms/${classroomId}`)} /> */}
-
-					<button
-						onClick={() =>
-							setSidebarContent(showParticipants ? null : "participants")
-						}
-					>
-						<div className=" cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
-							<Users size={20} className="text-white" />
-						</div>
-					</button>
-					<NewMessageNotification
-						chatClient={chatClient}
-						channelWatched={channelWatched}
-						disableOnChatOpen={showChat}
-					>
-						<div className="str-chat__chat-button__wrapper">
-							<CompositeButton
-								active={showChat}
-								disabled={!chatClient}
-								title="Chat"
-								onClick={() => {
-									setSidebarContent(showChat ? null : "chat");
-								}}
-							>
-								<Icon icon="chat" />
-							</CompositeButton>
-							{!showChat && (
-								<UnreadCountBadge
-									channelWatched={channelWatched}
-									chatClient={chatClient}
-									channelId={activeCall.id}
-								/>
+								</ChatWrapper>
 							)}
 						</div>
-					</NewMessageNotification>
-					{!isPersonalRoom && <EndCallButton />}
-					{/* </section> */}
+					)}
 				</div>
 			</div>
-		</div>
+			{/* video layout and call controls */}
+			<div className="rd__notifications">
+					<RecordingInProgressNotification />
+				</div>
+			<div className="fixed bottom-0 flex flex-wrap w-full items-center justify-center gap-1">
+				<CallControls onLeave={() => navigate(`/classrooms/${classroomId}`)} />
+
+				<DropdownMenu>
+					<div className="flex items-center">
+						<DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
+							<LayoutList size={20} className="text-white" />
+						</DropdownMenuTrigger>
+					</div>
+					<DropdownMenuContent className="border-dark-1 bg-dark-1 text-white">
+						{["Grid", "Speaker-Left", "Speaker-Right", "Speaker-Bottom"].map((item, index) => (
+							<div key={index}>
+								<DropdownMenuItem onClick={() => setLayout(item.toLowerCase())}>
+									{item}
+								</DropdownMenuItem>
+								<DropdownMenuSeparator className="border-dark-1" />
+							</div>
+						))}
+					</DropdownMenuContent>
+				</DropdownMenu>
+				<CallStatsButton />
+				{/* <RecordCallConfirmationButton /> */}
+
+				{/* <CancelCallConfirmButton onLeave={() => navigate(`/classrooms/${classroomId}`)} /> */}
+
+				<button
+					onClick={() =>
+						setSidebarContent(showParticipants ? null : "participants")
+					}
+				>
+					<div className=" cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
+						<Users size={20} className="text-white" />
+					</div>
+				</button>
+				<NewMessageNotification
+					chatClient={chatClient}
+					channelWatched={channelWatched}
+					disableOnChatOpen={showChat}
+				>
+					<div className="str-chat__chat-button__wrapper">
+						<CompositeButton
+							active={showChat}
+							disabled={!chatClient}
+							title="Chat"
+							onClick={() => {
+								setSidebarContent(showChat ? null : "chat");
+							}}
+						>
+							<Icon icon="chat" />
+						</CompositeButton>
+						{!showChat && (
+							<UnreadCountBadge
+								channelWatched={channelWatched}
+								chatClient={chatClient}
+								channelId={activeCall.id}
+							/>
+						)}
+					</div>
+				</NewMessageNotification>
+				{!isPersonalRoom && <EndCallButton />}
+			{/* </section> */}
+			</div>
+			</div>
+			</div>
 	);
 };
 
