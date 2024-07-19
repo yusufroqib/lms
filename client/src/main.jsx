@@ -10,12 +10,9 @@ import { Provider } from "react-redux";
 import { ThemeProvider } from "@material-tailwind/react";
 import { Toaster } from "react-hot-toast";
 import { ConfettiProvider } from "./components/providers/ConfettiProvider";
-import { registerLicense } from "@syncfusion/ej2-base";
 import "react-circular-progressbar/dist/styles.css";
 import "react-datepicker/dist/react-datepicker.css";
 import { resetScroll } from "./lib/scrollReset";
-
-registerLicense(import.meta.env.VITE_EJ2_LICENSE_KEY);
 
 function Root() {
   useEffect(() => {
