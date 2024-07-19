@@ -7,20 +7,7 @@ import { CourseSidebarItem } from "./CourseSidebarItem";
 import React from "react";
 
 const CourseSidebar = ({ course, progressCount, purchase, isTutor }) => {
-	// console.log(course)
-	// console.log("Course: ", course);
-	// const { username, isTutor, isAdmin, _id: userId } = useAuth();
-	// if (!userId) {
-	// 	return redirect("/");
-	// }
-	// const purchase = await db.purchase.findUnique({
-	// 	where: {
-	// 		userId_courseId: {
-	// 			userId,
-	// 			courseId: course.id,
-	// 		},
-	// 	},
-	// });
+
 	if (course) {
 		return (
 			<div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
