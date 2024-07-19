@@ -23,7 +23,7 @@ import "@/styles/streamChatStyles.css";
 // import { CustomMessage } from "./components/CustomMessage";
 // import useStreamChat from "@/hooks/useStreamChat";
 // import { useLoggedInAuth } from "./context/AuthContext";
-export function Messages() {
+ function Messages() {
 	const { _id } = useAuth();
 	const { streamChatClient } = useStreamChatClient();
 	// console.log(streamChatClient);
@@ -98,3 +98,4 @@ function Channels({ loadedChannels }) {
 // 		</div>
 // 	);
 // };
+export default Messages
