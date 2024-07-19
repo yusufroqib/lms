@@ -11,7 +11,6 @@ import useAuth from "@/hooks/useAuth";
 
 const MeetingPage = () => {
 	const { callId } = useParams();
-	// const { isLoaded, user } = useUser();
 	const { _id } = useAuth();
 
 	const { call, isCallLoading } = useGetCallById(callId);
@@ -32,9 +31,8 @@ const MeetingPage = () => {
 		(!_id || !call.state.members.find((m) => m.user.id === _id));
 	if (notAllowed)
 		return <Alert title="You are not allowed to join this meeting" />;
-
-	return (
-		<main className="h-screen w-full">
+	return ( 
+		<main className="str-video w-full">
 			<StreamCall call={call}>
 				<StreamTheme>
 					{!isSetupComplete ? (
