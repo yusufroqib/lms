@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import CourseSidebar from "./CourseSidebar";
 import useAuth from "@/hooks/useAuth";
 export const CourseMobileSidebar = ({ course, progressCount, isTutor }) => {
-	const { username, isTutor, isAdmin, _id } = useAuth();
+	const { username, isAdmin, _id } = useAuth();
 	const isPurchased = course.purchasedBy.some((item) => item.user === _id);
 	// console.log('couressssssss', course)
 
