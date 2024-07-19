@@ -110,21 +110,6 @@ export default function ProfilePage() {
 		setAvatarFile(null);
 	};
 
-	// const handleSave = async () => {
-	// 	try {
-	// 		const formData = new FormData();
-	// 		Object.keys(editedUser).forEach((key) =>
-	// 			formData.append(key, editedUser[key])
-	// 		);
-	// 		if (avatarFile) formData.append("avatar", avatarFile);
-
-	// 		await updateProfile(formData).unwrap();
-	// 		setIsEditing(false);
-	// 	} catch (err) {
-	// 		console.error("Failed to save profile", err);
-	// 	}
-	// };
-
 	const handleSave = async () => {
 		try {
 			// await axios.patch(`/api/courses/${courseId}`, values);
@@ -149,7 +134,7 @@ export default function ProfilePage() {
 
 			await updateProfile(formData).unwrap();
 			setIsEditing(false);
-            await refresh().unwrap()
+			await refresh().unwrap();
 
 			toast.success("Profile updated successfully");
 			// router.refresh();
@@ -192,6 +177,13 @@ export default function ProfilePage() {
 	return (
 		<div className="container mx-auto p-6 flex justify-center items-center min-h-full">
 			<Card className="w-full max-w-3xl mx-auto">
+				{!isEditing && (
+					<div className=" flex justify-end mr-4">
+						<Button onClick={handleEdit} className="relative top-4 max-md:text-xs">
+							<Edit className="mr-2 h-4 w-4" /> Edit Profile
+						</Button>
+					</div>
+				)}
 				<CardHeader className="relative">
 					<div className="flex items-center space-x-4">
 						<div className="relative">
@@ -216,20 +208,15 @@ export default function ProfilePage() {
 							)}
 						</div>
 						<div>
-							<CardTitle className="text-2xl font-bold">
+							<CardTitle className="text-lg md:text-2xl font-bold">
 								{editedUser.name}
 							</CardTitle>
-							<p className="text-sm text-gray-500">@{editedUser.username}</p>
+							<p className="text-xs md:text-sm text-gray-500">@{editedUser.username}</p>
 							<div className="mt-2">
-								<Badge className="mr-2">{status}</Badge>
+								<Badge className="mr-2 ">{status}</Badge>
 							</div>
 						</div>
 					</div>
-					{!isEditing && (
-						<Button onClick={handleEdit} className="absolute top-4 right-4">
-							<Edit className="mr-2 h-4 w-4" /> Edit Profile
-						</Button>
-					)}
 				</CardHeader>
 				<CardContent>
 					<div className="space-y-4">
@@ -273,34 +260,34 @@ export default function ProfilePage() {
 									/>
 								</div>
 								<div className="flex justify-end space-x-2">
-									<Button onClick={handleCancel} variant="outline">
+									<Button onClick={handleCancel} className="max-md:text-xs" variant="outline">
 										<X className="mr-2 h-4 w-4" /> Cancel
 									</Button>
-									<Button onClick={handleSave}>
+									<Button onClick={handleSave} className="max-md:text-xs">
 										<Save className="mr-2 h-4 w-4" /> Save Changes
 									</Button>
 								</div>
 							</>
 						) : (
 							<>
-								<div className="flex items-center space-x-2">
-									<User className="h-5 w-5 text-gray-500" />
+								<div className="flex items-center space-x-2 max-md:text-sm">
+									<User className="h-5 w-5  text-gray-500" />
 									{editedUser.bio ? (
 										<span>{editedUser.bio}</span>
 									) : (
 										<span className="italic">No bio provided</span>
 									)}
 								</div>
-								<div className="flex items-center space-x-2">
-									<Mail className="h-5 w-5 text-gray-500" />
+								<div className="flex items-center space-x-2 max-md:text-sm">
+									<Mail className="h-5 w-5 max-md:h-4 max-md:w-4 text-gray-500" />
 									<span>{editedUser.email}</span>
 								</div>
-								<div className="flex items-center space-x-2">
-									<Briefcase className="h-5 w-5 text-gray-500" />
+								<div className="flex items-center space-x-2 max-md:text-sm">
+									<Briefcase className="h-5 w-5 max-md:h-4 max-md:w-4 text-gray-500" />
 									<span>Reputation: {editedUser.reputation}</span>
 								</div>
 								{status === "Student" && (
-									<div className="flex items-center space-x-2">
+									<div className="flex items-center space-x-2 max-md:text-sm">
 										<MapPin className="h-5 w-5 text-gray-500" />
 										<span>
 											Enrolled Courses:{" "}
@@ -308,8 +295,8 @@ export default function ProfilePage() {
 										</span>
 									</div>
 								)}
-								<div className="flex items-center space-x-2">
-									<Calendar className="h-5 w-5 text-gray-500" />
+								<div className="flex items-center space-x-2 max-md:text-sm">
+									<Calendar className="h-5 w-5 max-md:h-4 max-md:w-4 text-gray-500"  />
 									<span>
 										Joined {new Date(editedUser.joinedAt).toLocaleDateString()}
 									</span>
@@ -321,7 +308,7 @@ export default function ProfilePage() {
 					{!isChangingPassword ? (
 						<Button
 							onClick={() => setIsChangingPassword(true)}
-							className="mt-4"
+							className="mt-4 max-md:text-xs"
 						>
 							<Key className="mr-2 h-4 w-4" /> Change Password
 						</Button>

@@ -177,11 +177,12 @@ const PasswordForm = ({ onCancel, onSubmit }) => {
 					onClick={onCancel}
 					variant="outline"
 					disabled={isSubmitting}
+					className='max-md:text-xs'
 				>
 					<X className="mr-2 h-4 w-4" /> Cancel
 				</Button>
-				<Button type="submit" disabled={!isFormValid || isSubmitting}>
-					<Save className="mr-2 h-4 w-4" />
+				<Button className='max-md:text-xs' type="submit" disabled={!isFormValid || isSubmitting}>
+					<Save className="mr-2 h-4 w-4 " />
 					{isSubmitting ? "Changing Password..." : "Change Password"}
 				</Button>
 			</div>
