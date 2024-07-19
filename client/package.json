@@ -30,7 +30,6 @@
     "@reduxjs/toolkit": "^2.2.1",
     "@stream-io/video-react-sdk": "^0.5.8",
     "@stripe/stripe-js": "^3.0.10",
-    "@syncfusion/ej2-react-richtexteditor": "^24.2.8",
     "@tailwindcss/typography": "^0.5.10",
     "@tanstack/react-table": "^8.13.2",
     "axios": "^1.6.7",
