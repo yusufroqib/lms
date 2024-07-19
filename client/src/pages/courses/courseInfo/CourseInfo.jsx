@@ -84,11 +84,7 @@ const CourseInfo = () => {
 		};
 	}, []);
 
-	const hasPurchased = course?.purchasedBy?.some(
-		(item) => item?.user === _id
-	);
-
-
+	const hasPurchased = course?.purchasedBy?.some((item) => item?.user === _id);
 
 	if (isLoading) {
 		return (
@@ -146,14 +142,18 @@ const CourseInfo = () => {
 											value={Number(course?.averageRating)}
 											readonly
 										/>
-										<Typography>({course.averageRating})</Typography>
+										<Typography>({course?.reviews?.length})</Typography>
 									</div>
 								) : (
 									<div className=" text-blue-gray-500 italic">
 										<Typography>No Rating</Typography>
 									</div>
 								)}
+								<p className="text-sm text-gray-400">
+									{course?.purchasedBy?.length || 0} students
+								</p>
 							</div>
+
 							<hr className="border-gray-400 mb-8" />
 
 							{windowWidth < 1280 && (
@@ -166,7 +166,6 @@ const CourseInfo = () => {
 										isPurchased={isPurchased}
 										firstChapter={course.chapters[0]}
 										tutorId={course.tutor._id}
-
 									/>
 								</div>
 							)}
@@ -217,7 +216,7 @@ const CourseInfo = () => {
 										</TabPanel>
 										<TabPanel key={"reviews"} value={"reviews"}>
 											<div className="">
-												<ReviewsTab hasPurchased={hasPurchased}/>
+												<ReviewsTab hasPurchased={hasPurchased} />
 											</div>
 										</TabPanel>
 									</TabsBody>

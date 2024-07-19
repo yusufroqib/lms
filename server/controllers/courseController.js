@@ -407,7 +407,7 @@ const recordStudyTime = async (req, res) => {
 		const { courseId: course, duration } = req.body;
 		const userId = req.userId;
 		const foundCourse = await Course.findById(course)
-		console.log(foundCourse)
+		// console.log(foundCourse)
 		
 		const now = new Date();
 		if (foundCourse?.tutor?.toString() === userId) {

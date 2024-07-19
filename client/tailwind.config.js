@@ -16,10 +16,12 @@ export default withMT({
 	theme: {
 		extend: {
 			screens: {
-				"2xsm": "375px",
-				xsm: "425px",
+				"2xs": "375px",
+				xs: "425px",
 				...defaultTheme.screens,
 				"3xl": "2000px",
+				"max-2xs": { max: "375px" },
+				"max-xs" : { max: "425px" },
 				"max-sm": { max: "639px" }, // Add custom max-sm breakpoint
 				"max-md": { max: "767px" }, // Add custom max-md breakpoint
 				"max-lg": { max: "1023px" }, // Add custom max-lg breakpoint

@@ -192,7 +192,7 @@ const DropdownUser = () => {
 				</ul>
 				<button
 					onClick={handleLogout}
-					className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-blue-500 lg:text-base"
+					className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out text-red-500 hover:text-red-700 lg:text-base"
 				>
 					<svg
 						className="fill-current"
