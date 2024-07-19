@@ -68,11 +68,17 @@ const StudyPage = () => {
 
 	// if(!course) return <div>Loading...</div>
 	if (isError) return <div>Error</div>;
-	if (isLoading || isFetching) return <div className="flex min-h-[80vh] justify-center items-center">
-	<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
-</div>
+	if (isLoading || isFetching)
+		return (
+			<div className="flex min-h-[80vh] justify-center items-center">
+				<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />{" "}
+			</div>
+		);
 
-	if ((!course && isSuccess && !isTutorLoading ) || (isError && !isTutorLoading && !isLoading)) {
+	if (
+		(!course && isSuccess && !isTutorLoading) ||
+		(isError && !isTutorLoading && !isLoading)
+	) {
 		// navigate("/courses/search");
 		return <Navigate to={"/courses/search"} />;
 	}
@@ -95,6 +101,7 @@ const StudyPage = () => {
 					{/* <p>Duration: {duration} seconds</p> */}
 
 					<CourseNavbar
+						isTutor={isTutor}
 						course={{ ...course }}
 						progressCount={course.progress}
 					/>
