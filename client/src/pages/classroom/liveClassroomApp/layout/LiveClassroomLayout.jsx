@@ -9,7 +9,7 @@ import 'stream-chat-react/dist/css/v2/index.css';
 import "@stream-io/video-react-sdk/dist/css/styles.css";
 import "@/styles/index.scss";
 
-import "react-datepicker/dist/react-datepicker.css";
+// import "react-datepicker/dist/react-datepicker.css";
 import useAuth from "@/hooks/useAuth";
 import { useGetMyClassroomsQuery } from "@/features/users/usersApiSlice";
 import { Loader2 } from "lucide-react";
