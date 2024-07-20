@@ -1,7 +1,7 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useGetEnrolledCoursesQuery } from "@/features/courses/coursesApiSlice";
+import { useGetEnrolledCoursesQuery, useGetTutorCoursesQuery } from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
@@ -10,6 +10,7 @@ const StudyIndex = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const purchaseSuccess = searchParams.get("success");
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (!!purchaseSuccess) {
@@ -18,7 +19,6 @@ const StudyIndex = () => {
 	}, [purchaseSuccess]);
 
 	// console.log(courseId);
-	const navigate = useNavigate();
 	const { purchasedCourse, isLoading, isFetching, isSuccess, isError } =
 		useGetEnrolledCoursesQuery("enrolledCourses", {
 			selectFromResult: ({
@@ -62,6 +62,7 @@ const StudyIndex = () => {
 
 	// console.log(course);
 	let course = purchasedCourse || tutorCourse;
+	console.log(course)
 
 	useEffect(() => {
 		if (course && isSuccess) {

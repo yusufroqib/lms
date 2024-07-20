@@ -49,11 +49,22 @@ app.use(
 // and fetch cookies credentials requirement
 app.use(credentials);
 
+// Stripe webhook parsing middleware
+app.use((req, res, next) => {
+    if (req.originalUrl === '/api/webhook') {
+        next();
+    } else {
+        express.json()(req, res, next);
+    }
+});
+
+// Use express.raw for the Stripe webhook route
 app.use('/api', express.raw({ type: 'application/json' }));
+
 // Middleware to initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.json({ limit: "50mb" })); //parse json data inside the req body
+// app.use(express.json({ limit: "50mb" })); //parse json data inside the req body
 app.use(express.urlencoded({ extended: true })); // parse form data inside the req body
 
 // Cross Origin Resource Sharing
