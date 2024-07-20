@@ -193,7 +193,7 @@ const handleStripeWebhook = async (req, res) => {
 				// Record the transaction for the tutor (payout)
 				tutor.transactions.push({
 					type: "balanceTransfers",
-					amount: tutorAmount,
+					amount: tutorAmount / 100,
 					courseId: course._id,
 					stripeTransactionId: transfer.id,
 					status: "success",
@@ -207,7 +207,7 @@ const handleStripeWebhook = async (req, res) => {
 			// Record the transaction for the student (purchase)
 			user.transactions.push({
 				type: "purchase",
-				amount: totalAmount,
+				amount: totalAmount / 100,
 				courseId: course._id,
 				stripeTransactionId: session.id,
 				status: "completed",
@@ -429,11 +429,9 @@ const recordStudyTime = async (req, res) => {
 
 		const now = new Date();
 		if (foundCourse?.tutor?.toString() === userId) {
-			return res
-				.status(204)
-				.json({
-					message: "Tutor can't record study time for their own course",
-				});
+			return res.status(204).json({
+				message: "Tutor can't record study time for their own course",
+			});
 		}
 
 		// Get the start and end of the current day in UTC
