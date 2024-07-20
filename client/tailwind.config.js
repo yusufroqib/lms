@@ -361,7 +361,6 @@ export default withMT({
 		},
 	},
 	plugins: [
-		require("daisyui"),
 		require("tailwindcss-animate"),
 		require("@tailwindcss/typography"),
 	],
