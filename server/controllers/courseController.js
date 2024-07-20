@@ -194,7 +194,7 @@ const handleStripeWebhook = async (req, res) => {
 
 				// Record the transaction for the tutor (payout)
 				tutor.transactions.push({
-					type: "balanceTransfers",
+					type: "balanceTransfer",
 					amount: tutorAmountDollars,
 					courseId: course._id,
 					stripeTransactionId: transfer.id,
