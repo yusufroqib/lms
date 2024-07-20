@@ -177,14 +177,16 @@ const handleStripeWebhook = async (req, res) => {
 				return res.status(400).send("Tutor has no connected Stripe account");
 			}
 
-			const totalAmount = session.amount_total;
-			const platformFee = Math.round(totalAmount * 0.1); // 10% platform fee
-			const tutorAmount = totalAmount - platformFee;
+			const totalAmountCents = session.amount_total;
+			const totalAmountDollars = totalAmountCents / 100;
+			const platformFeeCents = Math.round(totalAmountCents * 0.1); // 10% platform fee
+			const tutorAmountCents = totalAmountCents - platformFeeCents;
+			const tutorAmountDollars = tutorAmountCents / 100;
 
 			// Transfer funds to tutor's Stripe account
 			try {
 				const transfer = await stripe.transfers.create({
-					amount: tutorAmount,
+					amount: totalAmountCents,
 					currency: session.currency,
 					destination: tutor.stripeAccountId,
 					transfer_group: session.id,
@@ -193,7 +195,7 @@ const handleStripeWebhook = async (req, res) => {
 				// Record the transaction for the tutor (payout)
 				tutor.transactions.push({
 					type: "balanceTransfers",
-					amount: tutorAmount / 100,
+					amount: tutorAmountDollars,
 					courseId: course._id,
 					stripeTransactionId: transfer.id,
 					status: "success",
@@ -207,7 +209,7 @@ const handleStripeWebhook = async (req, res) => {
 			// Record the transaction for the student (purchase)
 			user.transactions.push({
 				type: "purchase",
-				amount: totalAmount / 100,
+				amount: totalAmountDollars,
 				courseId: course._id,
 				stripeTransactionId: session.id,
 				status: "completed",
