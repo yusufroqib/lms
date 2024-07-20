@@ -217,7 +217,7 @@ const handleStripeWebhook = async (req, res) => {
 			await user.save();
 
 			// Update course and user as before
-			course.purchasedBy.push({ user: userId, amount: totalAmount });
+			course.purchasedBy.push({ user: userId, amount: totalAmountDollars });
 			await course.save();
 
 			courseClassroom.students.push(userId);
