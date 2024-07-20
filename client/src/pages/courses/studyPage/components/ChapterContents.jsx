@@ -105,7 +105,7 @@ const ChapterContents = ({ nextChapterId, chapter, purchase, isTutor }) => {
 					</div>
 					<Separator />
 					<div className="p-4">
-						{parse(chapter.description)}
+						{parse(chapter?.description)}
 						{/* <Markdown value={chapter.description}/> */}
 						{/* <Markdown value={chapter.description}/> */}
 					</div>

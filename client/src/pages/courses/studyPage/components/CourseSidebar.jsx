@@ -1,12 +1,10 @@
-// import { auth } from "@clerk/nextjs";
-// import { redirect } from "next/navigation";
-// import { db } from "@/lib/db";
-import useAuth from "@/hooks/useAuth";
 import { CourseProgress } from "@/components/ui/CourseProgress";
 import { CourseSidebarItem } from "./CourseSidebarItem";
 import React from "react";
 
 const CourseSidebar = ({ course, progressCount, purchase, isTutor }) => {
+	const publishedChapters =
+		course?.chapters?.filter((chapter) => chapter.isPublished) || [];
 
 	if (course) {
 		return (
@@ -20,7 +18,7 @@ const CourseSidebar = ({ course, progressCount, purchase, isTutor }) => {
 					)}
 				</div>
 				<div className="flex flex-col w-full">
-					{course.chapters.map((chapter) => (
+					{publishedChapters.map((chapter) => (
 						<CourseSidebarItem
 							isTutor={isTutor}
 							purchase={purchase}

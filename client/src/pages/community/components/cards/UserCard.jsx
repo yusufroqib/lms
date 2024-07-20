@@ -16,7 +16,6 @@ const UserCard = ({ user }) => {
 		isError,
 	} = useGetTopInteractedTagsQuery({ userId: user._id });
 
-    console.log(interactedTags)
 
 	// useEffect(() => {
 	//     const fetchTags = async () => {

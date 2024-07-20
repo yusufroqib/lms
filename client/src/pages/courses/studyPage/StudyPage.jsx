@@ -62,6 +62,11 @@ const StudyPage = () => {
 
 	let course = purchasedCourse || tutorCourse;
 
+	const publishedChapters =
+		course?.chapters?.filter((chapter) => chapter.isPublished) || [];
+
+	console.log(publishedChapters);
+
 	// console.log(course);
 
 	// console.log(course);
@@ -88,11 +93,11 @@ const StudyPage = () => {
 		const isPurchased = course.purchasedBy.some((item) => item.user === _id);
 		const isTutor = course.tutor === _id;
 		// console.log('TTTTTTTTTT', isPurchased)\
-		const chapter = course.chapters.find(
+		const chapter = publishedChapters.find(
 			(chapter) => chapter._id === chapterId
 		);
 		const nextChapterIndex =
-			course.chapters.findIndex((chapter) => chapter._id === chapterId) + 1;
+			publishedChapters.findIndex((chapter) => chapter._id === chapterId) + 1;
 		const nextChapterId = course.chapters[nextChapterIndex]?._id;
 		// console.log(chapter)
 		return (
