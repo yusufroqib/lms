@@ -50,9 +50,9 @@ export default function Navbar() {
 						</div>
 					) : (
 						<div className="py-6 flex justify-center">
-							<Link to="/dashboard">
+							<a href="/dashboard">
 								<Button variant={"default"}>Dashboard</Button>
-							</Link>
+							</a>
 						</div>
 					)}
 				</SheetContent>

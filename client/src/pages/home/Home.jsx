@@ -42,49 +42,7 @@ export default function Home() {
 	return (
 		<div className="flex flex-col min-h-[100dvh] bg-gray-200 ">
 			<Navbar />
-			{/* <header className="bg-background sticky top-0 z-50 border-b">
-				<div className="container flex items-center justify-between py-4 px-4 md:px-6">
-					<Link to="#" className="flex items-center gap-2" prefetch={false}>
-						<CloudyIcon className="h-6 w-6" />
-						<span className="font-bold text-lg">LMS Platform</span>
-					</Link>
-					<nav className="hidden md:flex items-center gap-6">
-						<Link
-							to="#"
-							className="text-sm font-medium hover:underline underline-offset-4"
-							prefetch={false}
-						>
-							Features
-						</Link>
-						<Link
-							to="#"
-							className="text-sm font-medium hover:underline underline-offset-4"
-							prefetch={false}
-						>
-							Pricing
-						</Link>
-						<Link
-							to="#"
-							className="text-sm font-medium hover:underline underline-offset-4"
-							prefetch={false}
-						>
-							Community
-						</Link>
-						<Link
-							to="#"
-							className="text-sm font-medium hover:underline underline-offset-4"
-							prefetch={false}
-						>
-							Contact
-						</Link>
-					</nav>
-					<div className="flex items-center gap-2 md:hidden">
-						<Button variant="outline" size="icon">
-							<MenuIcon className="h-5 w-5" />
-						</Button>
-					</div>
-				</div>
-			</header> */}
+			
 			<main className="flex-1 ">
 				<section className="bg-muted py-10 md:py-12 lg:py-20">
 					<div className="container grid md:grid-cols-2 gap-8 items-center mx-auto">
@@ -111,7 +69,7 @@ export default function Home() {
 								) : (
 									<nav className=" max-md:mx-auto gap-6">
 										{/* <div className="grid gap-2 py-6"> */}
-										<Link to="/dashboard">
+										<a href="/dashboard">
 											<Button
 												size="lg"
 												className={"lg:h-14 text-lg lg:text-xl"}
@@ -119,7 +77,7 @@ export default function Home() {
 											>
 												Dashboard
 											</Button>
-										</Link>
+										</a>
 									</nav>
 								)}
 								{/* <Button
