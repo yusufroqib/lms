@@ -30,7 +30,7 @@ const userSchema = new Schema(
 			{
 				type: {
 					type: String,
-					enum: ["purchase", "payout"],
+					enum: ["purchase", "payout", "balanceTransfers"],
 				},
 				amount: Number,
 				status: String,

@@ -120,15 +120,7 @@ function RTEditor({ name, value, setValue, editorRef, field }) {
 		},
 	};
 
-	// const handleChange = (event, editor) => {
-	// 	const data = editor.getData();
-	// 	console.log(data)
-	// 	// setValue(data);
-
-	// 	field.onChange(data);
-
-	// 	// console.log(name, e.value)
-	// };
+	
 
 	return (
 		<CKEditor

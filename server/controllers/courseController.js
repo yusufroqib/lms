@@ -168,15 +168,8 @@ const handleStripeWebhook = async (req, res) => {
 
 		const user = await User.findById(userId);
 
-		// console.log(event.type);
-
 		if (event.type === "checkout.session.completed") {
-			const session = event.data.object;
-			const userId = session.metadata.userId;
-			const courseId = session.metadata.courseId;
-
 			const course = await Course.findById(courseId);
-			const user = await User.findById(userId);
 			const tutor = await User.findById(course.tutor);
 
 			if (!tutor.stripeAccountId) {
@@ -184,7 +177,32 @@ const handleStripeWebhook = async (req, res) => {
 				return res.status(400).send("Tutor has no connected Stripe account");
 			}
 
-			const totalAmount = course.price;
+			const totalAmount = session.amount_total;
+			const platformFee = Math.round(totalAmount * 0.1); // 10% platform fee
+			const tutorAmount = totalAmount - platformFee;
+
+			// Transfer funds to tutor's Stripe account
+			try {
+				const transfer = await stripe.transfers.create({
+					amount: tutorAmount,
+					currency: session.currency,
+					destination: tutor.stripeAccountId,
+					transfer_group: session.id,
+				});
+
+				// Record the transaction for the tutor (payout)
+				tutor.transactions.push({
+					type: "balanceTransfers",
+					amount: tutorAmount,
+					courseId: course._id,
+					stripeTransactionId: transfer.id,
+					status: "success",
+				});
+				await tutor.save();
+			} catch (error) {
+				console.error("Failed to transfer funds to tutor:", error);
+				return res.status(500).send("Failed to transfer funds to tutor");
+			}
 
 			// Record the transaction for the student (purchase)
 			user.transactions.push({
@@ -406,14 +424,16 @@ const recordStudyTime = async (req, res) => {
 	try {
 		const { courseId: course, duration } = req.body;
 		const userId = req.userId;
-		const foundCourse = await Course.findById(course)
+		const foundCourse = await Course.findById(course);
 		// console.log(foundCourse)
-		
+
 		const now = new Date();
 		if (foundCourse?.tutor?.toString() === userId) {
 			return res
 				.status(204)
-				.json({ message: "Tutor can't record study time for their own course" });
+				.json({
+					message: "Tutor can't record study time for their own course",
+				});
 		}
 
 		// Get the start and end of the current day in UTC
