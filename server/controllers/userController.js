@@ -37,81 +37,81 @@ const loggedInUser = async (req, res) => {
 };
 const becomeTutor = async (req, res) => {
 	try {
-	  const userId = req.userId; 
-	  const user = await User.findById(userId);
-  
-	  if (!user) {
-		return res.status(404).json({ message: 'User not found' });
-	  }
-  
-	  if (user.roles.Tutor) {
-		return res.status(400).json({ message: 'User is already a tutor' });
-	  }
-  
-	  // Update user role to Tutor
-	  user.roles.Tutor = 'Tutor';
-	  await user.save();
-  
-	  res.status(200).json({ message: 'User is now a tutor' });
+		const userId = req.userId;
+		const user = await User.findById(userId);
+
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		if (user.roles.Tutor) {
+			return res.status(400).json({ message: "User is already a tutor" });
+		}
+
+		// Update user role to Tutor
+		user.roles.Tutor = "Tutor";
+		await user.save();
+
+		res.status(200).json({ message: "User is now a tutor" });
 	} catch (error) {
-	  console.error('Error in becomeTutor:', error);
-	  res.status(500).json({ message: 'Internal server error' });
+		console.error("Error in becomeTutor:", error);
+		res.status(500).json({ message: "Internal server error" });
 	}
-  };
+};
 const updateProfile = async (req, res) => {
-    try {
-        const userId = req.userId;
-        const { name, username, bio, avatar } = req.body;
-        // console.log(req.body);
+	try {
+		const userId = req.userId;
+		const { name, username, bio, avatar } = req.body;
+		// console.log(req.body);
 
-        // Check if the new username already exists (excluding the current user)
-        if (username) {
-            const existingUser = await User.findOne({
-                username,
-                _id: { $ne: userId },
-            });
-            if (existingUser) {
-                return res.status(400).json({ message: "Username already exists" });
-            }
-        }
+		// Check if the new username already exists (excluding the current user)
+		if (username) {
+			const existingUser = await User.findOne({
+				username,
+				_id: { $ne: userId },
+			});
+			if (existingUser) {
+				return res.status(400).json({ message: "Username already exists" });
+			}
+		}
 
-        // Prepare the update object
-        const updateObject = {};
-        if (name) updateObject.name = name;
-        if (username) updateObject.username = username;
-        if (bio) updateObject.bio = bio;
-        if (avatar) {
-            // If avatar is an array, take the last element (which should be the Firebase URL)
-            updateObject.avatar = Array.isArray(avatar) ? avatar[avatar.length - 1] : avatar;
-        }
+		// Prepare the update object
+		const updateObject = {};
+		if (name) updateObject.name = name;
+		if (username) updateObject.username = username;
+		if (bio) updateObject.bio = bio;
+		if (avatar) {
+			// If avatar is an array, take the last element (which should be the Firebase URL)
+			updateObject.avatar = Array.isArray(avatar)
+				? avatar[avatar.length - 1]
+				: avatar;
+		}
 
 		// console.log(updateObject)
 
-        // Find the user and update their profile
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            updateObject,
-            { new: true, runValidators: true }
-        ).select("-password");
+		// Find the user and update their profile
+		const updatedUser = await User.findByIdAndUpdate(userId, updateObject, {
+			new: true,
+			runValidators: true,
+		}).select("-password");
 
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
+		if (!updatedUser) {
+			return res.status(404).json({ message: "User not found" });
+		}
 
-        res.json(updatedUser);
-    } catch (error) {
-        console.error("Profile update error:", error);
-        if (error.name === "ValidationError") {
-            return res
-                .status(400)
-                .json({ message: "Validation error", error: error.message });
-        }
-        res
-            .status(500)
-            .json({ message: "Error updating profile", error: error.message });
-    }
+		res.json(updatedUser);
+	} catch (error) {
+		console.error("Profile update error:", error);
+		if (error.name === "ValidationError") {
+			return res
+				.status(400)
+				.json({ message: "Validation error", error: error.message });
+		}
+		res
+			.status(500)
+			.json({ message: "Error updating profile", error: error.message });
+	}
 };
-
 
 const changePassword = async (req, res) => {
 	try {
@@ -125,9 +125,13 @@ const changePassword = async (req, res) => {
 		}
 
 		// Check if the current password is correct
-		const isMatch = await bcrypt.compare(currentPassword, user.password);
-		if (!isMatch) {
-			return res.status(400).json({ message: "Current password is incorrect" });
+		if (user.password) {
+			const isMatch = await bcrypt.compare(currentPassword, user.password);
+			if (!isMatch) {
+				return res
+					.status(400)
+					.json({ message: "Current password is incorrect" });
+			}
 		}
 
 		// Hash the new password

@@ -30,7 +30,9 @@
     "nodemailer": "^6.9.9",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "siwe": "^2.3.2",
     "stream-chat": "^8.25.0",
-    "stripe": "^14.21.0"
+    "stripe": "^14.21.0",
+    "ua-parser-js": "^1.0.38"
   }
 }

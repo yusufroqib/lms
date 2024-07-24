@@ -9,7 +9,7 @@ module.exports = createActivationToken = (user) => {
 		},
 		process.env.ACTIVATION_SECRET,
 		{
-			expiresIn: "5m",
+			expiresIn: "10m",
 		}
 	);
 

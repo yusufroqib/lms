@@ -89,7 +89,7 @@ const handleRefreshToken = async (req, res) => {
 						image: foundUser.avatar,
 						roles: roles,
 						streamToken: streamToken,
-						stripeAccountId: foundUser.stripeAccountId,
+						stripeOnboardingComplete: foundUser.stripeOnboardingComplete,
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,

@@ -5,6 +5,9 @@ const { sendMail } = require("../utils/sendMail.js");
 const createActivationToken = require("../utils/createActivationToken.js");
 // const { connect } = require("getstream");
 const { StreamClient } = require("@stream-io/node-sdk");
+const UAParser = require("ua-parser-js");
+const formatDate = require("../utils/formateDate.js");
+const getGeolocation = require("../utils/geolocation.js");
 
 const api_key = process.env.STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
@@ -86,15 +89,7 @@ const generateGoogleAuthCookie = async (req, res) => {
 		// Saving refreshToken with current user
 		foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
 
-		// const serverClient = connect(api_key, api_secret, app_id);
-		// const expirationTime = Math.floor(Date.now() / 1000) + 3600;
-		// const issuedAt = Math.floor(Date.now() / 1000) - 60;
-		// const streamToken = serverClient.createUserToken(foundUser._id.toString(), expirationTime, issuedAt);
-
 		const result = await foundUser.save();
-		// console.log(result)
-
-		// const userInfo = {...result, password: ''}
 
 		// Creates Secure Cookie with refresh token
 		res.cookie("jwt", newRefreshToken, {
@@ -135,7 +130,6 @@ const signUp = async (req, res) => {
 
 		const salt = await bcrypt.genSalt(10);
 
-
 		const hashedPassword = await bcrypt.hash(password, salt);
 		// const hashedPassword = await bcrypt.hash(password, 12);
 		const user = { name, username, email, password: hashedPassword };
@@ -168,6 +162,49 @@ const signUp = async (req, res) => {
 	}
 };
 
+const submitAdditionalInfo = async (req, res) => {
+	const { email, username, name, ethAddress } = req.body;
+
+
+	try {
+		const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+		if (existingUser) {
+			return res
+				.status(400)
+				.json({ error: "Email or username already exists" });
+		}
+
+		const user = { name, username, email, ethAddress };
+
+		const activationToken = createActivationToken(user);
+		const activationCode = activationToken.activationCode;
+
+		const data = { user: { name: user.name }, activationCode };
+
+		try {
+			console.log("Sending activation email...");
+			await sendMail({
+				email: user.email,
+				subject: "Activate your Account",
+				template: "activation-mail.ejs",
+				data,
+			});
+			console.log("Activation email sent successfully.");
+			res.status(201).json({
+				success: true,
+				message: `Please check your email ${user.email} to activate your account`,
+				activationToken: activationToken.token,
+			});
+		} catch (error) {
+			console.error("Error sending email:", error);
+			return res.status(400).json({ error: error.message });
+		}
+	} catch (error) {
+		console.error("Error in processing request:", error);
+		res.status(400).json({ error: error.message });
+	}
+};
+
 const activateUser = async (req, res) => {
 	try {
 		const { activation_token, activation_code } = req.body;
@@ -178,19 +215,33 @@ const activateUser = async (req, res) => {
 			return res.status(400).json({ error: "Invalid activation code" });
 		}
 
-		const { name, email, username, password } = newUser.user;
+		const { name, email, username, password, ethAddress } = newUser.user;
 
-		const existUser = await User.findOne({ email });
+		const existUser = await User.findOne({
+			$or: [{ email }, { username }],
+		});
 
 		if (existUser) {
 			return res.status(400).json({ error: "User already exists" });
 		}
-		const user = await User.create({
-			name,
-			username,
-			email,
-			password,
-		});
+
+		let user;
+		if (password) {
+			user = await User.create({
+				name,
+				username,
+				email,
+				password,
+			});
+		}
+		if (ethAddress) {
+			user = await User.create({
+				name,
+				username,
+				email,
+				connectedWallets: [ethAddress],
+			});
+		}
 
 		const newRefreshToken = jwt.sign(
 			{ _id: user._id.toString() },
@@ -325,8 +376,31 @@ const passwordResetConfirmed = async (req, res) => {
 
 const login = async (req, res) => {
 	const cookies = req.cookies;
-	const { user, password } = req.body;
-	// console.log(req.body);
+	const { user, password, fingerprint } = req.body;
+
+	const uaParser = new UAParser(req.headers["user-agent"]);
+	const browserName = `${uaParser.getBrowser().name} ${
+		uaParser.getBrowser().version || ""
+	}`;
+	const osName = `${uaParser.getOS().name} ${uaParser.getOS().version || ""}`;
+
+	const geoLocationData = await getGeolocation(req.ip);
+	const location = `${geoLocationData.state_prov}, ${geoLocationData.country_name}`;
+
+	// console.log(location);
+
+	const deviceInfo = {
+		fingerprint,
+		userAgent: req.headers["user-agent"],
+		browser: browserName,
+		os: osName,
+		lastIP: req.ip,
+		location,
+		lastUsed: new Date(),
+		isVerified: false,
+	};
+
+	// console.log(deviceInfo);
 
 	try {
 		if (!user || !password)
@@ -352,6 +426,57 @@ const login = async (req, res) => {
 		// evaluate password
 		const match = await bcrypt.compare(password, foundUser.password);
 		if (match) {
+			foundUser.devices = foundUser.devices.filter(
+				(device) => device.expiresAt > new Date()
+			);
+
+			const knownDevice = foundUser.devices.find(
+				(d) => d.fingerprint === fingerprint
+			);
+
+			if (!knownDevice) {
+				const user = {
+					name: foundUser.name,
+					deviceInfo: deviceInfo,
+					email: foundUser.email,
+				};
+
+				const activationToken = createActivationToken(user);
+				const activationCode = activationToken.activationCode;
+
+				const data = {
+					user: { name: user.name },
+					deviceInfo: {
+						...deviceInfo,
+						lastUsed: formatDate(deviceInfo.lastUsed),
+					},
+					activationCode,
+				};
+
+				try {
+					console.log("Sending activation email...");
+					await sendMail({
+						email: user.email,
+						subject: "Signing in from a new device",
+						template: "new-device-mail.ejs",
+						data,
+					});
+					console.log("New device mail sent successfully.");
+					return res.status(201).json({
+						success: true,
+						message: `Please check your email ${user.email} to authorize this device`,
+						activationToken: activationToken.token,
+						email: user.email,
+					});
+				} catch (error) {
+					console.error("Error sending email:", error);
+					return res.status(400).json({ error: error.message });
+				}
+			}
+
+			knownDevice.lastUsed = new Date();
+			knownDevice.lastIP = req.ip;
+
 			const roles = Object.values(foundUser.roles).filter(Boolean);
 
 			const newRefreshToken = jwt.sign(
@@ -392,15 +517,7 @@ const login = async (req, res) => {
 			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
 
 			const streamClient = new StreamClient(api_key, api_secret);
-			const expirationTime = Math.floor(Date.now() / 1000) + 3600;
-			const issuedAt = Math.floor(Date.now() / 1000) - 60;
-			// const streamToken = streamClient.createToken(foundUser._id.toString(), expirationTime, issuedAt);
 			const streamToken = streamClient.createToken(foundUser._id.toString());
-
-			// const serverClient = connect(api_key, api_secret, app_id);
-			// const expirationTime = Math.floor(Date.now() / 1000) + 3600;
-			// const issuedAt = Math.floor(Date.now() / 1000) - 60;
-			// const streamToken = serverClient.createUserToken(foundUser._id.toString(), expirationTime, issuedAt);
 
 			const result = await foundUser.save();
 			// console.log(result)
@@ -415,7 +532,7 @@ const login = async (req, res) => {
 						image: foundUser.avatar,
 						roles: roles,
 						streamToken: streamToken,
-						stripeAccountId: foundUser.stripeAccountId
+						stripeOnboardingComplete: foundUser.stripeOnboardingComplete,
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,
@@ -441,7 +558,64 @@ const login = async (req, res) => {
 			res.status(401).json({ message: "Invalid username or password" }); //Unauthorized
 		}
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({ message: error.message });
+	}
+};
+
+const verifyDeviceOTP = async (req, res) => {
+	const { activation_token, activation_code, fingerprint } = req.body;
+
+	try {
+		const decoded = jwt.verify(activation_token, process.env.ACTIVATION_SECRET);
+
+		if (decoded.activationCode !== activation_code) {
+			return res.status(400).json({ error: "Invalid activation code" });
+		}
+
+		const { email } = decoded.user;
+
+		const user = await User.findOne({ email });
+
+		if (!user) {
+			return res.status(400).json({ error: "User not found" });
+		}
+
+		user.devices.push({
+			...decoded.user.deviceInfo,
+			isVerified: true,
+		});
+		const newRefreshToken = jwt.sign(
+			{ _id: user._id.toString() },
+			process.env.REFRESH_TOKEN_SECRET,
+			{ expiresIn: "1d" }
+		);
+		let newRefreshTokenArray = user.refreshToken;
+
+		// Saving refreshToken with current user
+		user.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+
+		// const result = await user.save();
+		// console.log(result)
+		await user.save();
+
+		// const userInfo = {...result, password: ''}
+
+		// Creates Secure Cookie with refresh token
+		res.cookie("jwt", newRefreshToken, {
+			httpOnly: true,
+			secure: true,
+			sameSite: "None",
+			maxAge: 24 * 60 * 60 * 1000,
+		});
+
+		res.status(201).json({
+			success: true,
+			message: "Device verified successfully",
+		});
+	} catch (error) {
+		console.log(error)
+		res.status(500).json({ error: error.message });
 	}
 };
 
@@ -483,11 +657,12 @@ module.exports = {
 	generateGoogleAuthCookie,
 	signUp,
 	activateUser,
+	submitAdditionalInfo,
 	login,
+	verifyDeviceOTP,
 	logout,
 	getCurrentUserInfo,
 	passwordReset,
 	confirmPasswordResetOTP,
 	passwordResetConfirmed,
-	
 };

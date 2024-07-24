@@ -17,6 +17,8 @@ const courseRoutes = require("./routes/courseRoutes");
 const classroomRoutes = require("./routes/classroomRoutes");
 const communityRoutes = require("./routes/communityRoutes");
 const webhookRoute = require("./routes/webhookRoute");
+const nonceRoutes = require("./routes/nonceRoutes");
+
 const homeHTMLContent = require("./utils/homeHTMLContent");
 // const webhookRoute = require("./routes/webhookRoute");
 require("./config/passport-setup");
@@ -33,7 +35,6 @@ const store = new MongoDBStore({
 	expires: 1 * 60 * 60, // 1hr in seconds
 });
 
-
 // Use express-session middleware
 app.use(
 	session({
@@ -44,22 +45,21 @@ app.use(
 	})
 );
 
-
 // Handle options credentials check - before CORS!
 // and fetch cookies credentials requirement
 app.use(credentials);
 
 // Stripe webhook parsing middleware
 app.use((req, res, next) => {
-    if (req.originalUrl === '/api/webhook') {
-        next();
-    } else {
-        express.json()(req, res, next);
-    }
+	if (req.originalUrl === "/api/webhook") {
+		next();
+	} else {
+		express.json()(req, res, next);
+	}
 });
 
 // Use express.raw for the Stripe webhook route
-app.use('/api', express.raw({ type: 'application/json' }));
+app.use("/api", express.raw({ type: "application/json" }));
 
 // Middleware to initialize passport
 app.use(passport.initialize());
@@ -72,20 +72,18 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 // app.use(bodyParser.raw({ type: 'application/json' }));
 
-
-app.get('/', (req, res) => {
-	
+app.get("/", (req, res) => {
 	res.send(homeHTMLContent);
-  });
-  
+});
+app.use("/nonce", nonceRoutes);
 app.use("/auth", authRoutes);
 app.use("/api", webhookRoute);
 app.use("/refresh", refreshRoute);
 app.use("/users", userRoutes);
 app.use("/tutors", tutorRoutes);
-app.use('/courses', courseRoutes);
-app.use('/classrooms', classroomRoutes);
-app.use('/community', communityRoutes);
+app.use("/courses", courseRoutes);
+app.use("/classrooms", classroomRoutes);
+app.use("/community", communityRoutes);
 
 mongoose
 	.connect(process.env.MONGO_URI)

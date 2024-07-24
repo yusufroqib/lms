@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Learniverse Password Reset Email</title>
+		<title>Learniverse Activation Email</title>
 		<style type="text/css">
 			body {
 				margin: 0;
@@ -30,7 +30,7 @@
 			p {
 				margin-top: 0;
 				margin-bottom: 24px;
-				font-size: 18px;
+                font-size: 18px;
 			}
 			table td {
 				vertical-align: top;
@@ -68,13 +68,32 @@
 	<body>
 		<div class="email-wrapper">
 			<div class="email-header">
-				<h1>Learniverse</h1>
+				<h1>Login Attempt Detected</h1>
 			</div>
 			<div class="email-body">
-				<p style="font-size: 24px">Hello <%= user.name %> ,</p>
+				<p  style="font-size: 24px">Hello <%= user.name %> ,</p>
 				<p>
-					You recently requested to reset the password for your Learniverse
-					account, please use the following code :
+					We have detected an attempt to login from an unknown device/IP address
+				</p>
+				<p>
+					<strong>Time:</strong> <%= deviceInfo.lastUsed %>
+				</p>
+				<p>
+					<strong>Browser:</strong> <%= deviceInfo.browser %>
+				</p>
+				<p>
+					<strong>Operating System:</strong> <%= deviceInfo.os %>
+				</p>
+				<p>
+					<strong>IP-Address:</strong> <%= deviceInfo.lastIP %>
+				</p>
+				<p>
+					<strong>Location:</strong> <%= deviceInfo.location %>
+				</p>
+				<br>
+				<p>
+					Please enter this code on the verification page within the next 10
+					minutes.
 				</p>
 				<h1
 					style="
@@ -89,17 +108,13 @@
 				>
 					<%= activationCode %>
 				</h1>
+				
 				<p>
-					Please enter this code on the activation page withing the next 5
-					minutes.
-				</p>
-				<p>
-					If you did not request a password reset, please ignore this email or
-					reply to let us know.
+					If you did not make this request, someone might have your password. Kindly change your password.
 				</p>
 			</div>
 			<div class="email-footer">
-				<p style="font-size: 16px;">
+				<p>
 					if you have any questions, please don't hesitate to contact us at
 					<a href="mailto:yusufroqib@gmail.com"> Learniverse</a>
 				</p>
