@@ -20,6 +20,7 @@ const webhookRoute = require("./routes/webhookRoute");
 const nonceRoutes = require("./routes/nonceRoutes");
 
 const homeHTMLContent = require("./utils/homeHTMLContent");
+const CoursePaymentController = require("./controllers/contractEventsController");
 // const webhookRoute = require("./routes/webhookRoute");
 require("./config/passport-setup");
 
@@ -84,6 +85,9 @@ app.use("/tutors", tutorRoutes);
 app.use("/courses", courseRoutes);
 app.use("/classrooms", classroomRoutes);
 app.use("/community", communityRoutes);
+
+CoursePaymentController.initializeWebSocket();
+
 
 mongoose
 	.connect(process.env.MONGO_URI)

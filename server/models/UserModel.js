@@ -32,10 +32,15 @@ const userSchema = new Schema(
 					type: String,
 					enum: ["purchase", "payout", "balanceTransfer"],
 				},
+				paymentMethod: {
+					type: String,
+					enum: ["card", "crypto"],
+				},
 				amount: Number,
 				status: String,
 				courseId: { type: Schema.Types.ObjectId, ref: "Course" },
 				stripeTransactionId: String,
+				txHash: String,
 				createdAt: { type: Date, default: Date.now },
 			},
 		],
@@ -48,6 +53,7 @@ const userSchema = new Schema(
 			Admin: String,
 		},
 		connectedWallets: { type: [String], default: [] },
+		paymentWallet: String,
 		reputation: { type: Number, default: 0 },
 		saved: [{ type: Schema.Types.ObjectId, ref: "Post" }],
 		enrolledCourses: [
@@ -67,20 +73,23 @@ const userSchema = new Schema(
 		],
 		badges: [{ type: Schema.Types.ObjectId, ref: "Badge" }],
 		devices: [
-            {
-                fingerprint: String,
-                userAgent: String,
-                browser: String,
-                os: String,
-                lastIP: String,
+			{
+				fingerprint: String,
+				userAgent: String,
+				browser: String,
+				os: String,
+				lastIP: String,
 				location: String,
-                lastUsed: Date,
-                isVerified: Boolean,
-                createdAt: { type: Date, default: Date.now },
-                // expiresAt: { type: Date, default: () => new Date(+new Date() + 2*60*1000) } // 30 days from now
-                expiresAt: { type: Date, default: () => new Date(+new Date() + 30*24*60*60*1000) } // 30 days from now
-            },
-        ],
+				lastUsed: Date,
+				isVerified: Boolean,
+				createdAt: { type: Date, default: Date.now },
+				// expiresAt: { type: Date, default: () => new Date(+new Date() + 2*60*1000) } // 30 days from now
+				expiresAt: {
+					type: Date,
+					default: () => new Date(+new Date() + 30 * 24 * 60 * 60 * 1000),
+				}, // 30 days from now
+			},
+		],
 		joinedAt: {
 			type: Date,
 			default: Date.now,
@@ -90,8 +99,5 @@ const userSchema = new Schema(
 		timestamps: true,
 	}
 );
-
-
-
 
 module.exports = mongoose.model("User", userSchema);

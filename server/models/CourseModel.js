@@ -69,8 +69,12 @@ const courseSchema = new Schema(
 		},
 		price: {
 			type: Number,
-			default: 0
+			default: 0,
 			// required: true,
+		},
+		paymentMethod: {
+			type: String,
+			enum: ["card", "crypto", "both", "none"],
 		},
 		classroom: {
 			type: Schema.Types.ObjectId,
@@ -83,7 +87,7 @@ const courseSchema = new Schema(
 			type: String,
 		},
 		previewVideoUrl: {
-			type:String
+			type: String,
 		},
 		categoryId: {
 			type: Schema.Types.ObjectId,

@@ -461,6 +461,9 @@ const toggleCoursePublicationStatus = async (req, res) => {
 		const client = createStreamChatClient();
 
 		const { id: courseId } = req.params;
+		const { paymentMethod } = req.body;
+
+		const userWithWallet = await User.findById(userId).select("paymentWallet");
 
 		// Check if the user owns the course
 		const ownCourse = await Course.findOne({
@@ -479,6 +482,15 @@ const toggleCoursePublicationStatus = async (req, res) => {
 			return res
 				.status(400)
 				.json({ message: "Cannot publish course with no chapters" });
+		}
+
+		if (
+			(paymentMethod === "both" || paymentMethod === "crypto") &&
+			!userWithWallet.paymentWallet
+		) {
+			return res.status(400).json({
+				message: "Please set up your address to receive crypto payment",
+			});
 		}
 
 		if (ownCourse.isPublished) {

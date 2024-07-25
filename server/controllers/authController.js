@@ -529,6 +529,8 @@ const login = async (req, res) => {
 						_id: foundUser._id,
 						username: foundUser.username,
 						fullName: foundUser.name,
+						connectedWallets: foundUser.connectedWallets,
+						paymentWallet: foundUser.paymentWallet,
 						image: foundUser.avatar,
 						roles: roles,
 						streamToken: streamToken,
