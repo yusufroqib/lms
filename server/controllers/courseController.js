@@ -77,8 +77,16 @@ const purchaseCourse = async (req, res) => {
 
 		// Find the course by its ID
 		const course = await Course.findById(courseId);
+		const tutor = await User.findById(course.tutor);
+
 		if (!course) {
 			return res.status(404).json({ message: "Course not found" });
+		}
+
+		if (!tutor.stripeOnboardingComplete) {
+			return res
+				.status(403)
+				.json({ message: "Tutor has not setup stripe to receive payments" });
 		}
 
 		// Ensure the course is published

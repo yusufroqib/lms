@@ -420,7 +420,7 @@ const login = async (req, res) => {
 		if (!foundUser.password) {
 			return res.status(404).json({
 				error:
-					"This user was registered using Google. Login with Google and create password.",
+					"This user registered with Google or Wallet. Login with Google and create password.",
 			});
 		}
 		// evaluate password

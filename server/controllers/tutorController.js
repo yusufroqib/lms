@@ -462,6 +462,7 @@ const toggleCoursePublicationStatus = async (req, res) => {
 
 		const { id: courseId } = req.params;
 		const { paymentMethod } = req.body;
+		console.log(req.body)
 
 		const userWithWallet = await User.findById(userId).select("paymentWallet");
 
@@ -476,6 +477,16 @@ const toggleCoursePublicationStatus = async (req, res) => {
 
 		// Toggle the course's publication status
 		ownCourse.isPublished = !ownCourse.isPublished;
+
+		if (ownCourse.isPublished && paymentMethod) {
+			ownCourse.paymentMethod = paymentMethod;
+		}
+
+		if (!paymentMethod && ownCourse.price && ownCourse.isPublished) {
+			return res
+				.status(400)
+				.json({ message: "Please select mode of payment for this course" });
+		}
 
 		// If the course is being published and has no chapters, return error
 		if (ownCourse.isPublished && ownCourse.chapters.length === 0) {

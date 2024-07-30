@@ -78,7 +78,7 @@ const setupEventListeners = () => {
             const course = await Course.findById(courseId);
 
             if (user && course) {
-                const txHash = event.transactionHash;
+                const txHash = event.log.transactionHash;
 
                 await User.findByIdAndUpdate(user._id, {
                     $push: {
@@ -117,10 +117,11 @@ const setupEventListeners = () => {
 
     // TutorWithdrawal event
     contract.on("TutorWithdrawal", async (tutorId, amount, event) => {
+        // console.log( event.log.transactionHash)
         try {
             const user = await User.findOne({ _id: tutorId });
             if (user) {
-                const txHash = event.transactionHash;
+                const txHash = event.log.transactionHash;
 
                 await User.findByIdAndUpdate(user._id, {
                     $push: {

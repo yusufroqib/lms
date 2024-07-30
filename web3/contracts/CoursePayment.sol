@@ -2,9 +2,12 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CoursePayment is Ownable {
+    using SafeERC20 for IERC20;
+
     IERC20 public usdcToken;
     uint256 public platformFeePercentage = 10;
 
@@ -33,7 +36,7 @@ contract CoursePayment is Ownable {
     event TutorWithdrawal(string tutorId, uint256 amount);
     event PlatformFeeUpdated(uint256 newPercentage);
 
-    constructor(address _usdcTokenAddress) Ownable(msg.sender) {
+    constructor(address _usdcTokenAddress) Ownable(msg.sender) { 
         usdcToken = IERC20(_usdcTokenAddress);
     }
 
@@ -52,7 +55,10 @@ contract CoursePayment is Ownable {
         emit TutorRegistered(_id, msg.sender);
     }
 
-    function updateTutorAddress(string memory _id, address _newAddress) external {
+    function updateTutorAddress(
+        string memory _id,
+        address _newAddress
+    ) external {
         require(tutorsById[_id].isRegistered, "Tutor not registered");
         require(
             msg.sender == tutorsById[_id].walletAddress ||
@@ -67,9 +73,10 @@ contract CoursePayment is Ownable {
         emit TutorAddressUpdated(_id, oldAddress, _newAddress);
     }
 
-    function withdrawTutorBalance(string memory _tutorId, uint256 amount)
-        external
-    {
+    function withdrawTutorBalance(
+        string memory _tutorId,
+        uint256 amount
+    ) external {
         require(tutorsById[_tutorId].isRegistered, "Tutor not registered");
         require(
             msg.sender == tutorsById[_tutorId].walletAddress,
@@ -78,11 +85,10 @@ contract CoursePayment is Ownable {
         require(tutorsById[_tutorId].balance >= amount, "Insufficient balance");
 
         tutorsById[_tutorId].balance -= amount;
-        require(usdcToken.transfer(msg.sender, amount), "Transfer failed");
+        usdcToken.safeTransfer(msg.sender, amount);
 
         emit TutorWithdrawal(_tutorId, amount);
     }
-
     function isAddressUsed(address _address) internal view returns (bool) {
         for (uint256 i = 0; i < tutorIds.length; i++) {
             if (tutorsById[tutorIds[i]].walletAddress == _address) {
@@ -101,10 +107,12 @@ contract CoursePayment is Ownable {
         string memory _courseId
     ) external {
         require(tutorsById[_tutorId].isRegistered, "Tutor not registered");
-        require(
-            usdcToken.transferFrom(msg.sender, address(this), amount),
-            "Transfer failed"
-        );
+
+        // Check allowance
+        require(checkAllowance(msg.sender, amount), "Insufficient allowance");
+
+        // Use safeTransferFrom instead of transferFrom for added security
+        usdcToken.safeTransferFrom(msg.sender, address(this), amount);
 
         uint256 platformFee = (amount * platformFeePercentage) / 100;
         uint256 tutorAmount = amount - platformFee;
@@ -114,11 +122,17 @@ contract CoursePayment is Ownable {
         emit CoursePurchased(msg.sender, _tutorId, amount, _courseId);
     }
 
-    function getTutorBalance(string memory _tutorId)
-        external
-        view
-        returns (uint256)
-    {
+    // Helper function to check allowance
+    function checkAllowance(
+        address _user,
+        uint256 _amount
+    ) public view returns (bool) {
+        return usdcToken.allowance(_user, address(this)) >= _amount;
+    }
+
+    function getTutorBalance(
+        string memory _tutorId
+    ) external view returns (uint256) {
         return tutorsById[_tutorId].balance;
     }
 
@@ -143,10 +157,9 @@ contract CoursePayment is Ownable {
         return 0;
     }
 
-    function updatePlatformFeePercentage(uint256 newFeePercentage)
-        external
-        onlyOwner
-    {
+    function updatePlatformFeePercentage(
+        uint256 newFeePercentage
+    ) external onlyOwner {
         require(newFeePercentage <= 20, "Fee percentage too high");
         platformFeePercentage = newFeePercentage;
         emit PlatformFeeUpdated(newFeePercentage);
@@ -155,6 +168,6 @@ contract CoursePayment is Ownable {
     function emergencyWithdraw() external onlyOwner {
         uint256 balance = usdcToken.balanceOf(address(this));
         require(balance > 0, "No balance to withdraw");
-        require(usdcToken.transfer(owner(), balance), "Transfer failed");
+        usdcToken.safeTransfer(owner(), balance); // Changed from transfer to safeTransfer
     }
 }

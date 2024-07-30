@@ -1,4 +1,4 @@
-module.exports.COURSE_PAYMENT_CA = "0x5635C6cE0674B08322988866C7cA6030698B71Ac";
+module.exports.COURSE_PAYMENT_CA = "0x3A16cab6f258Ee0385DE64B23Cf3F9E2de838a92";
 module.exports.COURSE_PAYMENT_ABI = [
 	{
 		inputs: [
@@ -10,6 +10,33 @@ module.exports.COURSE_PAYMENT_ABI = [
 		],
 		stateMutability: "nonpayable",
 		type: "constructor",
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "target",
+				type: "address",
+			},
+		],
+		name: "AddressEmptyCode",
+		type: "error",
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "account",
+				type: "address",
+			},
+		],
+		name: "AddressInsufficientBalance",
+		type: "error",
+	},
+	{
+		inputs: [],
+		name: "FailedInnerCall",
+		type: "error",
 	},
 	{
 		inputs: [
@@ -31,6 +58,17 @@ module.exports.COURSE_PAYMENT_ABI = [
 			},
 		],
 		name: "OwnableUnauthorizedAccount",
+		type: "error",
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "token",
+				type: "address",
+			},
+		],
+		name: "SafeERC20FailedOperation",
 		type: "error",
 	},
 	{
@@ -158,6 +196,30 @@ module.exports.COURSE_PAYMENT_ABI = [
 		],
 		name: "TutorWithdrawal",
 		type: "event",
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_user",
+				type: "address",
+			},
+			{
+				internalType: "uint256",
+				name: "_amount",
+				type: "uint256",
+			},
+		],
+		name: "checkAllowance",
+		outputs: [
+			{
+				internalType: "bool",
+				name: "",
+				type: "bool",
+			},
+		],
+		stateMutability: "view",
+		type: "function",
 	},
 	{
 		inputs: [],

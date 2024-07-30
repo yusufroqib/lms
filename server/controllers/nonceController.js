@@ -53,7 +53,7 @@ exports.verifySignature = async (req, res) => {
 		});
 
 		let user;
-        //Add address to wallet list
+		//Add address to wallet list
 		if (userId) {
 			user = await User.findById(userId);
 			if (!user) {
@@ -91,6 +91,7 @@ exports.verifySignature = async (req, res) => {
 
 		const result = await user.save();
 
+		console.log("RESULTTTTTT", result);
 
 		// console.log("newRefreshToken", newRefreshToken);
 
@@ -102,9 +103,10 @@ exports.verifySignature = async (req, res) => {
 			maxAge: 24 * 60 * 60 * 1000,
 		});
 
-		res.status(200).json({
-			message: "Wallet signed successfully",
-		});
+			res.status(200).json({
+				message: "Wallet signed successfully",
+			});
+
 	} catch (error) {
 		console.log(error);
 		res.status(400).json({ error: error.message });
