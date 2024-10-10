@@ -110,6 +110,10 @@ const courseSchema = new Schema(
 					type: Date,
 					default: Date.now, // Optional: Set a default value to the current date and time
 				},
+				completedCourseAt: {
+					type: Date,
+					default: null,
+				},
 			},
 		],
 	},

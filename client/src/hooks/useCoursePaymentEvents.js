@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useContractEvent } from 'wagmi';
-import { ethers } from 'ethers';
+import { useState } from 'react';
+import { useWatchContractEvent } from 'wagmi';
+import { formatUnits } from 'viem';
 
 // Assuming CONTRACT_ADDRESS and CONTRACT_ABI are defined elsewhere
 const CONTRACT_ADDRESS = 'YOUR_CONTRACT_ADDRESS';
@@ -9,81 +9,88 @@ const CONTRACT_ABI = ['hhyfg']; // Ensure this includes all the event signatures
 export function useCoursePaymentEvents(address) {
   const [tutorRegistrations, setTutorRegistrations] = useState([]);
   const [addressUpdates, setAddressUpdates] = useState([]);
-  const [latestPurchase, setLatestPurchase] = useState(null)
-  const [purchaseHistory, setPurchaseHistory] = useState([])
-
+  const [latestPurchase, setLatestPurchase] = useState(null);
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
   const [feeUpdates, setFeeUpdates] = useState([]);
 
-//   useEffect(() => {
-//     // Cleanup function to unsubscribe from the event listeners when the component unmounts
-//     return () => {
-//       // Assuming wagmi provides a way to unsubscribe, otherwise you might need to manage this differently
-//     };
-//   }, []);
-
-  // Listen to TutorRegistered event
-  useContractEvent({
+  // Watch TutorRegistered event
+  useWatchContractEvent({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     eventName: 'TutorRegistered',
-    listener: (id, walletAddress, event) => {
-      const registration = { id, walletAddress, transactionHash: event.transactionHash, blockNumber: event.blockNumber };
-      setTutorRegistrations((prev) => [...prev, registration]);
+    onLogs: (logs) => {
+      logs.forEach((log) => {
+        const [id, walletAddress] = log.args;
+        const registration = { id, walletAddress, transactionHash: log.transactionHash, blockNumber: log.blockNumber };
+        setTutorRegistrations((prev) => [...prev, registration]);
+      });
     },
   });
 
-  // Listen to TutorAddressUpdated event
-  useContractEvent({
+  // Watch TutorAddressUpdated event
+  useWatchContractEvent({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     eventName: 'TutorAddressUpdated',
-    listener: (id, oldAddress, newAddress, event) => {
-      const update = { id, oldAddress, newAddress, transactionHash: event.transactionHash, blockNumber: event.blockNumber };
-      setAddressUpdates((prev) => [...prev, update]);
+    onLogs: (logs) => {
+      logs.forEach((log) => {
+        const [id, oldAddress, newAddress] = log.args;
+        const update = { id, oldAddress, newAddress, transactionHash: log.transactionHash, blockNumber: log.blockNumber };
+        setAddressUpdates((prev) => [...prev, update]);
+      });
     },
   });
 
-  // Listen to CoursePurchased event
-  useContractEvent({
+  // Watch CoursePurchased event
+  useWatchContractEvent({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     eventName: 'CoursePurchased',
-    listener(student, tutorId, amount, courseId, event) {
-      const newPurchase = {
-        student,
-        tutorId,
-        amount: ethers.utils.formatUnits(amount, 6),
-        courseId,
-        transactionHash: event.transactionHash,
-        blockNumber: event.blockNumber,
-      }
-      setPurchaseHistory(prev => [...prev, newPurchase])
-      setLatestPurchase(newPurchase)
+    onLogs: (logs) => {
+      logs.forEach((log) => {
+        const [student, tutorId, amount, courseId] = log.args;
+        const newPurchase = {
+          student,
+          tutorId,
+          amount: formatUnits(amount, 6),
+          courseId,
+          transactionHash: log.transactionHash,
+          blockNumber: log.blockNumber,
+        };
+        setPurchaseHistory(prev => [...prev, newPurchase]);
+        setLatestPurchase(newPurchase);
+      });
     },
-  })
+  });
 
-  // Listen to TutorWithdrawal event
-  useContractEvent({
+  // Watch TutorWithdrawal event
+  useWatchContractEvent({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     eventName: 'TutorWithdrawal',
-    listener: (tutorId, amount, event) => {
-      const withdrawal = { tutorId, amount: ethers.utils.formatUnits(amount, 6), transactionHash: event.transactionHash, blockNumber: event.blockNumber };
-      setWithdrawals((prev) => [...prev, withdrawal]);
+    onLogs: (logs) => {
+      logs.forEach((log) => {
+        const [tutorId, amount] = log.args;
+        const withdrawal = { tutorId, amount: formatUnits(amount, 6), transactionHash: log.transactionHash, blockNumber: log.blockNumber };
+        setWithdrawals((prev) => [...prev, withdrawal]);
+      });
     },
   });
 
-  // Listen to PlatformFeeUpdated event
-  useContractEvent({
+  // Watch PlatformFeeUpdated event
+  useWatchContractEvent({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     eventName: 'PlatformFeeUpdated',
-    listener: (newPercentage, event) => {
-      const feeUpdate = { newPercentage, transactionHash: event.transactionHash, blockNumber: event.blockNumber };
-      setFeeUpdates((prev) => [...prev, feeUpdate]);
+    onLogs: (logs) => {
+      logs.forEach((log) => {
+        const [newPercentage] = log.args;
+        const feeUpdate = { newPercentage, transactionHash: log.transactionHash, blockNumber: log.blockNumber };
+        setFeeUpdates((prev) => [...prev, feeUpdate]);
+      });
     },
   });
 
-  return { tutorRegistrations, addressUpdates, latestPurchase,purchaseHistory , withdrawals, feeUpdates };
+  return { tutorRegistrations, addressUpdates, latestPurchase, purchaseHistory, withdrawals, feeUpdates };
 }

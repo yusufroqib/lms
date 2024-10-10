@@ -1,7 +1,7 @@
 import { useGetCoursesQuery } from "@/features/courses/coursesApiSlice";
 import useAuth from "@/hooks/useAuth";
 import React, { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 import CourseVideo from "./components/CourseVideo";
 import {
 	Avatar,
@@ -163,6 +163,7 @@ const CourseInfo = () => {
 										price={course.price}
 										previewVideoUrl={course.previewVideoUrl}
 										courseId={course._id}
+										paymentMethod={course.paymentMethod}
 										isPurchased={isPurchased}
 										firstChapter={course.chapters[0]}
 										tutorId={course.tutor._id}
@@ -228,6 +229,7 @@ const CourseInfo = () => {
 						<div className="w-2/5 h-screen fixed lg:pl-30 top-40 right-7  ">
 							<CourseVideo
 								courseImage={course.courseImage}
+								paymentMethod={course.paymentMethod}
 								price={course.price}
 								previewVideoUrl={course.previewVideoUrl}
 								courseId={course._id}

@@ -17,6 +17,7 @@ import {
 	useDeleteChapterAttachmentMutation,
 	useUpdateChapterAttachmentMutation,
 } from "@/features/courses/coursesApiSlice";
+import { Input } from "@/components/ui/input";
 // import { FileUpload } from "@/components/ui/file-upload";
 const formSchema = z.object({
 	url: z.string().min(1),
@@ -212,7 +213,7 @@ export const AttachmentForm = ({ initialData, courseId, chapterId }) => {
 			)}
 			{isEditing && (
 				<div>
-					<input
+					<Input
 						disabled={isUploading}
 						type="file"
 						name="fileUpload"

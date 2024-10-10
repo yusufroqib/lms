@@ -16,6 +16,7 @@ import {
 	Key,
 	Briefcase,
 	MapPin,
+	Loader2,
 } from "lucide-react";
 import {
 	getStorage,
@@ -35,6 +36,8 @@ import useAuth from "@/hooks/useAuth";
 import toast from "react-hot-toast";
 import PasswordForm from "./components/PasswordForm";
 import { useRefreshMutation } from "@/features/auth/authApiSlice";
+import { compressImage } from "@/lib/compressImage";
+import { set } from "date-fns";
 
 export default function ProfilePage() {
 	const { _id: userId } = useAuth();
@@ -43,6 +46,7 @@ export default function ProfilePage() {
 	const [isChangingPassword, setIsChangingPassword] = useState(false);
 	const [avatarFile, setAvatarFile] = useState(null);
 	const [editedUser, setEditedUser] = useState(null);
+	const [isUploading, setIsUploading] = useState(false);
 	// console.log(editedUser.avatar)
 	const [refresh] = useRefreshMutation();
 	const { user, isLoading } = useGetMyDetailsQuery("myDetails", {
@@ -61,7 +65,7 @@ export default function ProfilePage() {
 
 	const uploadImage = async (file) => {
 		const storage = getStorage(app);
-		const fileName = file.name;
+		const fileName = `${Date.now()}_${file.name.replace(/\.[^/.]+$/, ".webp")}`;
 		const folderPath = `Users/${userId}/Avatar`;
 
 		// Check if there is an existing image URL
@@ -78,9 +82,11 @@ export default function ProfilePage() {
 			}
 		}
 
+		const compressedFile = await compressImage(file);
+
 		// Concatenate the folder path with the file name to create storage reference
 		const storageRef = ref(storage, `${folderPath}/${fileName}`);
-		const uploadTask = uploadBytesResumable(storageRef, file);
+		const uploadTask = uploadBytesResumable(storageRef, compressedFile);
 		// setUploadTask(uploadTask);
 
 		return new Promise((resolve, reject) => {
@@ -110,11 +116,15 @@ export default function ProfilePage() {
 		setAvatarFile(null);
 	};
 
-	const handleSave = async () => {
+	const handleSave = async (file) => {
+		// console.log(file);
 		try {
 			// await axios.patch(`/api/courses/${courseId}`, values);
 			let url;
-			if (avatarFile) url = await uploadImage(avatarFile);
+			if ((avatarFile || file) && file.type !== "click") {
+				setIsUploading(true);
+				url = await uploadImage(avatarFile || file);
+			}
 			const formData = new FormData();
 			Object.keys(editedUser).forEach((key) => {
 				if (key !== "avatar") {
@@ -124,7 +134,7 @@ export default function ProfilePage() {
 			});
 
 			// Only append the new avatar URL if it exists
-			if (url) {
+			if ( url && url?.startsWith("https://")) {
 				formData.append("avatar", url);
 			} else if (editedUser.avatar) {
 				// If no new avatar was uploaded, use the existing one
@@ -133,8 +143,11 @@ export default function ProfilePage() {
 			// console.log(url)
 
 			await updateProfile(formData).unwrap();
-			setIsEditing(false);
+			!url && setIsEditing(false);
+			setIsUploading(false);
+			setAvatarFile(null);
 			await refresh().unwrap();
+			url = null;
 
 			toast.success("Profile updated successfully");
 			// router.refresh();
@@ -149,11 +162,12 @@ export default function ProfilePage() {
 		setEditedUser({ ...editedUser, [e.target.name]: e.target.value });
 	};
 
-	const handleAvatarChange = (e) => {
+	const handleAvatarChange = async (e) => {
 		const file = e.target.files[0];
 		if (file) {
 			setAvatarFile(file);
 			setEditedUser({ ...editedUser, avatar: URL.createObjectURL(file) });
+			await handleSave(file);
 		}
 	};
 
@@ -179,7 +193,10 @@ export default function ProfilePage() {
 			<Card className="w-full max-w-3xl mx-auto">
 				{!isEditing && (
 					<div className=" flex justify-end mr-4">
-						<Button onClick={handleEdit} className="relative top-4 max-md:text-xs">
+						<Button
+							onClick={handleEdit}
+							className="relative top-4 max-md:text-xs"
+						>
 							<Edit className="mr-2 h-4 w-4" /> Edit Profile
 						</Button>
 					</div>
@@ -196,8 +213,12 @@ export default function ProfilePage() {
 									htmlFor="avatar-upload"
 									className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-2 cursor-pointer"
 								>
-									<Upload className="h-4 w-4" />
-									<input
+									{isUploading ? (
+										<Loader2 className="h-4 w-4 animate-spin " />
+									) : (
+										<Upload className="h-4 w-4 " />
+									)}
+									<Input
 										id="avatar-upload"
 										type="file"
 										accept="image/*"
@@ -211,7 +232,9 @@ export default function ProfilePage() {
 							<CardTitle className="text-lg md:text-2xl font-bold">
 								{editedUser.name}
 							</CardTitle>
-							<p className="text-xs md:text-sm text-gray-500">@{editedUser.username}</p>
+							<p className="text-xs md:text-sm text-gray-500">
+								@{editedUser.username}
+							</p>
 							<div className="mt-2">
 								<Badge className="mr-2 ">{status}</Badge>
 							</div>
@@ -260,7 +283,11 @@ export default function ProfilePage() {
 									/>
 								</div>
 								<div className="flex justify-end space-x-2">
-									<Button onClick={handleCancel} className="max-md:text-xs" variant="outline">
+									<Button
+										onClick={handleCancel}
+										className="max-md:text-xs"
+										variant="outline"
+									>
 										<X className="mr-2 h-4 w-4" /> Cancel
 									</Button>
 									<Button onClick={handleSave} className="max-md:text-xs">
@@ -296,7 +323,7 @@ export default function ProfilePage() {
 									</div>
 								)}
 								<div className="flex items-center space-x-2 max-md:text-sm">
-									<Calendar className="h-5 w-5 max-md:h-4 max-md:w-4 text-gray-500"  />
+									<Calendar className="h-5 w-5 max-md:h-4 max-md:w-4 text-gray-500" />
 									<span>
 										Joined {new Date(editedUser.joinedAt).toLocaleDateString()}
 									</span>

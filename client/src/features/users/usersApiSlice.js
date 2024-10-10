@@ -95,6 +95,17 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 				return responseData;
 			},
 		}),
+		updateSignature: builder.mutation({
+			query: (formData) => ({
+				url: "/users/signature",
+				method: "PUT",
+				body: formData,
+			}),
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+			invalidatesTags: (result, error, arg) => [{ type: "MyInfo", id: "ME" }],
+		}),
 		changePassword: builder.mutation({
 			query: (formData) => ({
 				url: "/users/change-password",
@@ -127,7 +138,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 			},
 			invalidatesTags: ["TutorBalance"],
 		}),
-		
+
 		getTutorBalance: builder.query({
 			query: () => "/tutors/balance",
 			transformResponse: (responseData) => {
@@ -164,6 +175,7 @@ export const {
 	useBecomeTutorMutation,
 	useUpdateProfileMutation,
 	useChangePasswordMutation,
+	useUpdateSignatureMutation,
 	// useAddNewUserMutation,
 	useCreateStripeConnectAccountMutation,
 	useCompleteStripeConnectAccountMutation,

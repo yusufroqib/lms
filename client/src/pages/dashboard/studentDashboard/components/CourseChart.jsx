@@ -46,8 +46,8 @@ export default function CourseChart({ data, formatDuration }) {
 		return acc;
 	}, {});
 
-    console.log(processedData)
-    console.log(courseTitles)
+    // console.log(processedData)
+    // console.log(courseTitles)
 
 	return (
 		<ResponsiveContainer width="100%" height={400}>

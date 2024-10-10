@@ -6,7 +6,9 @@ import { usePurchaseCourseMutation } from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+
 import useAuth from "@/hooks/useAuth";
+import CryptoPaymentModal from "./CryptoPaymentModal";
 
 // import {loadStripe} from '@stripe/stripe-js';
 
@@ -14,16 +16,18 @@ const CourseVideo = ({
 	previewVideoUrl,
 	price,
 	courseImage,
+	paymentMethod,
 	tutorId,
 	courseId,
 	isPurchased,
 	firstChapter,
 }) => {
-	const { _id } = useAuth();
+	const { _id, paymentWallet, stripeOnboardingComplete } = useAuth();
 	const navigate = useNavigate();
 	const [purchaseCourse, { isLoading, isError, isSuccess, error }] =
 		usePurchaseCourseMutation();
 	const [canStudy, setCanStudy] = useState(false);
+	const [isCryptoModalOpen, setIsCryptoModalOpen] = useState(false);
 
 	useEffect(() => {
 		setCanStudy(isPurchased || _id === tutorId);
@@ -36,8 +40,12 @@ const CourseVideo = ({
 		try {
 			const response = await purchaseCourse({ courseId }).unwrap();
 			window.location.assign(response.url);
-		} catch {
-			toast.error("Something went wrong");
+		} catch (error) {
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		}
 	};
 
@@ -51,19 +59,21 @@ const CourseVideo = ({
 		}
 	};
 
-	let buttonText = "Enroll Now";
+	// let buttonText = "Enroll now";
 
-	if (isLoading) {
-		buttonText = (
-			<>
-				<Loader2 key="loader" className="mr-2 h-4 w-4 animate-spin" /> Please
-				wait
-			</>
-		);
-	}
+	// if (isLoading) {
+	// 	buttonText = (
+	// 		<>
+	// 			<Loader2 key="loader" className="mr-2 h-4 w-4 animate-spin" /> Please
+	// 			wait
+	// 		</>
+	// 	);
+	// }
 
 	return (
 		<div className="p-2 border border-gray-600 rounded-xl">
+			<CryptoPaymentModal isCryptoModalOpen={isCryptoModalOpen} setIsCryptoModalOpen={setIsCryptoModalOpen} tutorId={tutorId} courseId={courseId} price={price} />
+
 			<div className="relative min-w-full aspect-video">
 				<video
 					className="w-full"
@@ -94,7 +104,7 @@ const CourseVideo = ({
 					>
 						Goto Course Study Page{" "}
 					</Button>
-				) : (
+				) : paymentMethod === "card" ? (
 					<Button
 						onClick={handlePurchase}
 						size="lg"
@@ -102,9 +112,40 @@ const CourseVideo = ({
 						className="animated-blink"
 						variant={"success"}
 					>
-						{buttonText}
+						Pay with card
 					</Button>
-				)}
+				) : paymentMethod === "crypto" ? (
+					<Button
+						onClick={() => setIsCryptoModalOpen(true)}
+						size="lg"
+						disabled={isLoading}
+						className="animated-blink"
+						variant={"orange"}
+					>
+						Pay with crypto
+					</Button>
+				) : paymentMethod === "both" ? (
+					<div className="flex gap-2">
+						<Button
+							onClick={handlePurchase}
+							size="sm"
+							disabled={isLoading}
+							// className="animated-blink"
+							variant={"success"}
+						>
+							Pay with card
+						</Button>
+						<Button
+							onClick={() => setIsCryptoModalOpen(true)}
+							size="sm"
+							disabled={isLoading}
+							// className="animated-blink"
+							variant={"orange"}
+						>
+							Pay with crypto
+						</Button>
+					</div>
+				) : null}
 			</div>
 		</div>
 	);

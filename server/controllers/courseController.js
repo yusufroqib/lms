@@ -6,6 +6,9 @@ const Classroom = require("../models/ClassroomModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
 const StudyTime = require("../models/StudyTimeModel");
 const { default: mongoose } = require("mongoose");
+const Certificate = require("../models/CertificateModel");
+const { v4: uuidv4 } = require("uuid");
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const clientUrl = process.env.CLIENT_URL;
 
@@ -104,6 +107,34 @@ const purchaseCourse = async (req, res) => {
 			return res
 				.status(403)
 				.json({ message: "User is already enrolled in this course" });
+		}
+
+		const courseClassroom = await Classroom.findOne({ course: courseId });
+		const client = createStreamChatClient();
+
+		if (course.price === 0) {
+			// Update course and user as before
+			course.purchasedBy.push({ user: userId, amount: 0 });
+			await course.save();
+
+			courseClassroom.students.push(userId);
+			await courseClassroom.save();
+
+			// Add the course to the enrolledCourses array in the user model
+			user.enrolledCourses.push({
+				course: courseId,
+				lastStudiedAt: new Date(),
+			});
+			await user.save();
+
+			const channel = client.channel("messaging", courseId);
+			await channel.addMembers([
+				{ user_id: userId, channel_role: "channel_member" },
+			]);
+
+			return res.status(200).json({
+				message: "Course enrolled successfully for free",
+			});
 		}
 
 		const line_items = [
@@ -239,6 +270,7 @@ const handleStripeWebhook = async (req, res) => {
 			await user.save();
 
 			const channel = client.channel("messaging", courseId);
+			
 			await channel.addMembers([
 				{ user_id: userId, channel_role: "channel_member" },
 			]);
@@ -311,9 +343,29 @@ const getEnrolledCoursesWithProgress = async (req, res) => {
 		}
 
 		// Filter and process enrolled courses
-		const enrolledCoursesWithProgress = user.enrolledCourses
-			.map((enrollment) => {
+		const enrolledCoursesWithProgress = await Promise.all(
+			user.enrolledCourses.map(async (enrollment) => {
 				const course = enrollment.course;
+
+				// Get tutor
+				const getTutor = async (tutorId) => {
+					try {
+						const tutor = await User.findById(tutorId);
+						return tutor || null;
+					} catch (error) {
+						console.error("Error fetching tutor:", error);
+						return null;
+					}
+				};
+
+				const tutor = await getTutor(course.tutor.toObject());
+				const signature = tutor ? tutor.signature : null;
+
+				//Check certificate is created
+				const certificate = await Certificate.findOne({
+					student: userId,
+					course: course._id,
+				});
 
 				// Check if the course is published
 				if (!course.isPublished) {
@@ -362,19 +414,28 @@ const getEnrolledCoursesWithProgress = async (req, res) => {
 						}),
 					progress: progressPercentage,
 					lastStudiedAt: enrollment.lastStudiedAt,
+					tutorSignature: signature,
+					certificate: certificate || null,
 				};
 			})
-			.filter((course) => course !== null);
+		);
+
+		// Filter out null values
+		const filteredCoursesWithProgress = enrolledCoursesWithProgress.filter(
+			(course) => course !== null
+		);
+
+		// console.log(filteredCoursesWithProgress);
 
 		// Sort the courses by lastStudiedAt
-		enrolledCoursesWithProgress.sort((a, b) => {
+		filteredCoursesWithProgress.sort((a, b) => {
 			if (!a.lastStudiedAt) return 1;
 			if (!b.lastStudiedAt) return -1;
 			return new Date(b.lastStudiedAt) - new Date(a.lastStudiedAt);
 		});
-
+		// console.log(filteredCoursesWithProgress)
 		// Return the enrolled courses with progress
-		res.status(200).json({ enrolledCourses: enrolledCoursesWithProgress });
+		res.status(200).json({ enrolledCourses: filteredCoursesWithProgress });
 	} catch (error) {
 		console.error("[GET_ENROLLED_COURSES_WITH_PROGRESS]", error);
 		res.status(500).json({ message: "Internal server error" });
@@ -396,6 +457,13 @@ const updateChapterProgress = async (req, res) => {
 			return res.status(404).json({ message: "Course not found" });
 		}
 
+		//Check if course already completed before
+		const isCourseCompletedAlready = course.purchasedBy.some(
+			(purchase) =>
+				purchase.user.toString() === userId &&
+				purchase.completedCourseAt !== null
+		);
+
 		// Find the chapter within the course by chapterId
 		const chapter = course.chapters.find((chapter) => chapter._id == chapterId);
 		if (!chapter) {
@@ -414,16 +482,32 @@ const updateChapterProgress = async (req, res) => {
 			chapter.userProgress[userProgressIndex].isCompleted = true;
 		}
 
-		// Update lastStudiedAt for the course in user's enrolledCourses
-		await User.findOneAndUpdate(
-			{ _id: userId, "enrolledCourses.course": courseId },
-			{ $set: { "enrolledCourses.$.lastStudiedAt": new Date() } }
+		// Check if all chapters are completed
+		const allChaptersCompleted = course.chapters.every((chapter) =>
+			chapter.userProgress.some(
+				(progress) =>
+					progress.userId.toString() === userId && progress.isCompleted
+			)
 		);
+
+		// Update completedCourseAt in purchasedBy array if all chapters are completed
+		if (allChaptersCompleted) {
+			const purchasedByIndex = course.purchasedBy.findIndex(
+				(purchase) => purchase.user.toString() === userId
+			);
+			if (purchasedByIndex !== -1) {
+				course.purchasedBy[purchasedByIndex].completedCourseAt = new Date();
+			}
+		}
 
 		// Save the updated course
 		await course.save();
 
-		return res.json({ message: "Chapter progress updated successfully" });
+		return res.json({
+			message: "Chapter progress updated successfully",
+			// courseCompleted: allChaptersCompleted,
+			isCourseCompletedAlready,
+		});
 	} catch (error) {
 		console.error("Error updating chapter progress:", error);
 		return res.status(500).json({ message: "Internal Server Error" });
@@ -656,6 +740,59 @@ const addReview = async (req, res) => {
 	}
 };
 
+const createCertificate = async (req, res) => {
+	try {
+		const uid = uuidv4();
+		console.log(uid);
+		const { courseId } = req.params;
+		const { certificateId, firebaseUrl } = req.body;
+		const userId = req.userId;
+		console.log(req.body);
+
+		const user = await User.findById(userId);
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		const course = await Course.findById(courseId);
+		if (!course) {
+			return res.status(404).json({ message: "Course not found" });
+		}
+		if (!certificateId) {
+			return res.status(400).json({ message: "Certificate ID is required" });
+		}
+		if (!firebaseUrl) {
+			return res.status(400).json({ message: "firebaseUrl is required" });
+		}
+
+		const existingCertificate = await Certificate.findOne({
+			student: userId,
+			course: courseId,
+		});
+
+		if (existingCertificate) {
+			return res
+				.status(400)
+				.json({ message: "Certificate already exists for this course" });
+		}
+
+		const certificate = await Certificate.create({
+			student: userId,
+			course: courseId,
+			certificateId: certificateId,
+			firebaseUrl: firebaseUrl,
+			date: new Date(),
+		});
+
+		res
+			.status(201)
+			.json({ message: "Certificate created successfully", certificate });
+	} catch (error) {
+		console.error("Error creating certificate:", error);
+		res.status(500).json({ message: "Server error" });
+	}
+};
+
 module.exports = {
 	browseAllCourses,
 	purchaseCourse,
@@ -666,4 +803,5 @@ module.exports = {
 	getStudyTimeRecord,
 	getReviews,
 	addReview,
+	createCertificate,
 };

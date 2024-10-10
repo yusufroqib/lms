@@ -71,7 +71,7 @@ const TagPosts = () => {
             <div className="mt-10 flex w-full flex-col gap-6">
               {result.posts.length > 0 ? (
               //   result.posts.map((post: IPost) => (
-              result.posts.map((post) => (<PostCard key={post._id} _id={post._id} title={post.title} tags={post.tags} author={post.author} upvotes={post.upvotes} views={post.views} replies={post.replies} createdAt={post.createdAt}/>))) : (<NoResult title="There’s no tag post to show" description="Be the first to break the silence! 🚀 Ask a Post and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡" link="/ask-post" linkTitle="Ask a Post"/>)}
+              result.posts.map((post) => (<PostCard key={post._id} _id={post._id} title={post.title} tags={post.tags} author={post.author} upvotes={post.upvotes} views={post.views} replies={post.replies} createdAt={post.createdAt}/>))) : (<NoResult title="There’s no tag post to show" description="Be the first to break the silence! 🚀 Create a Post and kickstart the discussion. Your post could be the next big thing others learn from. Get involved! 💡" link="/ask-post" linkTitle="Ask a Post"/>)}
             </div>
             <div className="mt-10">
               <Pagination pageNumber={searchParams?.page ? +searchParams.page : 1} isNext={result.isNext}/>

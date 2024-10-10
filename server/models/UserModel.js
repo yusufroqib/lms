@@ -21,6 +21,7 @@ const userSchema = new Schema(
 			// required: true,
 		},
 		bio: String,
+		signature: String,
 		avatar: String,
 		followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
 		following: [{ type: Schema.Types.ObjectId, ref: "User" }],
@@ -62,7 +63,7 @@ const userSchema = new Schema(
 				lastStudiedAt: { type: Date, default: null },
 			},
 		],
-		createdCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
+		// createdCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 		refreshToken: [String],
 		points: [
 			{

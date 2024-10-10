@@ -12,28 +12,32 @@ import { Toaster } from "react-hot-toast";
 import { ConfettiProvider } from "./components/providers/ConfettiProvider";
 import "react-circular-progressbar/dist/styles.css";
 import "react-datepicker/dist/react-datepicker.css";
+import "@rainbow-me/rainbowkit/styles.css";
 import { resetScroll } from "./lib/scrollReset";
+import { WagmiConfigProvider } from "./wagmi";
 
 function Root() {
-  useEffect(() => {
-    resetScroll();
-  }, []);
+	useEffect(() => {
+		resetScroll();
+	}, []);
 
-  return (
-    <React.StrictMode>
-      <Provider store={store}>
-        <ThemeProvider>
-          <ConfettiProvider />
-          <Toaster />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/*" element={<App />} />
-            </Routes>
-          </BrowserRouter>
-        </ThemeProvider>
-      </Provider>
-    </React.StrictMode>
-  );
+	return (
+		<React.StrictMode>
+			<Provider store={store}>
+				<ThemeProvider>
+					<ConfettiProvider />
+					<Toaster />
+					<BrowserRouter>
+						<WagmiConfigProvider>
+							<Routes>
+								<Route path="/*" element={<App />} />
+							</Routes>
+						</WagmiConfigProvider>
+					</BrowserRouter>
+				</ThemeProvider>
+			</Provider>
+		</React.StrictMode>
+	);
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<Root />);

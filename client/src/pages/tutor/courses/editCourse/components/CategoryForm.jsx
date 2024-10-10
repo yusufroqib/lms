@@ -17,11 +17,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Combobox } from "@/components/ui/combobox";
-import { useGetCoursesQuery, useUpdateCategoryMutation } from "@/features/courses/coursesApiSlice";
+import {
+	useGetCoursesQuery,
+	useUpdateCategoryMutation,
+} from "@/features/courses/coursesApiSlice";
 const formSchema = z.object({
 	categoryId: z.string().min(1),
 });
- const CategoryForm = ({ initialData, courseId, options }) => {
+const CategoryForm = ({ initialData, courseId, options }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const toggleEdit = () => setIsEditing((current) => !current);
 	const [updateCategory, { isLoading, isError, isSuccess, error }] =
@@ -41,8 +44,12 @@ const formSchema = z.object({
 			toast.success("Course updated");
 			toggleEdit();
 			// router.refresh();
-		} catch {
-			toast.error("Something went wrong");
+		} catch(error) {
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		}
 	};
 	const selectedOption = options.find(

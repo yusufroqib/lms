@@ -61,11 +61,12 @@ const StudyPage = () => {
 	});
 
 	let course = purchasedCourse || tutorCourse;
+	console.log(course)
 
 	const publishedChapters =
 		course?.chapters?.filter((chapter) => chapter.isPublished) || [];
 
-	console.log(publishedChapters);
+	// console.log(publishedChapters);
 
 	// console.log(course);
 
@@ -91,6 +92,12 @@ const StudyPage = () => {
 
 	if (!!course && (isSuccess || isTutorSuccess)) {
 		const isPurchased = course.purchasedBy.some((item) => item.user === _id);
+		const isAlreadyCompleted = course.purchasedBy.some(
+			(item) => item.user === _id && item?.completedCourseAt
+		);
+		const certificate = course.certificate;
+		const signature = course.tutorSignature;
+		// console.log(signature);
 		const isTutor = course.tutor === _id;
 		// console.log('TTTTTTTTTT', isPurchased)\
 		const chapter = publishedChapters.find(
@@ -123,8 +130,12 @@ const StudyPage = () => {
 					<ChapterContents
 						chapter={chapter}
 						nextChapterId={nextChapterId}
+						isAlreadyCompleted={isAlreadyCompleted}
 						purchase={isPurchased}
+						signature={signature}
 						isTutor={isTutor}
+						courseTitle={course.title}
+						certificate={certificate}
 					/>
 				</main>
 			</div>

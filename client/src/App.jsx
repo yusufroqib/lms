@@ -12,6 +12,9 @@ import SuspenseWrapper from "./components/layouts/SuspenseWrapper";
 import Upcoming from "./pages/classroom/liveClassroomApp/upcoming/Upcoming";
 import Withdraw from "./pages/tutor/withdraw/Withdraw";
 import RootLayout from "./components/layouts/RootLayout";
+import { Loader2 } from "lucide-react";
+import Transactions from "./pages/tutor/wallets/transactions/Transactions";
+// import CryptoWallet from "./pages/tutor/wallets/CryptoWallet";
 
 // Lazy imports (constants)
 const AllTags = lazy(() => import("./pages/community/tags/allTags/AllTags"));
@@ -19,9 +22,13 @@ const AuthPage = lazy(() => import("./pages/auth/AuthPage"));
 const BrowseCourses = lazy(() =>
 	import("./pages/courses/browseCourses/BrowseCourses")
 );
+const CertificateVerification = lazy(() =>
+	import("./pages/certificates/CertificateVerification")
+);
 const ClassroomHome = lazy(() =>
 	import("./pages/classroom/liveClassroomApp/classroomHome/classroomHome")
 );
+const CryptoWallet = lazy(() => import("./pages/tutor/wallets/CryptoWallet"));
 const Classrooms = lazy(() => import("./pages/classroom/Classrooms"));
 const CommunityLayout = lazy(() => import("./pages/community/CommunityLayout"));
 const CourseInfo = lazy(() => import("./pages/courses/courseInfo/CourseInfo"));
@@ -32,6 +39,7 @@ const CreateCourse = lazy(() =>
 const CreatePost = lazy(() =>
 	import("./pages/community/posts/createPost/CreatePost")
 );
+
 const DashboardPage = lazy(() => import("./pages/dashboard/DashboardPage"));
 const EditChapter = lazy(() =>
 	import("./pages/tutor/courses/editCourse/editChapter/EditChapter")
@@ -80,95 +88,115 @@ const Users = lazy(() => import("./pages/community/users/allUsers/Users"));
 
 function App() {
 	return (
-		<Routes>
-			<Route path="/" element={<Home />} />
-			<Route element={<SuspenseWrapper />}>
-				<Route path="/auth" element={<AuthPage />} />
-				<Route path="/verify" element={<SignUpOTP />} />
-			</Route>
-			<Route element={<PersistLogin />}>
-				<Route
-					element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
-				>
-					<Route element={<Prefetch />}>
-						<Route element={<RootLayout />}>
-							<Route element={<SuspenseWrapper />}>
-								<Route path="dashboard" element={<DashboardPage />} />
-								<Route path="profile" element={<ProfilePage />} />
-								<Route path="messages" element={<Messages />} />
-								<Route path="courses">
-									<Route index element={<CoursesIndex />} />
-									<Route path="search" element={<BrowseCourses />} />
-									<Route path=":courseId/info" element={<CourseInfo />} />
-									<Route
-										path="enrolled-courses"
-										element={<EnrolledCourses />}
-									/>
-								</Route>
-								<Route
-									path="tutors"
-									element={<RequireTutor allowedRoles={[ROLES.Tutor]} />}
-								>
-									<Route path="my-courses" element={<TutorCourses />} />
-									<Route path="create-course" element={<CreateCourse />} />
-									<Route
-										path="edit-course/:courseId"
-										element={<EditCourse />}
-									/>
-									<Route
-										path="edit-course/:courseId/chapter/:chapterId"
-										element={<EditChapter />}
-									/>
-									<Route
-										path="stripe-connect/refresh"
-										element={<StripeOnboardingRefresh />}
-									/>
-									<Route
-										path="stripe-connect/complete"
-										element={<StripeOnboardingComplete />}
-									/>
-									<Route path="withdraw" element={<Withdraw />} />
-								</Route>
-								<Route path="community" element={<CommunityLayout />}>
-									<Route path="feeds" element={<Feeds />} />
-									<Route path="my-collection" element={<MyCollection />} />
-									<Route path="all-tags" element={<AllTags />} />
-									<Route path="users" element={<Users />} />
-									<Route path="profile/:user" element={<PublicProfile />} />
-									<Route path="tags/:tagId" element={<TagPosts />} />
-									<Route path="posts">
-										<Route path="create-post" element={<CreatePost />} />
-										<Route path=":postId" element={<PostPage />} />
-										<Route path="edit-post/:postId" element={<EditPost />} />
+		<Suspense
+			fallback={
+				<div className="flex min-h-[80vh] justify-center items-center">
+					<Loader2 key="loader" className="mr-2 h-10 w-10 animate-spin" />
+				</div>
+			}
+		>
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route element={<SuspenseWrapper />}>
+					<Route path="/auth" element={<AuthPage />} />
+					<Route path="/verify" element={<SignUpOTP />} />
+					<Route path="certificates">
+						<Route path="verify" element={<CertificateVerification />} />
+					</Route>
+				</Route>
+				<Route element={<PersistLogin />}>
+					<Route
+						element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
+					>
+						<Route element={<Prefetch />}>
+							<Route element={<RootLayout />}>
+								<Route element={<SuspenseWrapper />}>
+									<Route path="dashboard" element={<DashboardPage />} />
+									<Route path="profile" element={<ProfilePage />} />
+									<Route path="messages" element={<Messages />} />
+									<Route path="courses">
+										<Route index element={<CoursesIndex />} />
+										<Route path="search" element={<BrowseCourses />} />
+										<Route path=":courseId/info" element={<CourseInfo />} />
+										<Route
+											path="enrolled-courses"
+											element={<EnrolledCourses />}
+										/>
 									</Route>
-								</Route>
-								<Route path="classrooms">
-									<Route index element={<Classrooms />} />
-									<Route element={<LiveClassroomLayout />}>
-										<Route path=":classroomId">
-											<Route index element={<ClassroomHome />} />
-											<Route path="ongoing" element={<Ongoing />} />
-											<Route path="upcoming" element={<Upcoming />} />
-											<Route path="previous" element={<Previous />} />
-											<Route path="meeting">
-												<Route path=":callId" element={<MeetingPage />} />
+									<Route
+										path="tutors"
+										element={<RequireTutor allowedRoles={[ROLES.Tutor]} />}
+									>
+										<Route path="my-courses" element={<TutorCourses />} />
+										<Route path="create-course" element={<CreateCourse />} />
+										<Route
+											path="edit-course/:courseId"
+											element={<EditCourse />}
+										/>
+										<Route
+											path="edit-course/:courseId/chapter/:chapterId"
+											element={<EditChapter />}
+										/>
+										<Route
+											path="stripe-connect/refresh"
+											element={<StripeOnboardingRefresh />}
+										/>
+										<Route
+											path="stripe-connect/complete"
+											element={<StripeOnboardingComplete />}
+										/>
+										<Route path="withdraw" element={<Withdraw />} />
+									</Route>
+									<Route path="wallets">
+										<Route element={<SuspenseWrapper />}>
+											{/* <Route index element={<StudyIndex />} /> */}
+											<Route path="crypto" element={<CryptoWallet />} />
+											<Route path="stripe" element={<CryptoWallet />} />
+											<Route path="transactions" element={<Transactions />} />
+										</Route>
+									</Route>
+
+									<Route path="community" element={<CommunityLayout />}>
+										<Route path="feeds" element={<Feeds />} />
+										<Route path="my-collection" element={<MyCollection />} />
+										<Route path="all-tags" element={<AllTags />} />
+										<Route path="users" element={<Users />} />
+										<Route path="profile/:user" element={<PublicProfile />} />
+										<Route path="tags/:tagId" element={<TagPosts />} />
+										<Route path="posts">
+											<Route path="create-post" element={<CreatePost />} />
+											<Route path=":postId" element={<PostPage />} />
+											<Route path="edit-post/:postId" element={<EditPost />} />
+										</Route>
+									</Route>
+									<Route path="classrooms">
+										<Route index element={<Classrooms />} />
+										<Route element={<LiveClassroomLayout />}>
+											<Route path=":classroomId">
+												<Route index element={<ClassroomHome />} />
+												<Route path="ongoing" element={<Ongoing />} />
+												<Route path="upcoming" element={<Upcoming />} />
+												<Route path="previous" element={<Previous />} />
+												<Route path="meeting">
+													<Route path=":callId" element={<MeetingPage />} />
+												</Route>
 											</Route>
 										</Route>
 									</Route>
 								</Route>
 							</Route>
-						</Route>
-						<Route path="study/:courseId">
-							<Route element={<SuspenseWrapper />}>
-								<Route index element={<StudyIndex />} />
-								<Route path="chapter/:chapterId" element={<StudyPage />} />
+							<Route path="study/:courseId">
+								<Route element={<SuspenseWrapper />}>
+									<Route index element={<StudyIndex />} />
+									<Route path="chapter/:chapterId" element={<StudyPage />} />
+								</Route>
 							</Route>
 						</Route>
 					</Route>
 				</Route>
-			</Route>
-			<Route path="*" element={<NotFoundPage />} />
-		</Routes>
+				<Route path="*" element={<NotFoundPage />} />
+			</Routes>
+		</Suspense>
 	);
 }
 

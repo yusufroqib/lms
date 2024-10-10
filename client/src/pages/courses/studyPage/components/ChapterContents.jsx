@@ -8,15 +8,31 @@ import parse from "html-react-parser";
 import ReactPlayer from "react-player/lazy";
 import { openConfetti } from "@/features/confettiSlice";
 import { useDispatch } from "react-redux";
-import { useUpdateChapterProgressMutation } from "@/features/courses/coursesApiSlice";
+import {
+	useCreateCertificateMutation,
+	useUpdateChapterProgressMutation,
+} from "@/features/courses/coursesApiSlice";
 import toast from "react-hot-toast";
+import CertificateGenerator from "./CertificateGenerator";
 
-const ChapterContents = ({ nextChapterId, chapter, purchase, isTutor }) => {
+const ChapterContents = ({
+	isAlreadyCompleted,
+	nextChapterId,
+	chapter,
+	purchase,
+	isTutor,
+	signature,
+	courseTitle,
+	certificate,
+}) => {
 	const { courseId } = useParams();
 	const dispatch = useDispatch();
 	const [isLoading, setIsLoading] = useState(false);
+	const [isCourseJustCompleted, setIsCourseJustCompleted] = useState(false);
 	const navigate = useNavigate();
 	const [updateCourseProgress] = useUpdateChapterProgressMutation();
+	const [createCertificate] = useCreateCertificateMutation();
+
 	// const { userId } = auth();
 	// if (!userId) {
 	//     return redirect("/");
@@ -29,6 +45,7 @@ const ChapterContents = ({ nextChapterId, chapter, purchase, isTutor }) => {
 	// if (!chapter || !course) {
 	//     return redirect("/");
 	// }
+
 	const userProgress = chapter.userProgress;
 	const attachments = chapter.attachments;
 	const isLocked = !chapter.isFree && !purchase;
@@ -38,18 +55,28 @@ const ChapterContents = ({ nextChapterId, chapter, purchase, isTutor }) => {
 	const updateProgress = async () => {
 		try {
 			setIsLoading(true);
-			// await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
-			//     isCompleted: !isCompleted
-			// });
+			
 			if (!isCompleted && !isTutor)
 				await updateCourseProgress({
 					courseId,
 					chapterId: chapter._id,
 				}).unwrap();
-			if (!isCompleted && !nextChapterId && !isTutor) {
+			if (!isCompleted && !isAlreadyCompleted && !nextChapterId && !isTutor) {
 				// confetti.onOpen();
+
+				setIsCourseJustCompleted(true);
 				dispatch(openConfetti());
-			}
+
+			} 
+			// else if (
+			// 	!isCompleted &&
+			// 	isAlreadyCompleted && 		//!I need to come back to check here
+			// 	!nextChapterId &&
+			// 	!isTutor
+			// ) {
+			// 	dispatch(openConfetti());
+			// }
+			
 			if (nextChapterId) {
 				navigate(`/study/${courseId}/chapter/${nextChapterId}`);
 			}
@@ -129,6 +156,16 @@ const ChapterContents = ({ nextChapterId, chapter, purchase, isTutor }) => {
 					)}
 				</div>
 			</div>
+			{(isCourseJustCompleted ||  isAlreadyCompleted) && (
+			// {(isCourseJustCompleted || (!certificate && isAlreadyCompleted)) && (
+				<CertificateGenerator
+					isAlreadyCompleted={isAlreadyCompleted}
+					courseTitle={courseTitle}
+					courseCompleted={isCourseJustCompleted}
+					signature={signature}
+					certificate={certificate}
+				/>
+			)}
 		</div>
 	);
 };

@@ -41,6 +41,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				} else return [{ type: "Course", id: "LIST" }];
 			},
 		}),
+
 		getCourseCategories: builder.query({
 			query: () => ({
 				url: "/tutors/course-categories",
@@ -60,7 +61,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			},
 		}),
 		getCourseReviews: builder.query({
-			query: ({courseId, page}) => ({
+			query: ({ courseId, page }) => ({
 				url: `/courses/${courseId}/reviews?page=${page}`,
 				validateStatus: (response, result) => {
 					return response.status === 200 && !result.isError;
@@ -71,7 +72,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			},
 		}),
 		addCourseReview: builder.mutation({
-			query: ({courseId, ...userReview}) => ({
+			query: ({ courseId, ...userReview }) => ({
 				url: `/courses/${courseId}/reviews`,
 				method: "POST",
 				body: userReview,
@@ -84,7 +85,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			},
 			invalidatesTags: ["Course"],
 		}),
-		
+
 		getTutorCourses: builder.query({
 			query: () => ({
 				url: `/tutors/all-courses`,
@@ -170,9 +171,8 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 
 			transformResponse: (responseData) => {
-				return responseData
-				
-			},			
+				return responseData;
+			},
 		}),
 		getTutorCoursesSold: builder.query({
 			query: () => ({
@@ -184,10 +184,8 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 
 			transformResponse: (responseData) => {
-				return responseData
-				
+				return responseData;
 			},
-
 		}),
 		getStudyTime: builder.query({
 			query: ({ startDate, endDate, groupBy }) => ({
@@ -199,7 +197,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 
 			transformResponse: (responseData) => {
-				return responseData
+				return responseData;
 				// console.log(responseData)
 				// const summary = responseData.map((item) => {
 				// 	item.id = item._id;
@@ -220,7 +218,6 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 					];
 				} else return [{ type: "StudyTimeSummary", id: "LIST" }];
 			},
-			
 		}),
 		createCourseTitle: builder.mutation({
 			query: (data) => ({
@@ -278,9 +275,10 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			],
 		}),
 		toggleCoursePublish: builder.mutation({
-			query: ({ id }) => ({
+			query: ({ id, paymentMethod }) => ({
 				url: `/tutors/edit-course/${id}/toggle-publish`,
 				method: "PUT",
+				body: { paymentMethod },
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "TutorCourse", id: arg.id },
@@ -385,6 +383,33 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: [{ type: "EnrolledCourse", id: "LIST" }],
 		}),
+		createCertificate: builder.mutation({
+			query: ({ courseId, ...data }) => ({
+				url: `/courses/${courseId}/certificate`,
+				method: "POST",
+				body: { ...data },
+			}),
+		}),
+		prepareCertificate: builder.mutation({
+			query: ({ courseId, ...data }) => ({
+				url: `/courses/${courseId}/certificate`,
+				method: "PUT",
+				body: { ...data },
+			}),
+		}),
+		getCertificate: builder.query({
+			query: (searchParam) => {
+				return {
+					url: `/certificates/verify?${searchParam}`,
+					validateStatus: (response, result) => {
+						return response.status === 200 && !result.isError;
+					},
+				};
+			},
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
 	}),
 });
 
@@ -415,6 +440,9 @@ export const {
 	usePurchaseCourseMutation,
 	useUpdateChapterProgressMutation,
 	useRecordStudyTimeMutation,
+	useCreateCertificateMutation,
+	usePrepareCertificateMutation,
+	useGetCertificateQuery,
 } = coursesApiSlice;
 
 // export const selectallCoursesResult = coursesApiSlice.endpoints.getCourses.select();

@@ -16,6 +16,7 @@ const tutorRoutes = require("./routes/tutorRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const classroomRoutes = require("./routes/classroomRoutes");
 const communityRoutes = require("./routes/communityRoutes");
+const certificateRoutes = require("./routes/certificateRoutes");
 const webhookRoute = require("./routes/webhookRoute");
 const nonceRoutes = require("./routes/nonceRoutes");
 
@@ -83,6 +84,7 @@ app.use("/refresh", refreshRoute);
 app.use("/users", userRoutes);
 app.use("/tutors", tutorRoutes);
 app.use("/courses", courseRoutes);
+app.use("/certificates", certificateRoutes);
 app.use("/classrooms", classroomRoutes);
 app.use("/community", communityRoutes);
 
@@ -90,7 +92,7 @@ CoursePaymentController.initializeWebSocket();
 
 
 mongoose
-	.connect(process.env.MONGO_URI)
+	.connect(process.env.MONGO_URI, )
 	.then(() => {
 		app.listen(PORT, () => console.log(`Server Is 🏃‍♂️ On PORT ${PORT}`));
 	})

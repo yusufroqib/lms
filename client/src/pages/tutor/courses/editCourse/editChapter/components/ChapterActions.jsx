@@ -23,38 +23,41 @@ export const ChapterActions = ({
 	const [toggleChapterPublish] = useToggleChapterPublishMutation(); // Ensure you have the appropriate mutation hook
 	const navigate = useNavigate();
 
-  const deleteFolderAndContents = async (folderPath) => {
-    const storage = getStorage(app);
-    const folderRef = ref(storage, folderPath);
+	const deleteFolderAndContents = async (folderPath) => {
+		const storage = getStorage(app);
+		const folderRef = ref(storage, folderPath);
 
-    try {
-        // List all items in the folder
-        const { items, prefixes } = await listAll(folderRef);
-        // console.log(items)
-        // console.log(prefixes)
+		try {
+			// List all items in the folder
+			const { items, prefixes } = await listAll(folderRef);
+			// console.log(items)
+			// console.log(prefixes)
 
-        // Delete items in the folder if any
-        if (items.length > 0) {
-            await Promise.all(items.map(async (itemRef) => {
-                // Delete individual file
-                await deleteObject(itemRef);
-            }));
-        }
+			// Delete items in the folder if any
+			if (items.length > 0) {
+				await Promise.all(
+					items.map(async (itemRef) => {
+						// Delete individual file
+						await deleteObject(itemRef);
+					})
+				);
+			}
 
-        // Recursively delete subdirectories if any
-        if (prefixes.length > 0) {
-            await Promise.all(prefixes.map(async (prefix) => {
-                await deleteFolderAndContents(prefix._location.path_);
-            }));
-        }
+			// Recursively delete subdirectories if any
+			if (prefixes.length > 0) {
+				await Promise.all(
+					prefixes.map(async (prefix) => {
+						await deleteFolderAndContents(prefix._location.path_);
+					})
+				);
+			}
 
-        console.log('Folder and its contents deleted successfully');
-    } catch (error) {
-      toast.error('Something went wrong')
-        console.error('Error deleting folder and its contents:', error);
-    }
-};
-
+			console.log("Folder and its contents deleted successfully");
+		} catch (error) {
+			toast.error("Something went wrong");
+			console.error("Error deleting folder and its contents:", error);
+		}
+	};
 
 	const onClick = async () => {
 		try {
@@ -72,8 +75,12 @@ export const ChapterActions = ({
 				}).unwrap();
 				toast.success("Chapter published");
 			}
-		} catch {
-			toast.error("Something went wrong");
+		} catch (error) {
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -81,9 +88,8 @@ export const ChapterActions = ({
 	const onDelete = async () => {
 		try {
 			setIsLoading(true);
-			const folderPath = 
-				`Courses/${courseId}/Chapters/${chapterId}`			
-				await deleteFolderAndContents(folderPath);
+			const folderPath = `Courses/${courseId}/Chapters/${chapterId}`;
+			await deleteFolderAndContents(folderPath);
 
 			await deleteChapter({
 				courseId: courseId,

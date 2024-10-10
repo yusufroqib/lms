@@ -18,7 +18,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { ChaptersList } from "./ChaptersList";
-import { useCreateChapterMutation, useReorderChaptersMutation } from "@/features/courses/coursesApiSlice";
+import {
+	useCreateChapterMutation,
+	useReorderChaptersMutation,
+} from "@/features/courses/coursesApiSlice";
 import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
@@ -27,11 +30,9 @@ const formSchema = z.object({
 export const ChaptersForm = ({ initialData, courseId }) => {
 	const [isCreating, setIsCreating] = useState(false);
 	const [isUpdating, setIsUpdating] = useState(false);
-    const navigate = useNavigate()
-	const [createChapter] =
-		useCreateChapterMutation();
-	const [reorderChapters] =
-    useReorderChaptersMutation();
+	const navigate = useNavigate();
+	const [createChapter] = useCreateChapterMutation();
+	const [reorderChapters] = useReorderChaptersMutation();
 	const toggleCreating = () => {
 		setIsCreating((current) => !current);
 	};
@@ -58,28 +59,32 @@ export const ChaptersForm = ({ initialData, courseId }) => {
 		}
 	};
 	const onReorder = async (updateData) => {
-        console.log(updateData)
+		console.log(updateData);
 		try {
 			setIsUpdating(true);
-            await reorderChapters({
-                id: courseId,
-                list: updateData
-            }).unwrap();
+			await reorderChapters({
+				id: courseId,
+				list: updateData,
+			}).unwrap();
 			// await axios.put(`/api/courses/${courseId}/chapters/reorder`, {
 			//     list: updateData
 			// });
 			toast.success("Chapters reordered");
 			// router.refresh();
-		} catch {
-			toast.error("Something went wrong");
+		} catch (error) {
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		} finally {
 			setIsUpdating(false);
 		}
 	};
 	const onEdit = (id) => {
-        navigate(`/tutors/edit-course/${courseId}/chapter/${id}`)
+		navigate(`/tutors/edit-course/${courseId}/chapter/${id}`);
 
-        // console.log(id)
+		// console.log(id)
 
 		// router.push(`/teacher/courses/${courseId}/chapters/${id}`);
 	};

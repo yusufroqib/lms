@@ -51,8 +51,11 @@ export const ChapterAccessForm = ({
 			toggleEdit();
 			// router.refresh();
 		} catch (error) {
-			console.log(error);
-			toast.error("Something went wrong");
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		}
 	};
 	return (

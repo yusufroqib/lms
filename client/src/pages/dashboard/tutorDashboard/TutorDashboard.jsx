@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	BookCheck,
 	BookUp2,
@@ -14,6 +14,7 @@ import {
 	useGetTutorStatsQuery,
 	useGetTutorTopCoursesQuery,
 } from "@/features/courses/coursesApiSlice";
+
 import { Link } from "react-router-dom";
 import TutorEarningsChart from "./components/TutorEarningChart";
 import { DataTable } from "./components/DataTable";
@@ -23,37 +24,37 @@ import {
 	useGetTutorBalanceQuery,
 } from "@/features/users/usersApiSlice";
 import { Button } from "@/components/ui/button";
+import useAuth from "@/hooks/useAuth";
+import { useAccount } from "wagmi";
+import { useCoursePayment } from "@/hooks/useCoursePayment";
+import { formatUnits } from "viem";
+import { Tooltip } from "@material-tailwind/react";
 
 const TUTOR_SHARE = import.meta.env.VITE_TUTOR_SHARE;
 
 const TutorDashboard = ({ setDashboardMode }) => {
-	// const [balance, setBalance] = useState(0)
+	const { myDetails } = useGetMyDetailsQuery("myDetails", {
+		selectFromResult: ({ data }) => ({
+			myDetails: Object.values(data?.entities ?? {})[0],
+		}),
+	});
+	const { getTutorBalance } = useCoursePayment();
 	const { data: tutorStats, isLoading } = useGetTutorStatsQuery();
 	const { data: topCourses } = useGetTutorTopCoursesQuery();
 	const { data: courseTransactions, error } = useGetTutorCoursesSoldQuery();
 	const { data: tutorBalance, error: balanceError } = useGetTutorBalanceQuery();
+	const { _id: tutorId } = useAuth();
+	const { status, address } = useAccount();
+	const { data: tutorUSDCBalance } = getTutorBalance(tutorId);
+	// console.log(tutorUSDCBalance)
 
-	console.log(tutorBalance);
+	// console.log(Number(formatUnits(tutorUSDCBalance || 0, 6)));
 
-	const { myDetails } = useGetMyDetailsQuery("myDetails", {
-		selectFromResult: ({
-			data,
-			isLoading,
-			isSuccess,
-			isFetching,
-			isError,
-			error,
-		}) => ({
-			myDetails: Object.values(data?.entities ?? {})[0],
-			isLoading,
-			isSuccess,
-			isFetching,
-			error,
-			isError,
-		}),
-	});
+	// console.log(tutorUSDCBalance);
+	const stripeBalance =
+		(tutorBalance && tutorBalance?.available[0]?.amount / 100) || 0;
 
-	// console.log(courseTransactions);
+	const USDCBalance = Number(formatUnits(tutorUSDCBalance || 0, 6)) || 0;
 
 	if (isLoading) {
 		return (
@@ -66,6 +67,7 @@ const TutorDashboard = ({ setDashboardMode }) => {
 	return (
 		<div className="flex-1 p-8  space-y-6">
 			<div className="flex justify-end">
+
 				<Button
 					variant="outline"
 					className="flex gap-2 max-md:text-xs text-sm"
@@ -77,7 +79,7 @@ const TutorDashboard = ({ setDashboardMode }) => {
 			</div>
 			<div
 				style={{
-					backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.05)), url(/tutor-bg.jpg)`,
+					backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.05)), url(/tutor-bg.webp)`,
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 				}}
@@ -99,9 +101,27 @@ const TutorDashboard = ({ setDashboardMode }) => {
 					</h1>
 					<h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white text-right">
 						$
-						{(
-							tutorBalance && tutorBalance?.available[0]?.amount / 100
-						)?.toFixed(2) ?? "0.00"}
+						<Tooltip
+							content={
+								<>
+									<p>
+										<strong>Stripe: </strong>$
+										{stripeBalance?.toFixed(2) || "0.00"}
+									</p>
+									<p>
+										<strong>USDC: </strong>${USDCBalance?.toFixed(2) || "0.00"}
+									</p>
+								</>
+							}
+							placement="left"
+							animate={{
+								mount: { scale: 1, y: 0 },
+								unmount: { scale: 0, y: 25 },
+							}}
+							// className="hidden md:block"
+						>
+							{(stripeBalance + USDCBalance)?.toFixed(2) || "0.00"}
+						</Tooltip>
 					</h1>
 				</div>
 			</div>

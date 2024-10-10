@@ -29,10 +29,13 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import { useDispatch } from "react-redux";
 import { setAuthScreen } from "@/features/authScreenSlice";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import CustomConnectButton from "@/components/CustomConnectButton";
 
 export default function Home() {
 	const dispatch = useDispatch();
 	const isLogin = localStorage.getItem("isLogin");
+	
 
 	const handleRegister = () => {
 		dispatch(setAuthScreen("signup"));
@@ -42,7 +45,7 @@ export default function Home() {
 	return (
 		<div className="flex flex-col min-h-[100dvh] bg-gray-200 ">
 			<Navbar />
-			
+
 			<main className="flex-1 ">
 				<section className="bg-muted py-10 md:py-12 lg:py-20">
 					<div className="container grid md:grid-cols-2 gap-8 items-center mx-auto">
@@ -89,7 +92,7 @@ export default function Home() {
 							</div>
 						</div>
 						<img
-							src="/Mediamodifier-Design.svg"
+							src="/unlock-knowledge.svg"
 							width="700"
 							height="400"
 							alt="Hero"
@@ -253,21 +256,18 @@ export default function Home() {
 						<Link
 							to="#"
 							className="text-sm font-medium hover:underline underline-offset-4"
-							prefetch={false}
 						>
 							Terms of Service
 						</Link>
 						<Link
 							to="#"
 							className="text-sm font-medium hover:underline underline-offset-4"
-							prefetch={false}
 						>
 							Privacy Policy
 						</Link>
 						<Link
 							to="#"
 							className="text-sm font-medium hover:underline underline-offset-4"
-							prefetch={false}
 						>
 							Contact Us
 						</Link>

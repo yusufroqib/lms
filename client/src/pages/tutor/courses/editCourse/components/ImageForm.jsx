@@ -1,5 +1,4 @@
 import * as z from "zod";
-// import axios from "axios";
 import { Pencil, PlusCircle, ImageIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -14,21 +13,23 @@ import {
 import app from "../../../../../firebase";
 import { Progress } from "@material-tailwind/react";
 import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
-
+import { compressImage } from "@/lib/compressImage";
+import { Input } from "@/components/ui/input";
 
 export const ImageForm = ({ initialData, courseId }) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const [img, setImg] = useState("");
+	const [img, setImg] = useState(null);
 	const [imgPerc, setImgPerc] = useState(0);
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadTask, setUploadTask] = useState(null);
 	const [updateCourse, { isLoading, isError, isSuccess, error }] =
 		useUpdateCourseMutation();
+
 	const toggleEdit = () => setIsEditing((current) => !current);
 
-	const uploadImage = async (file, inputs) => {
+	const uploadImage = async (file) => {
 		const storage = getStorage(app);
-		const fileName = file.name;
+		const fileName = `${Date.now()}_${file.name.replace(/\.[^/.]+$/, ".webp")}`;
 		const folderPath = `Courses/${courseId}/CourseImage`;
 
 		// Check if there is an existing image URL
@@ -45,9 +46,12 @@ export const ImageForm = ({ initialData, courseId }) => {
 			}
 		}
 
+		// Compress the image before uploading
+		const compressedFile = await compressImage(file);
+
 		// Concatenate the folder path with the file name to create storage reference
 		const storageRef = ref(storage, `${folderPath}/${fileName}`);
-		const uploadTask = uploadBytesResumable(storageRef, file);
+		const uploadTask = uploadBytesResumable(storageRef, compressedFile);
 		setUploadTask(uploadTask);
 
 		return new Promise((resolve, reject) => {
@@ -57,53 +61,44 @@ export const ImageForm = ({ initialData, courseId }) => {
 					const progress =
 						(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 					setImgPerc(Math.round(progress));
-					switch (snapshot.state) {
-						case "paused":
-							console.log("Upload is paused");
-							break;
-						case "running":
-							console.log("Upload is running");
-							break;
-						default:
-							break;
-					}
 				},
 				(error) => {
-					reject(error); // Reject promise if there's an upload error
+					reject(error);
 				},
 				async () => {
 					try {
 						const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-						// Update inputs state with the new image URL
-						// setInputs((prev) => ({ ...prev, courseImage: downloadURL }));
-						resolve(downloadURL); // Resolve promise with the download URL
+						resolve(downloadURL);
 					} catch (error) {
-						reject(error); // Reject promise if there's an error getting the download URL
+						reject(error);
 					}
 				}
 			);
 		});
 	};
 
-	// const router = useRouter();
-	const onSubmit = async (values) => {
+	const onSubmit = async () => {
+		if (!img) {
+			return toast.error("Please select an image");
+		}
+
 		try {
-			// await axios.patch(`/api/courses/${courseId}`, values);
 			setIsUploading(true);
-			const url = await uploadImage(img, values);
-			// console.log(url);
+			const url = await uploadImage(img);
 			await updateCourse({ id: courseId, courseImage: url }).unwrap();
-			toast.success("Course updated");
+			toast.success("Course image updated");
 			toggleEdit();
-			// router.refresh();
 		} catch (error) {
-			// console.log(error.code);
 			if (error?.code === "storage/canceled") {
 				return toast.error("Upload Cancelled");
 			}
-			toast.error("Something went wrong");
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		} finally {
-			setImg("");
+			setImg(null);
 			setImgPerc(0);
 			setIsUploading(false);
 			setUploadTask(null);
@@ -114,10 +109,11 @@ export const ImageForm = ({ initialData, courseId }) => {
 		if (uploadTask) {
 			uploadTask.cancel();
 			setUploadTask(null);
-			setImg("");
-			setImgPerc(0);
-			setIsUploading(false);
 		}
+		setImg(null);
+		setImgPerc(0);
+		setIsUploading(false);
+		toggleEdit();
 	};
 
 	return (
@@ -148,7 +144,7 @@ export const ImageForm = ({ initialData, courseId }) => {
 				) : (
 					<div className="relative aspect-video mt-2">
 						<img
-							alt="Upload"
+							alt="Course"
 							className="object-cover rounded-md"
 							src={initialData.courseImage}
 						/>
@@ -156,13 +152,13 @@ export const ImageForm = ({ initialData, courseId }) => {
 				))}
 			{isEditing && (
 				<div>
-					<input
+					<Input
 						disabled={isUploading}
 						type="file"
 						name="courseImage"
 						accept="image/*"
 						onChange={(e) => setImg(e.target.files[0])}
-						className="file-input file-input-bordered w-full "
+						className="file-input file-input-bordered w-full"
 					/>
 					<div className="text-xs text-muted-foreground mt-4">
 						16:9 aspect ratio recommended

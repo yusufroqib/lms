@@ -45,23 +45,24 @@ export const TitleForm = ({ initialData, courseId }) => {
 			await updateCourse({ id: courseId, ...values }).unwrap();
 
 			const channel = streamChatClient.channel("messaging", courseId);
-console.log(channel)
+			console.log(channel);
 			const channelData = await channel.query();
 
 			// Update the channel name
 			await channel.update({
 				name: values.title,
 				image: channelData?.data?.image, // Include the existing image URL
-
 			});
-			// await axios.patch(`/api/courses/${courseId}`, values);
 			toast.success("Course updated");
 			toggleEdit();
 			form.reset({ title: "" });
 			// router.refresh();
-		} catch (error){
-			console.log(error)
-			toast.error("Something went wrong");
+		} catch (error) {
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		}
 	};
 	return (

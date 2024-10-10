@@ -5,6 +5,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    font-family: 'Pacifico';
+    src: url('/fonts/Pacifico-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Droid Serif Reg';
+    src: url('/fonts/DroidSerif-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
 html {
 	font-family: "Roboto", sans-serif;
 }
@@ -33,6 +46,12 @@ body,
 	display: -webkit-box;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+
+
+.iekbcc0{
+	pointer-events:auto !important;
 }
 
 .rating-svg span svg {

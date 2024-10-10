@@ -42,7 +42,7 @@ const RecommendedCourses = ({ items }) => {
 				</CarouselContent>
 				{/* <CarouselPrevious />
 				<CarouselNext /> */}
-				<div className="flex gap-2 mt-10 justify-end">
+				<div className="flex gap-2 mt-10  justify-end">
 					<CarouselPrevious className="static h-10 w-10"/>
 						
 					<CarouselNext className="static h-10 w-10 "/>

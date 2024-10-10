@@ -9,113 +9,103 @@ const api_secret = process.env.STREAM_API_SECRET;
 const app_id = process.env.STREAM_APP_ID;
 
 const handleRefreshToken = async (req, res) => {
-	const cookies = req.cookies;
-	// console.log("[Cookies]", cookies)
-	if (!cookies?.jwt) return res.sendStatus(401);
-	const refreshToken = cookies.jwt;
-	// console.log("[refreshToken]", refreshToken)
-	res.clearCookie("jwt");
-
-	const foundUser = await User.findOne({ refreshToken }).exec();
-	// console.log("[foundUser]", foundUser)
-
-	//Detected refresh token reuse!
-	if (!foundUser) {
-		jwt.verify(
+	try {
+	  const cookies = req.cookies;
+	  if (!cookies?.jwt) return res.sendStatus(401);
+	  const refreshToken = cookies.jwt;
+	  res.clearCookie("jwt");
+  
+	  const foundUser = await User.findOne({ refreshToken }).exec();
+  
+	  if (!foundUser) {
+		try {
+		  jwt.verify(
 			refreshToken,
 			process.env.REFRESH_TOKEN_SECRET,
 			async (err, decoded) => {
-				if (err) return res.sendStatus(403); //Forbidden
-				console.log("No user found, hacked user");
-
-				// Delete refresh token from db
-				const hackedUser = await User.findOne({
-					_id: decoded._id,
-				}).exec();
-				hackedUser.refreshToken = [];
-				const result = await hackedUser.save();
-				// console.log("[hackedUser]", hackedUser)
-
-				// console.log(result);
+			  if (err) return res.sendStatus(403);
+			  console.log("No user found, hacked user");
+  
+			  const hackedUser = await User.findOne({
+				_id: decoded._id,
+			  }).exec();
+			  hackedUser.refreshToken = [];
+			  await hackedUser.save();
 			}
-		);
+		  );
+		} catch (verifyError) {
+		  console.error("Error verifying token:", verifyError);
+		}
 		console.log("No user found");
 		return res.sendStatus(403);
-	}
-
-	const newRefreshTokenArray = foundUser.refreshToken.filter(
+	  }
+  
+	  const newRefreshTokenArray = foundUser.refreshToken.filter(
 		(rt) => rt !== refreshToken
-	);
-
-	// evaluate jwt
-	jwt.verify(
-		refreshToken,
-		process.env.REFRESH_TOKEN_SECRET,
-		async (err, decoded) => {
+	  );
+  
+	  try {
+		jwt.verify(
+		  refreshToken,
+		  process.env.REFRESH_TOKEN_SECRET,
+		  async (err, decoded) => {
 			if (err) {
-				// expired refresh token
-				foundUser.refreshToken = [...newRefreshTokenArray];
-				const result = await foundUser.save();
+			  foundUser.refreshToken = [...newRefreshTokenArray];
+			  await foundUser.save();
+			  return res.sendStatus(403);
 			}
-			if (err || foundUser._id.toString() !== decoded._id) {
-				// console.log(foundUser._id.toString());
-				// console.log( decoded._id);
-				// console.log("_id not equals");
-
-				return res.sendStatus(403);
+			if (foundUser._id.toString() !== decoded._id) {
+			  return res.sendStatus(403);
 			}
-
+  
 			const streamClient = new StreamClient(api_key, api_secret);
-			const expirationTime = Math.floor(Date.now() / 1000) + 3600;
-			const issuedAt = Math.floor(Date.now() / 1000) - 60;
-			// const streamToken = streamClient.createToken(foundUser._id.toString(), expirationTime, issuedAt);
 			const streamToken = streamClient.createToken(foundUser._id.toString());
-
-			// console.log("refreshTokenStream", streamToken);
-
-			// Refresh token was still valid
-			// const roles = Object.values(foundUser.roles);
+  
 			const roles = Object.values(foundUser.roles).filter(Boolean);
 			const accessToken = jwt.sign(
-				{
-					UserInfo: {
-						_id: foundUser._id,
-						username: foundUser.username,
-						fullName: foundUser.name,
-						connectedWallets: foundUser.connectedWallets,
-						paymentWallet: foundUser.paymentWallet,
-						image: foundUser.avatar,
-						roles: roles,
-						streamToken: streamToken,
-						stripeOnboardingComplete: foundUser.stripeOnboardingComplete,
-					},
+			  {
+				UserInfo: {
+				  _id: foundUser._id,
+				  username: foundUser.username,
+				  fullName: foundUser.name,
+				  connectedWallets: foundUser.connectedWallets,
+				  paymentWallet: foundUser.paymentWallet,
+				  image: foundUser.avatar,
+				  roles: roles,
+				  streamToken: streamToken,
+				  stripeOnboardingComplete: foundUser.stripeOnboardingComplete,
 				},
-				process.env.ACCESS_TOKEN_SECRET,
-				{ expiresIn: "15m" }
+			  },
+			  process.env.ACCESS_TOKEN_SECRET,
+			  { expiresIn: "15m" }
 			);
-
+  
 			const newRefreshToken = jwt.sign(
-				{ _id: foundUser._id.toString() },
-				process.env.REFRESH_TOKEN_SECRET,
-				{ expiresIn: "1d" }
+			  { _id: foundUser._id.toString() },
+			  process.env.REFRESH_TOKEN_SECRET,
+			  { expiresIn: "1d" }
 			);
-
-			// Saving refreshToken with current user
+  
 			foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-			const result = await foundUser.save();
-			// console.log(result);
-
-			// Creates Secure Cookie with refresh token
+			await foundUser.save();
+  
 			res.cookie("jwt", newRefreshToken, {
-				httpOnly: true,
-				secure: true,
-				sameSite: "None",
-				maxAge: 24 * 60 * 60 * 1000,
+			  httpOnly: true,
+			  secure: true,
+			  sameSite: "None",
+			  maxAge: 24 * 60 * 60 * 1000,
 			});
-
 			res.json({ accessToken });
-		}
-	);
-};
+		  }
+		);
+	  } catch (jwtError) {
+		console.error("Error verifying or signing JWT:", jwtError);
+		return res.sendStatus(500);
+	  }
+	} catch (error) {
+	  console.error("Error in handleRefreshToken:", error);
+	  return res.sendStatus(500);
+	}
+  };
 
 module.exports = { handleRefreshToken };

@@ -135,7 +135,7 @@ const Feeds = () => {
 					) : (
 						<NoResult
 							title="There’s no post to show"
-							description="Be the first to break the silence! 🚀 Create a Post and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
+							description="Be the first to break the silence! 🚀 Create a Post and kickstart the discussion. Your post could be the next big thing others learn from. Get involved! 💡"
 							link="/community/posts/create-post"
 							linkTitle="Create a Post"
 						/>

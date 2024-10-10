@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 // import OtpInput from "react-otp-input";
 import OtpInput from "react18-input-otp";
@@ -11,6 +11,7 @@ import {
 	// setUser,
 } from "@/features/auth/authSlice";
 import toast from "react-hot-toast";
+import { useAccount, useDisconnect } from "wagmi";
 
 const SignUpOTP = () => {
 	const dispatch = useDispatch();
@@ -20,6 +21,21 @@ const SignUpOTP = () => {
 	const activationToken = useSelector(selectCurrentActivationToken);
 	const signUpEmail = useSelector(selectCurrentSignUpEmail);
 	const navigate = useNavigate();
+	const location = useLocation();
+	const from = location.state?.from?.pathname || "/dashboard";
+	const { isConnected } = useAccount();
+	const { disconnectAsync } = useDisconnect();
+
+	useEffect(() => {
+		const disconectWallet = async () => {
+			try {
+				await disconnectAsync();
+			} catch (error) {
+				toast.error("Error disconnecting wallet");
+			}
+		};
+		if (isConnected) disconectWallet();
+	}, [isConnected]);
 
 	useEffect(() => {
 		let countdown = setInterval(() => {
@@ -55,20 +71,9 @@ const SignUpOTP = () => {
 			}).unwrap();
 
 			toast.success("Account activated successfully");
+			localStorage.setItem("isLogin", "true");
+			navigate(from, { replace: true });
 
-			navigate("/dashboard");
-
-			// console.log(res)
-			// dispatch(setUser({ user }));
-			// console.log(user);
-			// setData({
-			// 	...data,
-			// 	fullName: "",
-			// 	email: "",
-			// 	password: "",
-			// 	username: "",
-			// });
-			// navigate("/verify");
 		} catch (err) {
 			if (!err.status) {
 				console.log("No Server Response");

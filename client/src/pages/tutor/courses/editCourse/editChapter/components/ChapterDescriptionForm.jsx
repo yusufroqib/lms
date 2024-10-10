@@ -49,9 +49,6 @@ export const ChapterDescriptionForm = ({
 	const { isSubmitting, isValid } = form.formState;
 
 	const onSubmit = async (values) => {
-		// e.preventDefault();
-		// const sanitizedContent = DOMPurify.sanitize(value);
-
 		try {
 			// setIsSubmitting(true);
 			await updateChapter({
@@ -63,8 +60,11 @@ export const ChapterDescriptionForm = ({
 			setIsEditing(false);
 			// setIsSubmitting(false);
 		} catch (error) {
-			console.log(error);
-			toast.error("Something went wrong");
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		} finally {
 			// setIsSubmitting(false);
 		}

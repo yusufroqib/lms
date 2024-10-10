@@ -17,9 +17,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import { useStreamChatClient } from "@/context/StreamChatContext";
+import { ConfirmPublishModal } from "./ConfirmPublishModal";
 
 export const Actions = ({
 	disabled,
+	price,
 	title,
 	courseImage,
 	courseId,
@@ -35,6 +37,9 @@ export const Actions = ({
 	const [toggleCoursePublish] = useToggleCoursePublishMutation(); // Ensure you have the appropriate mutation hook
 	const [deleteCourse] = useDeleteCourseMutation(); // Ensure you have the appropriate mutation hook
 	const navigate = useNavigate();
+	const [open, setOpen] = useState(false);
+
+	// console.log(price);
 
 	const deleteFolderAndContents = async (folderPath) => {
 		const storage = getStorage();
@@ -72,7 +77,9 @@ export const Actions = ({
 		}
 	};
 
-	const onClick = async () => {
+	const onClick = async (data) => {
+		let paymentMethod;
+
 		try {
 			setIsLoading(true);
 			if (isPublished) {
@@ -80,31 +87,43 @@ export const Actions = ({
 					id: courseId,
 				}).unwrap();
 				toast.success("Course unpublished");
+				setOpen(false);
 			} else {
-				const channel = await streamChatClient
-				.channel("messaging", courseId, {
+				if (data.items.includes("card") && data.items.includes("crypto")) {
+					paymentMethod = "both";
+				} else if (data.items.includes("card")) {
+					paymentMethod = "card";
+				} else if (data.items.includes("crypto")) {
+					paymentMethod = "crypto";
+				} else if (
+					data.items.includes("card") &&
+					data.items.includes("crypto")
+				) {
+					paymentMethod = "both";
+				}
+				const channel = await streamChatClient.channel("messaging", courseId, {
 					name: title,
-						image: courseImage,
-						// members: [_id, ...memberIds],
-					})
-					await channel.create();
-					
-					await toggleCoursePublish({
-						id: courseId,
-					}).unwrap();
-				// console.log(channel);
-
-
-				// await channel.updateMembers([{ user_id: _id, role: "channel_moderator" }]);
-
+					image: courseImage,
+					// members: [_id, ...memberIds],
+				});
+				await channel.create();
+				await toggleCoursePublish({
+					id: courseId,
+					paymentMethod,
+				}).unwrap();
+				console.log(paymentMethod);
 				toast.success("Course published");
 				// confetti.onOpen();
 				dispatch(openConfetti());
+				setOpen(false);
 			}
-			// router.refresh();
-		} catch(error) {
-			console.log(error)
-			toast.error("Something went wrong");
+		} catch (error) {
+			console.log(error);
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -130,14 +149,17 @@ export const Actions = ({
 	};
 	return (
 		<div className="flex items-center gap-x-2">
-			<Button
-				onClick={onClick}
-				disabled={disabled || isLoading}
-				variant="outline"
-				size="sm"
+			<ConfirmPublishModal
+				open={open}
+				setOpen={setOpen}
+				isPublished={isPublished}
+				price={price}
+				onConfirm={onClick}
 			>
-				{isPublished ? "Unpublish" : "Publish"}
-			</Button>
+				<Button disabled={disabled || isLoading} variant="outline" size="sm">
+					{isPublished ? "Unpublish" : "Publish"}
+				</Button>
+			</ConfirmPublishModal>
 			<ConfirmModal onConfirm={onDelete}>
 				<Button size="sm" disabled={isLoading}>
 					<LuTrash className="h-4 w-4" />

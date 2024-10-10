@@ -5,17 +5,25 @@ import usePersist from "@/hooks/usePersist";
 import { useSelector } from "react-redux";
 import { selectCurrentToken } from "./authSlice";
 import { Loader2 } from "lucide-react";
+import { useDisconnect } from "wagmi";
 
 const PersistLogin = () => {
 	const [persist] = usePersist();
 	const token = useSelector(selectCurrentToken);
 	const effectRan = useRef(false);
 	const location = useLocation();
+	const { disconnectAsync } = useDisconnect();
 
 	const [trueSuccess, setTrueSuccess] = useState(false);
 
 	const [refresh, { isUninitialized, isLoading, isSuccess, isError, error }] =
 		useRefreshMutation();
+
+	useEffect(() => {
+		if (!token && persist && !isLoading && isError) {
+			disconnectWallet();
+		}
+	}, [persist, isLoading, isError, token]);
 
 	useEffect(() => {
 		if (effectRan.current === true || process.env.NODE_ENV !== "development") {
@@ -40,6 +48,10 @@ const PersistLogin = () => {
 		// eslint-disable-next-line
 	}, []);
 
+	const disconnectWallet = async () => {
+		await disconnectAsync();
+	};
+
 	let content;
 	if (!persist) {
 		// persist: no
@@ -56,9 +68,8 @@ const PersistLogin = () => {
 	} else if (isError) {
 		//persist: yes, token: no
 		// console.log('error')
-        localStorage.setItem("isLogin", "false");
+		localStorage.setItem("isLogin", "false");
 		content = <Navigate to="/auth" state={{ from: location }} replace />;
-
 	} else if (isSuccess && trueSuccess) {
 		//persist: yes, token: yes
 		// console.log('success')

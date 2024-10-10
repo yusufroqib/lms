@@ -21,7 +21,7 @@ export default withMT({
 				...defaultTheme.screens,
 				"3xl": "2000px",
 				"max-2xs": { max: "375px" },
-				"max-xs" : { max: "425px" },
+				"max-xs": { max: "425px" },
 				"max-sm": { max: "639px" }, // Add custom max-sm breakpoint
 				"max-md": { max: "767px" }, // Add custom max-md breakpoint
 				"max-lg": { max: "1023px" }, // Add custom max-lg breakpoint
@@ -348,6 +348,14 @@ export default withMT({
 					from: { height: "var(--radix-accordion-content-height)" },
 					to: { height: "0" },
 				},
+				pop: {
+					"0%": { transform: "scale(0.9)", opacity: 0 },
+					"100%": { transform: "scale(1)", opacity: 1 },
+				},
+				reveal: {
+					"0%": { transform: "scale(0.8) rotate(-10deg)", opacity: 0 },
+					"100%": { transform: "scale(1) rotate(0deg)", opacity: 1 },
+				},
 			},
 			animation: {
 				"ping-once": "ping 5s cubic-bezier(0, 0, 0.2, 1)",
@@ -357,11 +365,10 @@ export default withMT({
 				"spin-3": "spin 3s linear infinite",
 				"accordion-down": "accordion-down 0.2s ease-out",
 				"accordion-up": "accordion-up 0.2s ease-out",
+				pop: 'pop 0.3s ease-out',
+				reveal: 'reveal 0.5s ease-out',
 			},
 		},
 	},
-	plugins: [
-		require("tailwindcss-animate"),
-		require("@tailwindcss/typography"),
-	],
+	plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 });

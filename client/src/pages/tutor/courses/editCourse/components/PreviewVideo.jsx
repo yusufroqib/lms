@@ -17,6 +17,7 @@ import {
 import app from "../../../../../firebase";
 import { Progress } from "@material-tailwind/react";
 import { useUpdateCourseMutation } from "@/features/courses/coursesApiSlice";
+import { Input } from "@/components/ui/input";
 // import { FileUpload } from "@/components/file-upload";
 const formSchema = z.object({
 	previewVideoUrl: z.string().min(1),
@@ -27,14 +28,14 @@ export const PreviewVideoForm = ({ initialData, courseId }) => {
 	const [vidPerc, setVidPerc] = useState(0);
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadTask, setUploadTask] = useState(null);
-    const [updateCourse, { isLoading, isError, isSuccess, error }] =
+	const [updateCourse, { isLoading, isError, isSuccess, error }] =
 		useUpdateCourseMutation();
 	const toggleEdit = () => setIsEditing((current) => !current);
 
 	const uploadVideo = async (file, inputs) => {
 		const storage = getStorage(app);
 		const fileName = file.name;
-		const folderPath =`Courses/${courseId}/PreviewVideo`;
+		const folderPath = `Courses/${courseId}/PreviewVideo`;
 
 		// Check if there is an existing video URL
 		const existingPreviewVideoUrl = initialData.previewVideoUrl;
@@ -97,7 +98,7 @@ export const PreviewVideoForm = ({ initialData, courseId }) => {
 			setIsUploading(true);
 			const url = await uploadVideo(vid, values);
 			// console.log(url);
-            await updateCourse({ id: courseId, previewVideoUrl: url }).unwrap();
+			await updateCourse({ id: courseId, previewVideoUrl: url }).unwrap();
 
 			toast.success("Course updated");
 			toggleEdit();
@@ -105,10 +106,14 @@ export const PreviewVideoForm = ({ initialData, courseId }) => {
 		} catch (error) {
 			// console.log(error.code);
 			if (error?.code === "storage/canceled") {
-                toggleEdit();
+				toggleEdit();
 				return toast.error("Upload Cancelled");
 			}
-			toast.error("Something went wrong");
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		} finally {
 			setVid("");
 			setVidPerc(0);
@@ -130,12 +135,13 @@ export const PreviewVideoForm = ({ initialData, courseId }) => {
 		video.onloadedmetadata = function () {
 			URL.revokeObjectURL(fileURL); // Free memory
 			const duration = video.duration;
-			console.log(duration)
+			console.log(duration);
 			if (duration > 1800) {
 				// Limit to 1 minute
-				toast.error("Video exceeds the maximum allowed duration of 30 minutes.");
+				toast.error(
+					"Video exceeds the maximum allowed duration of 30 minutes."
+				);
 				setVid(null);
-
 			} else {
 				setVid(file);
 				// Proceed with the upload or other operations
@@ -190,7 +196,7 @@ export const PreviewVideoForm = ({ initialData, courseId }) => {
 				))}
 			{isEditing && (
 				<div>
-					<input
+					<Input
 						disabled={isUploading}
 						type="file"
 						name="courseVideo"

@@ -21,7 +21,7 @@ const {
 	completeStripeConnectOnboarding,
 	getTutorBalance,
 	initiatePayout,
-	getTransactionHistory,
+	// getTransactionHistory,
 	getPayoutDetails,
 } = require("../controllers/tutorController");
 const express = require("express");
@@ -53,12 +53,12 @@ router.get(
 	verifyRoles(Admin, Tutor),
 	getPayoutDetails
 );
-router.get(
-	"/transactions-history",
-	verifyJWT,
-	verifyRoles(Admin, Tutor),
-	getTransactionHistory
-);
+// router.get(
+// 	"/transactions-history",
+// 	verifyJWT,
+// 	verifyRoles(Admin, Tutor),
+// 	getTransactionHistory
+// );
 router.get(
 	"/course-transactions",
 	verifyJWT,

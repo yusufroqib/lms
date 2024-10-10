@@ -1,32 +1,5 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/DuR4f1U6FTW
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-	Select,
-	SelectTrigger,
-	SelectValue,
-	SelectContent,
-	SelectItem,
-} from "@/components/ui/select";
-
-import { Badge } from "@/components/ui/badge";
-import { CartesianGrid, XAxis, Bar, BarChart, Line, LineChart } from "recharts";
-import {
-	ChartTooltipContent,
-	ChartTooltip,
-	ChartContainer,
-} from "@/components/ui/chart";
 import { Link } from "react-router-dom";
-import {
-	CircularProgressbarWithChildren,
-	buildStyles,
-} from "react-circular-progressbar";
 import {
 	useGetCoursesQuery,
 	useGetEnrolledCoursesQuery,
@@ -44,6 +17,8 @@ import StudyTimeCharts from "./components/StudyTimeCharts";
 import RecommendedCourses from "./components/RecommendedCourses";
 import { useGetMyDetailsQuery } from "@/features/users/usersApiSlice";
 import useAuth from "@/hooks/useAuth";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import CustomConnectButton from "@/components/CustomConnectButton";
 
 export default function StudentDashBoard({ setDashboardMode }) {
 	const { status } = useAuth();
@@ -55,27 +30,14 @@ export default function StudentDashBoard({ setDashboardMode }) {
 	const [enrolledIds, setEnrolledIds] = useState([]);
 	const {
 		data: courses,
-		isLoading,
-		isFetching,
+
 		isSuccess,
 		isError,
 	} = useGetEnrolledCoursesQuery("enrolledCourses");
 
 	const { myDetails } = useGetMyDetailsQuery("myDetails", {
-		selectFromResult: ({
-			data,
-			isLoading,
-			isSuccess,
-			isFetching,
-			isError,
-			error,
-		}) => ({
+		selectFromResult: ({ data }) => ({
 			myDetails: Object.values(data?.entities ?? {})[0],
-			isLoading,
-			isSuccess,
-			isFetching,
-			error,
-			isError,
 		}),
 	});
 	const {
@@ -146,8 +108,6 @@ export default function StudentDashBoard({ setDashboardMode }) {
 		}
 	}, [isSuccess, courses, enrolledCourses]);
 
-	
-
 	if (!courses || !coursesList)
 		return (
 			<div className="flex min-h-[80vh] justify-center items-center">
@@ -175,20 +135,29 @@ export default function StudentDashBoard({ setDashboardMode }) {
 							</Button>
 						</div>
 					)}
+					{/* <ConnectButton showBalance={false}/> */}
+					{/* <CustomConnectButton className={'w-full rounded-md'}/> */}
 					<div
 						style={{
 							backgroundImage: ` linear-gradient(rgba(0, 0, 128, 0.15), rgba(0, 0, 126, 0.1)), url(/line-background.svg)`,
 							backgroundSize: "cover",
 							backgroundPosition: "center",
 						}}
-						className="bg-slate-300 p-8 lg:p-14 rounded-3xl space-y-2 lg:space-y-5 "
+						className="bg-slate-300 relative p-8 h-50 md:h-80 lg:p-14 rounded-3xl space-y-2 lg:space-y-5 "
 					>
-						<h1 className="text-2xl md:text-3xl lg:text-5xl font-semibold text-blue-900">
-							Hi, {displayName}
-						</h1>
-						<h1 className="text-xs md:text-lg  lg:text-xl">
-							Boost your skills to shine in your life
-						</h1>
+						<img
+							src="/file (1).webp"
+							className="absolute max-sm:-left-10 top-0 h-full"
+							alt=""
+						/>
+						<div className="absolute left-20 max-sm:bottom-10 sm:left-60 md:left-100">
+							<h1 className="text-2xl   md:text-5xl font-semibold text-blue-900">
+								Welcome, {displayName}!
+							</h1>
+							<h1 className="text-xs  md:text-xl">
+								Boost your skills to shine in your life
+							</h1>
+						</div>
 					</div>
 					<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
 						<div className="  lg:col-span-1 space-y-8">

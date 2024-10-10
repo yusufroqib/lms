@@ -113,6 +113,35 @@ const updateProfile = async (req, res) => {
 	}
 };
 
+const updateSignature = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const { signature } = req.body;
+
+		if (!signature) {
+			return res.status(400).json({ message: "Signature is required" });
+		}
+
+		// Find the user and update their signature
+		const updatedUser = await User.findByIdAndUpdate(
+			userId,
+			{ signature },
+			{ new: true, runValidators: true }
+		).select("-password");
+
+		if (!updatedUser) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		res.json(updatedUser);
+	} catch (error) {
+		console.error("Signature update error:", error);
+		res
+			.status(500)
+			.json({ message: "Error updating signature", error: error.message });
+	}
+};
+
 const changePassword = async (req, res) => {
 	try {
 		const userId = req.userId;
@@ -171,5 +200,6 @@ module.exports = {
 	videocall,
 	becomeTutor,
 	updateProfile,
+	updateSignature,
 	changePassword,
 };

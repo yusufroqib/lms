@@ -18,12 +18,19 @@ import { CircleDollarSign, File, ListChecks, Loader2 } from "lucide-react";
 import { PriceForm } from "./components/PriceForm";
 import { ChaptersForm } from "./components/ChaptersForm";
 import { PreviewVideoForm } from "./components/PreviewVideo";
+import SignaturePad from "./components/SignaturePad";
+import { useGetMyDetailsQuery } from "@/features/users/usersApiSlice";
 // import { DescriptionForm } from "./components/DescForm";
 
 const EditCourse = () => {
 	const { courseId } = useParams();
 	const navigate = useNavigate();
 	const { username, isTutor, isAdmin, _id } = useAuth();
+	const { myDetails } = useGetMyDetailsQuery("myDetails", {
+		selectFromResult: ({ data }) => ({
+			myDetails: Object.values(data?.entities ?? {})[0],
+		}),
+	});
 	const { course, isLoading, isFetching, isSuccess, isError } =
 		useGetTutorCoursesQuery("tutorCourses", {
 			selectFromResult: ({
@@ -45,10 +52,6 @@ const EditCourse = () => {
 
 	const { data } = useGetCourseCategoriesQuery("courseCategories");
 
-	// console.log(categories)
-
-	// console.log(import.meta.env.VITE_FIREBASE_API_KEY)
-	// console.log(isSuccess);
 	let requiredFields;
 	// useEffect(() => {}, []);
 	if (isError) {
@@ -101,6 +104,7 @@ const EditCourse = () => {
 							</span>
 						</div>
 						<Actions
+							price={course.price}
 							title={course.title}
 							courseImage={course.courseImage}
 							disabled={!isComplete}
@@ -142,6 +146,9 @@ const EditCourse = () => {
 								</div>
 								<PriceForm initialData={course} courseId={course.id} />
 							</div>
+							<SignaturePad
+								signature={myDetails?.signature}
+							/>
 							<PreviewVideoForm initialData={course} courseId={course.id} />
 						</div>
 					</div>

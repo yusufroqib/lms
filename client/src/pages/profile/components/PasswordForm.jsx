@@ -78,10 +78,6 @@ const PasswordForm = ({ onCancel, onSubmit }) => {
 	const checkFormValidity = () => {
 		const newErrors = {};
 
-		if (!passwords.currentPassword) {
-			newErrors.currentPassword = "Current password is required";
-		}
-
 		const passwordError = validatePassword(passwords.newPassword);
 		if (passwordError) {
 			newErrors.newPassword = passwordError;
@@ -128,13 +124,14 @@ const PasswordForm = ({ onCancel, onSubmit }) => {
 					id="currentPassword"
 					name="currentPassword"
 					type="password"
+					placeholder="Enter your current password"
 					value={passwords.currentPassword}
 					onChange={handlePasswordChange}
 				/>
-				{errors.currentPassword && passwords.currentPassword && (
-					<Alert variant="destructive" className="mt-2">
+				{!passwords.currentPassword && (
+					<Alert  className="mt-2">
 						<AlertCircle className="h-4 w-4" />
-						<AlertDescription>{errors.currentPassword}</AlertDescription>
+						<AlertDescription className='text-gray-400 text-sm'>{`Leave current password field blank if this account doesn't have a password`}</AlertDescription>
 					</Alert>
 				)}
 			</div>

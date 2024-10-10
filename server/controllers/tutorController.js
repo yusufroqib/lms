@@ -846,17 +846,17 @@ const initiatePayout = async (req, res) => {
 	}
 };
 
-const getTransactionHistory = async (req, res) => {
-	try {
-		const userId = req.userId;
-		const user = await User.findById(userId).populate("transactions.courseId");
+// const getTransactionHistory = async (req, res) => {
+// 	try {
+// 		const userId = req.userId;
+// 		const user = await User.findById(userId).populate("transactions.courseId");
 
-		res.json(user.transactions);
-	} catch (error) {
-		console.error("[GET_TRANSACTION_HISTORY]", error);
-		res.status(500).json({ message: "Internal server error" });
-	}
-};
+// 		res.json(user.transactions);
+// 	} catch (error) {
+// 		console.error("[GET_TRANSACTION_HISTORY]", error);
+// 		res.status(500).json({ message: "Internal server error" });
+// 	}
+// };
 
 const getTutorEarnings = async (req, res) => {
 	try {
@@ -1012,7 +1012,7 @@ module.exports = {
 	getTutorBalance,
 	getPayoutDetails,
 	initiatePayout,
-	getTransactionHistory,
+	// getTransactionHistory,
 	deleteCourse,
 	getTutorStats,
 	getTutorTopCourses,

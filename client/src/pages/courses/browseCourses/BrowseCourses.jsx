@@ -16,10 +16,7 @@ const BrowseCourses = () => {
 
 	const {
 		data: courses,
-		isLoading,
-		isSuccess,
-		error,
-		isError,
+	
 	} = useGetCoursesQuery({ searchParams: searchParams });
 
 	// console.log(error)

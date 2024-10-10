@@ -1,88 +1,277 @@
-import { useCallback } from 'react';
-import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
-import { ethers } from 'ethers';
+import { useCallback } from "react";
+import {
+	useReadContract,
+	useWriteContract,
+	useTransaction,
+	useAccount,
+	useConfig,
+	useSwitchChain,
+	useWaitForTransactionReceipt,
+} from "wagmi";
+// import { useReadContract, useWriteContract, useWaitForTransaction } from 'wagmi';
+import { parseUnits, formatUnits } from "viem";
+import {
+	COURSE_PAYMENT_ABI,
+	COURSE_PAYMENT_CA,
+	USDC_ABI,
+	USDC_CA,
+} from "@/contracts/coursePayment";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import toast from "react-hot-toast";
+import useAuth from "./useAuth";
+import truncateWalletAddress from "@/lib/truncateWalletAddress";
 
-const COURSE_PAYMENT_ADDRESS = 'YOUR_COURSE_PAYMENT_CONTRACT_ADDRESS';
-const COURSE_PAYMENT_ABI = ["bnghj"]; // Your CoursePayment contract ABI here
+const CORRECT_CHAIN_ID = parseInt(import.meta.env.VITE_CHAIN_ID, 10);
+
+console.log(CORRECT_CHAIN_ID);
+
+// const COURSE_PAYMENT_CA = 'YOUR_COURSE_PAYMENT_CONTRACT_ADDRESS';
+// const COURSE_PAYMENT_ABI = ["bnghj"]; // Your CoursePayment contract ABI here
 
 export function useCoursePayment() {
-  // Register Tutor
-  const { config: registerConfig } = usePrepareContractWrite({
-    address: COURSE_PAYMENT_ADDRESS,
-    abi: COURSE_PAYMENT_ABI,
-    functionName: 'registerTutor',
-  });
-  const { write: registerTutor } = useContractWrite(registerConfig);
+	const { address, isConnected, chain } = useAccount();
+	const { openConnectModal } = useConnectModal();
+	const { switchChain } = useSwitchChain();
+	const { paymentWallet } = useAuth();
 
-  // Update Tutor Address
-  const { config: updateAddressConfig } = usePrepareContractWrite({
-    address: COURSE_PAYMENT_ADDRESS,
-    abi: COURSE_PAYMENT_ABI,
-    functionName: 'updateTutorAddress',
-  });
-  const { write: updateTutorAddress } = useContractWrite(updateAddressConfig);
+	const truncateAddress = truncateWalletAddress(paymentWallet);
 
-  // Withdraw Tutor Balance
-  const { config: withdrawConfig } = usePrepareContractWrite({
-    address: COURSE_PAYMENT_ADDRESS,
-    abi: COURSE_PAYMENT_ABI,
-    functionName: 'withdrawTutorBalance',
-  });
-  const { write: withdrawTutorBalance } = useContractWrite(withdrawConfig);
+	// Helper function to check if the wallet is connected
+	const checkConnectionAndChain = useCallback(async () => {
+		if (!isConnected) {
+			toast.error("Please connect your wallet.");
+			openConnectModal?.();
+			return false;
+		}
+		if (paymentWallet !== address) {
+			// toast.error(Please connect the correct wallet to interact.");
+			toast.error(`Please connect the correct wallet ${truncateAddress}.`);
+			return false;
+		}
+		if (chain?.id !== CORRECT_CHAIN_ID) {
+			toast.error("Switching to the correct network...");
+			try {
+				switchChain({ chainId: CORRECT_CHAIN_ID });
+				return false;
+			} catch (error) {
+				console.error("Failed to switch network:", error);
+				toast.error("Failed to switch network. Please switch manually.");
+				return false;
+			}
+		}
+		return true;
+	}, [
+		isConnected,
+		openConnectModal,
+		chain,
+		switchChain,
+		paymentWallet,
+		address,
+	]);
 
-  // Purchase Course
-  const { config: purchaseConfig } = usePrepareContractWrite({
-    address: COURSE_PAYMENT_ADDRESS,
-    abi: COURSE_PAYMENT_ABI,
-    functionName: 'purchaseCourse',
-  });
-  const {data: purchaseData, write: purchaseCourse } = useContractWrite(purchaseConfig);
-  const { isLoading: isPurchaseProcessing, isSuccess: isPurchaseComplete } = useWaitForTransaction({
-    hash: purchaseData?.hash,
-  })
+	// Wrap contract write functions with the connection check
+	const wrapWithConnectionAndChainCheck = useCallback(
+		(writeFunction) => {
+			return async (...args) => {
+				if (await checkConnectionAndChain()) {
+					return writeFunction(...args);
+				}
+			};
+		},
+		[checkConnectionAndChain]
+	);
 
-  // Get Tutor Balance
-  const getTutorBalance = useCallback((tutorId) => {
-    return useContractRead({
-      address: COURSE_PAYMENT_ADDRESS,
-      abi: COURSE_PAYMENT_ABI,
-      functionName: 'getTutorBalance',
-      args: [tutorId],
-    });
-  }, []);
+	const {
+		writeContract: registerTutorRaw,
+		data: registerTutorHash,
+		isPending: isRegisterTutorPending,
+		error: registerTutorError,
+	} = useWriteContract();
+	const {
+		writeContract: updateTutorAddressRaw,
+		data: updateTutorAddressHash,
+		isPending: isUpdateTutorAddressPending,
+		error: updateTutorAddressError,
+	} = useWriteContract();
+	const {
+		writeContract: withdrawTutorBalanceRaw,
+		data: withdrawTutorBalanceHash,
+		isPending: isWithdrawTutorBalancePending,
+		error: withdrawTutorBalanceError,
+	} = useWriteContract();
+	const {
+		writeContract: purchaseCourseRaw,
+		data: purchaseDataHash,
+		isPending: isPurchasePending,
+		error: purchaseError,
+	} = useWriteContract();
 
-  // Get Total Tutor Balances
-  const { data: totalTutorBalances, isError: isTotalBalancesError, isLoading: isTotalBalancesLoading } = useContractRead({
-    address: COURSE_PAYMENT_ADDRESS,
-    abi: COURSE_PAYMENT_ABI,
-    functionName: 'getTotalTutorBalances',
-  });
+	const {
+		writeContract: approveUSDCRaw,
+		data: approveDataHash,
+		isPending: isApproving,
+		error: approveError,
+	} = useWriteContract({
+		address: USDC_CA,
+		abi: USDC_ABI,
+		functionName: "approve",
+	});
+	// console.log(error);
 
-  // Get Platform Fee
-  const { data: platformFee, isError: isPlatformFeeError, isLoading: isPlatformFeeLoading } = useContractRead({
-    address: COURSE_PAYMENT_ADDRESS,
-    abi: COURSE_PAYMENT_ABI,
-    functionName: 'getPlatformFee',
-  });
+	const approveUSDC = wrapWithConnectionAndChainCheck((amount) =>
+		approveUSDCRaw({
+			address: USDC_CA,
+			abi: USDC_ABI,
+			functionName: "approve",
+			args: [COURSE_PAYMENT_CA, parseUnits(amount, 6)],
+		})
+	);
+	// Register Tutor
+	const registerTutor = wrapWithConnectionAndChainCheck((tutorId) =>
+		registerTutorRaw({
+			address: COURSE_PAYMENT_CA,
+			abi: COURSE_PAYMENT_ABI,
+			functionName: "registerTutor",
+			args: [tutorId],
+		})
+	);
 
-  // Format balances
-  const formattedTotalTutorBalances = totalTutorBalances ? ethers.utils.formatUnits(totalTutorBalances, 6) : '0';
-  const formattedPlatformFee = platformFee ? ethers.utils.formatUnits(platformFee, 6) : '0';
+	// Update Tutor Address
+	const updateTutorAddress = wrapWithConnectionAndChainCheck(
+		(tutorId, newAddress) =>
+			updateTutorAddressRaw({
+				address: COURSE_PAYMENT_CA,
+				abi: COURSE_PAYMENT_ABI,
+				functionName: "updateTutorAddress",
+				args: [tutorId, newAddress],
+			})
+	);
 
-  return {
-    registerTutor: (tutorId) => registerTutor?.({ args: [tutorId] }),
-    updateTutorAddress: (tutorId) => updateTutorAddress?.({ args: [tutorId] }),
-    withdrawTutorBalance: (tutorId, amount) => withdrawTutorBalance?.({ args: [tutorId, ethers.utils.parseUnits(amount, 6)] }),
-    purchaseCourse: (tutorId, amount, courseId) => purchaseCourse?.({ args: [tutorId, ethers.utils.parseUnits(amount, 6), courseId] }),
-    getTutorBalance,
-    totalTutorBalances: formattedTotalTutorBalances,
-    platformFee: formattedPlatformFee,
-    isPurchaseLoading,
-    isPurchaseProcessing,
-    isPurchaseComplete,
-    isTotalBalancesError,
-    isTotalBalancesLoading,
-    isPlatformFeeError,
-    isPlatformFeeLoading,
-  };
+	// Withdraw Tutor Balance
+	const withdrawTutorBalance = wrapWithConnectionAndChainCheck(
+		(tutorId, amount) =>
+			withdrawTutorBalanceRaw({
+				address: COURSE_PAYMENT_CA,
+				abi: COURSE_PAYMENT_ABI,
+				functionName: "withdrawTutorBalance",
+				args: [tutorId, parseUnits(amount, 6)],
+			})
+	);
+
+	//   const { data: isAllowanceSufficient } = useContractRead({
+	//     address: COURSE_PAYMENT_ADDRESS,
+	//     abi: COURSE_PAYMENT_ABI,
+	//     functionName: 'checkAllowance',
+	//     args: [address, parseUnits(price.toString(), 6)],
+	// });
+
+	const getAllowanceStat = useCallback((address, price) => {
+		return useReadContract({
+			address: COURSE_PAYMENT_CA,
+			abi: COURSE_PAYMENT_ABI,
+			functionName: "checkAllowance",
+			args: [address, parseUnits(price, 6)],
+		});
+	}, []);
+
+	// Purchase Course
+	const purchaseCourse = wrapWithConnectionAndChainCheck(
+		(tutorId, amount, courseId) =>
+			purchaseCourseRaw({
+				address: COURSE_PAYMENT_CA,
+				abi: COURSE_PAYMENT_ABI,
+				functionName: "purchaseCourse",
+				args: [tutorId, parseUnits(amount, 6), courseId],
+			})
+	);
+
+	// const { isLoading: isPurchaseProcessing, isSuccess: isPurchaseComplete } = useWaitForTransaction({
+	//   hash: purchaseData?.hash,
+	// })
+
+	// Get Tutor Balance
+
+	const getTutorBalance = useCallback((tutorId) => {
+		return useReadContract({
+			address: COURSE_PAYMENT_CA,
+			abi: COURSE_PAYMENT_ABI,
+			functionName: "getTutorBalance",
+			args: [tutorId],
+		});
+	}, []);
+
+	// Get Total Tutor Balances
+
+	const {
+		data: totalTutorBalances,
+		isError: isTotalBalancesError,
+		isLoading: isTotalBalancesLoading,
+	} = useReadContract({
+		address: COURSE_PAYMENT_CA,
+		abi: COURSE_PAYMENT_ABI,
+		functionName: "getTotalTutorBalances",
+	});
+
+	// Get Platform Fee
+	const {
+		data: platformFee,
+		isError: isPlatformFeeError,
+		isLoading: isPlatformFeeLoading,
+	} = useReadContract({
+		address: COURSE_PAYMENT_CA,
+		abi: COURSE_PAYMENT_ABI,
+		functionName: "getPlatformFee",
+	});
+
+	// Format balances
+	const formattedTotalTutorBalances = totalTutorBalances
+		? formatUnits(totalTutorBalances, 6)
+		: "0";
+	const formattedPlatformFee = platformFee ? formatUnits(platformFee, 6) : "0";
+
+	// console.log(getAllowanceStat)
+
+	return {
+		registerTutor,
+		registerTutorHash,
+		isRegisterTutorPending,
+		approveUSDC,
+		approveDataHash,
+		isApproving,
+		approveError:
+			approveError?.cause?.code === 4001
+				? "User denied transaction signature."
+				: approveError?.cause?.reason,
+		getAllowanceStat,
+		registerTutorError:
+			registerTutorError?.cause?.code === 4001
+				? "User denied transaction signature."
+				: registerTutorError?.cause?.reason,
+
+		updateTutorAddress,
+		updateTutorAddressHash,
+		isUpdateTutorAddressPending,
+		updateTutorAddressError:
+			updateTutorAddressError?.cause?.code === 4001
+				? "User denied transaction signature."
+				: updateTutorAddressError?.cause?.reason,
+		withdrawTutorBalance,
+		withdrawTutorBalanceHash,
+		isWithdrawTutorBalancePending,
+		withdrawTutorBalanceError:
+			withdrawTutorBalanceError?.cause?.code === 4001
+				? "User denied transaction signature."
+				: withdrawTutorBalanceError?.cause?.reason,
+		purchaseCourse,
+		purchaseDataHash,
+		isPurchasePending,
+		purchaseError:
+			purchaseError?.cause?.code === 4001
+				? "User denied transaction signature."
+				: purchaseError?.cause?.reason,
+		getTutorBalance,
+		totalTutorBalances: formattedTotalTutorBalances,
+		platformFee: formattedPlatformFee,
+		
+	};
 }

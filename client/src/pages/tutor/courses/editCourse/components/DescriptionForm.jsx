@@ -25,11 +25,9 @@ const formSchema = z.object({
 export const DescriptionForm = ({ initialData, courseId }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const toggleEdit = () => setIsEditing((current) => !current);
-	const editorRef = useRef(null)
+	const editorRef = useRef(null);
 	const [updateCourse, { isLoading, isError, isSuccess, error }] =
 		useUpdateCourseMutation();
-	// const [value, setValue] = useState(initialData.description);
-	// const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const form = useForm({
 		resolver: zodResolver(formSchema),
@@ -48,10 +46,12 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 			}).unwrap();
 			toast.success("Course updated successfully");
 			setIsEditing(false);
-			// setIsSubmitting(false);
-			// router.refresh();
 		} catch (error) {
-			toast.error("Something went wrong");
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		} finally {
 			// setIsSubmitting(false);
 		}
@@ -83,13 +83,6 @@ export const DescriptionForm = ({ initialData, courseId }) => {
 				</div>
 			)}
 			{isEditing && (
-				// <Form>
-				// 	<form onSubmit={handleSubmit} className="space-y-4 mt-4">
-				// 		<RTEditor
-				// 			name="description"
-				// 			value={initialData.description}
-				// 			// setValue={setValue}
-				// 		/>
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}

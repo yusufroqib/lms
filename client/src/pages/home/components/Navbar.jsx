@@ -35,14 +35,14 @@ export default function Navbar() {
 					<Link className="mr-6 flex lg:hidden" href="#">
 						<img src="/learniverse-full.svg" className="h-15 " alt="logo" />
 					</Link>
-					{!(isLogin === "true") ? (
-						<div className="grid gap-2 py-6">
-							{/* <Link href="#"> */}
-							<Button onClick={handleLogin} variant={"ghost"}>
+					<Link to={"/certificates/verify"} className="grid ">
+						<Button variant="link" className="text-blue-800">Verify Certificate</Button>
+					</Link>
+					{isLogin !== "true" ? (
+						<div className="grid gap-4 py-2">
+							<Button onClick={handleLogin} variant={"outline"}>
 								Login
 							</Button>
-							{/* </Link> */}
-							{/* <Link href="#"> */}
 							<Button onClick={handleRegister} variant={"orange"}>
 								Register
 							</Button>
@@ -61,46 +61,24 @@ export default function Navbar() {
 			<Link className="mr-6  lg:flex" href="#">
 				<img src="/learniverse-full.svg" className="h-15 " alt="logo" />
 			</Link>
-
-			{!(isLogin === "true") ? (
-				<nav className="ml-auto hidden lg:flex gap-6">
-					{/* <Link href="#"> */}
-
-					<Button onClick={handleLogin} variant={"ghost"}>
+			<Link to={"/certificates/verify"} className="ml-auto hidden lg:block">
+				<Button variant="link" className="text-blue-700">Verify Certificate</Button>
+			</Link>
+			{isLogin !== "true" ? (
+				<nav className="ml-2 hidden lg:flex gap-6">
+					<Button onClick={handleLogin} variant={"outline"}>
 						Login
 					</Button>
 
 					<Button onClick={handleRegister} variant={"orange"}>
 						Register
 					</Button>
-					{/* </Link> */}
-					{/* <Link
-					className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-					href="#"
-				>
-					About
-				</Link>
-				<Link
-					className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-					href="#"
-				>
-					Services
-				</Link>
-				<Link
-					className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-					href="#"
-				>
-					Contact
-				</Link> */}
 				</nav>
 			) : (
-				<nav className="ml-auto hidden lg:flex gap-6">
-					{/* <div className="grid gap-2 py-6"> */}
+				<nav className="ml-2 hidden lg:flex gap-6">
 					<Link to="/dashboard">
 						<Button variant={"default"}>Dashboard</Button>
 					</Link>
-
-					{/* </div> */}
 				</nav>
 			)}
 		</header>

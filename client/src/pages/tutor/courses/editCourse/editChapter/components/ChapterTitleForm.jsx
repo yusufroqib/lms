@@ -22,7 +22,7 @@ const formSchema = z.object({
 export const ChapterTitleForm = ({ initialData, courseId, chapterId }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const toggleEdit = () => setIsEditing((current) => !current);
-	const [updateChapter,  { isLoading, isError, isSuccess, error }] =
+	const [updateChapter, { isLoading, isError, isSuccess, error }] =
 		useUpdateChapterMutation();
 	// const router = useRouter();
 	const form = useForm({
@@ -40,12 +40,15 @@ export const ChapterTitleForm = ({ initialData, courseId, chapterId }) => {
 			}).unwrap();
 
 			toast.success("Course updated successfully");
-      toggleEdit()
+			toggleEdit();
 			// router.refresh();
 		} catch (error) {
-      console.log(error)
-			toast.error("Something went wrong");
-		} 
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
+		}
 	};
 	return (
 		<div className="mt-6 border bg-slate-100 rounded-md p-4">

@@ -9,8 +9,11 @@ const {
 	getStudyTimeRecord,
 	getReviews,
 	addReview,
+	createCertificate,
 } = require("../controllers/courseController");
-
+const {
+	prepareCertificateData,
+} = require("../controllers/certificateController");
 const router = express.Router();
 router.get("/search", verifyJWT, browseAllCourses);
 router.get("/all-enrolled", verifyJWT, getEnrolledCoursesWithProgress);
@@ -24,5 +27,9 @@ router.put(
 	verifyJWT,
 	updateChapterProgress
 );
+
+router.post("/:courseId/certificate", verifyJWT, createCertificate);
+
+router.put("/:courseId/certificate", verifyJWT, prepareCertificateData);
 
 module.exports = router;

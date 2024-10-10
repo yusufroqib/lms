@@ -63,8 +63,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 				}`}
 			>
 				{/* <!-- SIDEBAR HEADER --> */}
-				<div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-					<NavLink to="/">
+				<div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-2.5">
+					<NavLink className={'max-lg:hidden'}  to="/">
 						<img src={Logo} alt="Logo" />
 					</NavLink>
 
@@ -73,7 +73,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 						onClick={() => setSidebarOpen(!sidebarOpen)}
 						aria-controls="sidebar"
 						aria-expanded={sidebarOpen}
-						className="block lg:hidden"
+						className="block opacity-0 pointer-events-none lg:hidden"
 					>
 						<svg
 							className="fill-current"
