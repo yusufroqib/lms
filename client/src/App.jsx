@@ -3,7 +3,7 @@ import Home from "./pages/home/Home";
 import NotFoundPage from "./components/NotFoundPage";
 import Ongoing from "./pages/classroom/liveClassroomApp/ongoing/Ongoing";
 import Previous from "./pages/classroom/liveClassroomApp/previous/Previous";
-import React, { lazy, Suspense } from "react";
+import  { lazy, Suspense } from "react";
 import RequireAuth from "./features/auth/RequireAuth";
 import RequireTutor from "./pages/tutor/ProtectTutor";
 import { ROLES } from "../config/roles";
@@ -15,6 +15,8 @@ import RootLayout from "./components/layouts/RootLayout";
 import { Loader2 } from "lucide-react";
 import Transactions from "./pages/tutor/wallets/transactions/Transactions";
 import CertificateCollection from "./pages/certificates/CertificateCollection";
+import MeetingPage from "./pages/classroom/liveClassroomApp/meeting/MeetingPage"
+
 // import CryptoWallet from "./pages/tutor/wallets/CryptoWallet";
 
 // Lazy imports (constants)
@@ -56,9 +58,6 @@ const EnrolledCourses = lazy(() =>
 );
 const LiveClassroomLayout = lazy(() =>
 	import("./pages/classroom/liveClassroomApp/layout/LiveClassroomLayout")
-);
-const MeetingPage = lazy(() =>
-	import("./pages/classroom/liveClassroomApp/meeting/MeetingPage")
 );
 const Messages = lazy(() => import("./pages/messages/Messages"));
 const MyCollection = lazy(() =>
