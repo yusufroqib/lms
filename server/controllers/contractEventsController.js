@@ -8,6 +8,7 @@ const { ethers, Contract } = require("ethers");
 const { CERTIFICATE_ABI, CERTIFICATE_CA } = require("../contracts/certificate");
 const Certificate = require("../models/CertificateModel");
 const { createStreamChatClient } = require("../utils/createStreamChatClient");
+const ClassroomModel = require("../models/ClassroomModel");
 
 require("dotenv").config();
 
@@ -89,7 +90,7 @@ const setupEventListeners = () => {
 			try {
 				const user = await User.findOne({ connectedWallets: student });
 				const course = await Course.findById(courseId);
-				const courseClassroom = await Classroom.findOne({ course: courseId });
+				const courseClassroom = await ClassroomModel.findOne({ course: courseId });
 				const client = createStreamChatClient();
 
 				if (user && course) {
@@ -145,7 +146,7 @@ const setupEventListeners = () => {
 	coursePaymentContract.on(
 		"TutorWithdrawal",
 		async (tutorId, amount, event) => {
-			// console.log( event.log.transactionHash)
+			console.log({ withdrawal: event.log.transactionHash });
 			try {
 				const user = await User.findOne({ _id: tutorId });
 				if (user) {
@@ -170,13 +171,14 @@ const setupEventListeners = () => {
 			}
 		}
 	);
+	
 	certificateContract.on(
 		"CertificateMinted",
 		async (NFTId, walletAddress, studentId, courseId, event) => {
 			// console.log(NFTId, walletAddress, studentId, courseId, )
 			try {
 				const txHash = event.log.transactionHash;
-				console.log({txHash})
+				console.log({ txHash });
 
 				// Update or create the certificate
 				const cert = await Certificate.findOneAndUpdate(

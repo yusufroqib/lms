@@ -105,7 +105,7 @@ const CryptoPaymentModal = ({
 			toast.success("USDC approved successfully, kindly proceed with payment", {
 				id: approvalToastId,
 			});
-            refetch();
+			refetch();
 		}
 		// toast.dismiss(toastId);
 		if (approveError) {
@@ -119,10 +119,11 @@ const CryptoPaymentModal = ({
 	const handlePurchase = async () => {
 		if (!isAllowanceSufficient) {
 			approveUSDC(price.toString());
+		} else {
+			purchaseCourse(tutorId, price.toString(), courseId);
 		}
 
 		// Proceed with purchase
-		purchaseCourse(tutorId, price.toString(), courseId);
 	};
 
 	return (
