@@ -3,7 +3,7 @@ import Home from "./pages/home/Home";
 import NotFoundPage from "./components/NotFoundPage";
 import Ongoing from "./pages/classroom/liveClassroomApp/ongoing/Ongoing";
 import Previous from "./pages/classroom/liveClassroomApp/previous/Previous";
-import  { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import RequireAuth from "./features/auth/RequireAuth";
 import RequireTutor from "./pages/tutor/ProtectTutor";
 import { ROLES } from "../config/roles";
@@ -15,7 +15,7 @@ import RootLayout from "./components/layouts/RootLayout";
 import { Loader2 } from "lucide-react";
 import Transactions from "./pages/tutor/wallets/transactions/Transactions";
 import CertificateCollection from "./pages/certificates/CertificateCollection";
-import MeetingPage from "./pages/classroom/liveClassroomApp/meeting/MeetingPage"
+import MeetingPage from "./pages/classroom/liveClassroomApp/meeting/MeetingPage";
 
 // import CryptoWallet from "./pages/tutor/wallets/CryptoWallet";
 
@@ -114,7 +114,10 @@ function App() {
 									<Route path="dashboard" element={<DashboardPage />} />
 									<Route path="profile" element={<ProfilePage />} />
 									<Route path="messages" element={<Messages />} />
-									<Route path="my-certificates" element={<CertificateCollection />} />
+									<Route
+										path="my-certificates"
+										element={<CertificateCollection />}
+									/>
 									<Route path="courses">
 										<Route index element={<CoursesIndex />} />
 										<Route path="search" element={<BrowseCourses />} />
@@ -171,15 +174,17 @@ function App() {
 										</Route>
 									</Route>
 									<Route path="classrooms">
-										<Route index element={<Classrooms />} />
-										<Route element={<LiveClassroomLayout />}>
-											<Route path=":classroomId">
-												<Route index element={<ClassroomHome />} />
-												<Route path="ongoing" element={<Ongoing />} />
-												<Route path="upcoming" element={<Upcoming />} />
-												<Route path="previous" element={<Previous />} />
-												<Route path="meeting">
-													<Route path=":callId" element={<MeetingPage />} />
+										<Route element={<SuspenseWrapper />}>
+											<Route index element={<Classrooms />} />
+											<Route element={<LiveClassroomLayout />}>
+												<Route path=":classroomId">
+													<Route index element={<ClassroomHome />} />
+													<Route path="ongoing" element={<Ongoing />} />
+													<Route path="upcoming" element={<Upcoming />} />
+													<Route path="previous" element={<Previous />} />
+													<Route path="meeting">
+														<Route path=":callId" element={<MeetingPage />} />
+													</Route>
 												</Route>
 											</Route>
 										</Route>

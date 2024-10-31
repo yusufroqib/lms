@@ -40,7 +40,7 @@ const ClassroomHome = () => {
 				>
 					{" "}
 					<div className="flex h-full flex-col justify-between bg-gray-800 bg-opacity-90 max-md:px-5 max-md:py-8 lg:p-11">
-						<h2 className="glassmorphism  rounded py-2 text-center text-lg lg:text-3xl font-normal">
+						<h2 className="glassmorphism  rounded py-2 text-lg lg:text-3xl font-normal">
 							{/* Upcoming Meeting at: 12:30 PM */} {currentClassroom?.course?.title}
 						</h2>
 						<div className="flex flex-col gap-2">
