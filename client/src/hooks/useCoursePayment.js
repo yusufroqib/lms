@@ -2,11 +2,8 @@ import { useCallback } from "react";
 import {
 	useReadContract,
 	useWriteContract,
-	useTransaction,
 	useAccount,
-	useConfig,
 	useSwitchChain,
-	useWaitForTransactionReceipt,
 } from "wagmi";
 // import { useReadContract, useWriteContract, useWaitForTransaction } from 'wagmi';
 import { parseUnits, formatUnits } from "viem";
@@ -61,6 +58,7 @@ export function useCoursePayment() {
 		}
 		return true;
 	}, [
+		truncateAddress,
 		isConnected,
 		openConnectModal,
 		chain,
@@ -202,22 +200,14 @@ export function useCoursePayment() {
 
 	// Get Total Tutor Balances
 
-	const {
-		data: totalTutorBalances,
-		isError: isTotalBalancesError,
-		isLoading: isTotalBalancesLoading,
-	} = useReadContract({
+	const { data: totalTutorBalances } = useReadContract({
 		address: COURSE_PAYMENT_CA,
 		abi: COURSE_PAYMENT_ABI,
 		functionName: "getTotalTutorBalances",
 	});
 
 	// Get Platform Fee
-	const {
-		data: platformFee,
-		isError: isPlatformFeeError,
-		isLoading: isPlatformFeeLoading,
-	} = useReadContract({
+	const { data: platformFee } = useReadContract({
 		address: COURSE_PAYMENT_CA,
 		abi: COURSE_PAYMENT_ABI,
 		functionName: "getPlatformFee",
@@ -272,6 +262,5 @@ export function useCoursePayment() {
 		getTutorBalance,
 		totalTutorBalances: formattedTotalTutorBalances,
 		platformFee: formattedPlatformFee,
-		
 	};
 }

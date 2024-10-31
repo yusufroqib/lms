@@ -1,11 +1,12 @@
+/* eslint-disable react/prop-types */
 import { useCoursePayment } from "@/hooks/useCoursePayment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "../ui/button";
 import useAuth from "@/hooks/useAuth";
 
-const RegisterTutorBtn = ({ label, className }) => {
+const RegisterTutorBtn = ({ label }) => {
 	const [toastId, setToastId] = useState(null);
 	const {
 		registerTutor,

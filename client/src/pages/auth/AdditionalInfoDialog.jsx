@@ -114,10 +114,7 @@ export const AdditionalInfoDialog = ({ ethAddress }) => {
 						/>
 					</div>
 					<div className="flex justify-between gap-5">
-						<Button type="submit" className="mx-auto w-full">
-							Submit
-						</Button>
-						<Button
+					<Button
 							type="button"
 							onClick={handleCancel}
 							variant="destructive"
@@ -125,6 +122,10 @@ export const AdditionalInfoDialog = ({ ethAddress }) => {
 						>
 							Cancel
 						</Button>
+						<Button type="submit" className="mx-auto w-full">
+							Submit
+						</Button>
+						
 					</div>
 				</form>
 			</AlertDialogContent>

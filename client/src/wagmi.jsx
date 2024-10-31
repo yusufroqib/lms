@@ -6,7 +6,12 @@ import {
 	RainbowKitAuthenticationProvider,
 } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { arbitrumSepolia, celo, celoAlfajores, liskSepolia } from "wagmi/chains";
+import {
+	arbitrumSepolia,
+	celo,
+	celoAlfajores,
+	liskSepolia,
+} from "wagmi/chains";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAuthenticationAdapter } from "@rainbow-me/rainbowkit";
@@ -28,7 +33,7 @@ import { AuthCheck } from "./features/auth/AuthCheck";
 const config = getDefaultConfig({
 	appName: "Learniverse",
 	projectId: "044601f65212332475a09bc14ceb3c34",
-	chains: [celo, celoAlfajores, arbitrumSepolia, liskSepolia],
+	chains: [celoAlfajores, celo, arbitrumSepolia, liskSepolia],
 });
 
 const queryClient = new QueryClient();
@@ -62,14 +67,7 @@ export const WagmiConfigProvider = ({ children }) => {
 				signature,
 				userId,
 			}).unwrap();
-			// const response = await fetch("http://localhost:3000/nonce/verify", {
-			// 	method: "POST",
-			// 	headers: { "Content-Type": "application/json" },
-			// 	body: JSON.stringify({ message, signature, userId }),
-			// 	credentials: "include", // This line allows credentials to be sent and received
-			// });
-			// const data = await response.json();
-			// console.log(response);
+			
 			if (response.requireAdditionalInfo) {
 				dispatch(setWalletAuthStatus({ walletAuthStatus: "authenticated" }));
 				// setStatus("authenticated");

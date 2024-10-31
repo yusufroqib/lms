@@ -22,6 +22,7 @@ const nonceRoutes = require("./routes/nonceRoutes");
 
 const homeHTMLContent = require("./utils/homeHTMLContent");
 const CoursePaymentController = require("./controllers/contractEventsController");
+// const UserModel = require("./models/UserModel");
 // const webhookRoute = require("./routes/webhookRoute");
 require("./config/passport-setup");
 
@@ -97,3 +98,15 @@ mongoose
 		app.listen(PORT, () => console.log(`Server Is 🏃‍♂️ On PORT ${PORT}`));
 	})
 	.catch((err) => console.log(err));
+
+
+	// mongoose
+	// .connect(process.env.MONGO_URI, ).then(() => {
+	// 	UserModel.collection.dropIndex('username_1');
+	// }).then(() => {
+	// 	UserModel.collection.createIndex({ username: 1 }, { unique: true, sparse: true });
+	// })
+	// .then(() => {
+	// 	app.listen(PORT, () => console.log(`Server Is 🏃‍♂️ On PORT ${PORT}`));
+	// })
+	// .catch((err) => console.log(err));

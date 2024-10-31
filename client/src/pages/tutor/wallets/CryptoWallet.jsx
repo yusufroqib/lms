@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
@@ -6,11 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
 	Wallet,
-	CreditCard,
 	ArrowRightLeft,
 	Edit,
 	X,
-	Plus,
 	PlusIcon,
 	AlertCircle,
 } from "lucide-react";
@@ -95,7 +93,7 @@ const CryptoWallet = () => {
 		}
 		// toast.dismiss(toastId);
 		if (updateTutorAddressError) {
-			toast.error(purchaseError, { id: toastId });
+			toast.error(updateTutorAddressError, { id: toastId });
 		}
 	}, [
 		isUpdateTutorAddressPending,
@@ -231,7 +229,7 @@ const CryptoWallet = () => {
 																address
 																	? truncateWalletAddress(address)
 																	: "NO WALLET CONNECTED"
-														  }) will be set as your payment wallet. Kindly confirm before you proceed. This can be changed later.`}
+													}) will be set as your payment wallet. Kindly confirm before you proceed. This can be changed later.`}
 												</AlertDialogDescription>
 											</AlertDialogHeader>
 											{paymentWallet ? (

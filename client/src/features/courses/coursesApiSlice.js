@@ -410,6 +410,13 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 				return responseData;
 			},
 		}),
+		getAllUserCertificates: builder.query({
+			query: (page) => `/certificates/my-certificates?page=${page}`,
+			providesTags: ["Certificate"],
+			transformResponse: (responseData) => {
+				return responseData;
+			},
+		}),
 	}),
 });
 
@@ -443,6 +450,7 @@ export const {
 	useCreateCertificateMutation,
 	usePrepareCertificateMutation,
 	useGetCertificateQuery,
+	useGetAllUserCertificatesQuery,
 } = coursesApiSlice;
 
 // export const selectallCoursesResult = coursesApiSlice.endpoints.getCourses.select();

@@ -4,7 +4,7 @@ import UserOne from "../../images/user/user-01.png";
 import useAuth from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSendLogoutMutation } from "@/features/auth/authApiSlice";
-import { Link as LinkIcon, Wallet } from "lucide-react";
+import { GraduationCapIcon, Link as LinkIcon, Wallet } from "lucide-react";
 import BecomeTutorDialog from "@/components/BecomeTutor";
 import { useDisconnect } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -238,6 +238,15 @@ const DropdownUser = () => {
 								</Link>
 							</li>
 						)}
+							<li>
+								<Link
+									onClick={() => setDropdownOpen(false)}
+									to="/my-certificates"
+									className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-blue-600 lg:text-base"
+								>
+									<GraduationCapIcon /> My Certificates
+								</Link>
+							</li>
 						{status === "Tutor" && !stripeOnboardingComplete && (
 							<li>
 								<Link

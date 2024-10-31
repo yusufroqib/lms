@@ -14,6 +14,7 @@ import Withdraw from "./pages/tutor/withdraw/Withdraw";
 import RootLayout from "./components/layouts/RootLayout";
 import { Loader2 } from "lucide-react";
 import Transactions from "./pages/tutor/wallets/transactions/Transactions";
+import CertificateCollection from "./pages/certificates/CertificateCollection";
 // import CryptoWallet from "./pages/tutor/wallets/CryptoWallet";
 
 // Lazy imports (constants)
@@ -114,6 +115,7 @@ function App() {
 									<Route path="dashboard" element={<DashboardPage />} />
 									<Route path="profile" element={<ProfilePage />} />
 									<Route path="messages" element={<Messages />} />
+									<Route path="my-certificates" element={<CertificateCollection />} />
 									<Route path="courses">
 										<Route index element={<CoursesIndex />} />
 										<Route path="search" element={<BrowseCourses />} />

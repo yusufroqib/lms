@@ -26,7 +26,7 @@ const RequireAuth = ({ allowedRoles }) => {
 	const { roles, username, _id, connectedWallets } = useAuth();
 	const [newUsername, setNewUsername] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const [showModal, setShowModal] = useState(true);
+	const [showModal, ] = useState(true);
 	const [createUsername] = useCreateUsernameMutation();
 	const [refresh] = useRefreshMutation();
 	const { address } = useAccount();

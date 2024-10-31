@@ -1,5 +1,3 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -9,7 +7,6 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import toast from "react-hot-toast";
 import { useBecomeTutorMutation } from "@/features/users/usersApiSlice";
@@ -45,17 +42,17 @@ const BecomeTutorDialog = ({ open, setOpen }) => {
 				</AlertDialogHeader>
 				<div className="grid gap-4 py-4">
 					<p className="text-sm text-gray-500">
-						As a tutor, you'll be able to:
+						As a tutor, you&apos;ll be able to:
 					</p>
 					<ul className="list-disc list-inside text-sm text-gray-500">
 						<li>Create and manage your own courses</li>
 						<li>Interact with students</li>
 						<li>Share your knowledge and expertise</li>
-						<li>Receive payments through Stripe</li>
+						<li>Receive payments through Stripe and stable coin (cryptocurrency)</li>
 					</ul>
 					<p className="text-sm text-gray-500 font-semibold">
-						Important: You'll need to set up a Stripe Connect account to receive
-						payments. This process will begin after you confirm.
+						Important: You&apos;ll need to set up a Stripe Connect account to receive
+						payments with stripe.
 					</p>
 				</div>
 				<AlertDialogFooter>

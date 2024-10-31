@@ -42,3 +42,8 @@ module.exports = {
 		],
 	},
 };
+
+
+export const getSource = (vin, otherParams) => {
+	return `https://xxxxxxxxxxx${vin}/${otherParams}`
+}

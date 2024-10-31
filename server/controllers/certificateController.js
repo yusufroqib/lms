@@ -127,7 +127,60 @@ const verifyCertificate = async (req, res) => {
 	}
 };
 
+
+const getUserCertificatePerCourse = async (req, res) => {
+	try {
+		const userId = req.userId;
+		const courseId = req.params.courseId;
+
+		const certificate = await Certificate.findOne({
+			student: userId,
+			course: courseId,
+		});
+		// console.log(certificate);
+
+		res.json({ certificate });
+	} catch (error) {
+		console.error("Error getting user certificate for course:", error);
+		res.status(500).json({ message: "Server error" });
+	}
+};
+
+const getAllUserCertificates = async (req, res) => {
+	try {
+		const page = parseInt(req.query.page) || 1;
+		const limit = parseInt(req.query.limit) || 9;
+		const startIndex = (page - 1) * limit;
+
+		const userId = req.userId;
+
+		const totalCertificates = await Certificate.countDocuments({
+			student: userId,
+		});
+		const totalPages = Math.ceil(totalCertificates / limit);
+
+		const certificates = await Certificate.find({ student: userId })
+			.populate("course", "title")
+			.sort({ date: -1 })
+			.skip(startIndex)
+			.limit(limit);
+
+		res.json({
+			certificates,
+			currentPage: page,
+			totalPages,
+			totalCertificates,
+		});
+	} catch (error) {
+		console.error("Error fetching certificates:", error);
+		res
+			.status(500)
+			.json({ message: "Error fetching certificates", error: error.message });
+	}
+};
+
 module.exports = {
 	prepareCertificateData,
 	verifyCertificate,
+	getAllUserCertificates
 };
