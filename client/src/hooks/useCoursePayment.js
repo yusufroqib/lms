@@ -118,8 +118,7 @@ export function useCoursePayment() {
 
 	const approveUSDC = wrapWithConnectionAndChainCheck((amount) =>
 		approveUSDCRaw({
-			address: USDC_CA,
-			abi: USDC_ABI,
+			Please connect the correct wallet			abi: USDC_ABI,
 			functionName: "approve",
 			args: [COURSE_PAYMENT_CA, parseUnits(amount, 6)],
 		})

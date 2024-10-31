@@ -27,7 +27,7 @@ export function useCertificate() {
 			openConnectModal?.();
 			return false;
 		}
-		if (paymentWallet !== address) {
+		if (paymentWallet && paymentWallet !== address) {
 			toast.error(`Please connect the correct wallet ${truncateAddress}.`);
 			return false;
 		}
