@@ -7,6 +7,7 @@ const {
 const { ethers, Contract } = require("ethers");
 const { CERTIFICATE_ABI, CERTIFICATE_CA } = require("../contracts/certificate");
 const Certificate = require("../models/CertificateModel");
+const { createStreamChatClient } = require("../utils/createStreamChatClient");
 
 require("dotenv").config();
 
@@ -88,6 +89,8 @@ const setupEventListeners = () => {
 			try {
 				const user = await User.findOne({ connectedWallets: student });
 				const course = await Course.findById(courseId);
+				const courseClassroom = await Classroom.findOne({ course: courseId });
+				const client = createStreamChatClient();
 
 				if (user && course) {
 					const txHash = event.log.transactionHash;
@@ -109,6 +112,14 @@ const setupEventListeners = () => {
 							},
 						},
 					});
+
+					courseClassroom.students.push(user._id);
+					await courseClassroom.save();
+
+					const channel = client.channel("messaging", courseId);
+					await channel.addMembers([
+						{ user_id: user._id, channel_role: "channel_member" },
+					]);
 
 					await Course.findByIdAndUpdate(course._id, {
 						$push: {
@@ -162,9 +173,10 @@ const setupEventListeners = () => {
 	certificateContract.on(
 		"CertificateMinted",
 		async (NFTId, walletAddress, studentId, courseId, event) => {
-            // console.log(NFTId, walletAddress, studentId, courseId, )
+			// console.log(NFTId, walletAddress, studentId, courseId, )
 			try {
-                const txHash = event.log.transactionHash;
+				const txHash = event.log.transactionHash;
+				console.log({txHash})
 
 				// Update or create the certificate
 				const cert = await Certificate.findOneAndUpdate(
@@ -175,13 +187,13 @@ const setupEventListeners = () => {
 							isMinted: true,
 							mintedAddress: walletAddress,
 							mintedDate: new Date(),
-                            txHash: txHash,
+							txHash: txHash,
 						},
 					},
 					{ new: true, upsert: true }
 				);
 
-                console.log(cert)
+				console.log(cert);
 			} catch (error) {
 				console.error("Errorminting certificate:", error);
 			}

@@ -39,7 +39,11 @@ const CourseVideo = ({
 
 		try {
 			const response = await purchaseCourse({ courseId }).unwrap();
-			window.location.assign(response.url);
+			if (response?.url) {
+				window.location.assign(response.url);
+			} else {
+				navigate(`/study/${courseId}/chapter/${firstChapter._id}`);
+			}
 		} catch (error) {
 			if (error?.data?.message) {
 				toast.error(error.data.message);
@@ -72,7 +76,13 @@ const CourseVideo = ({
 
 	return (
 		<div className="p-2 border border-gray-600 rounded-xl">
-			<CryptoPaymentModal isCryptoModalOpen={isCryptoModalOpen} setIsCryptoModalOpen={setIsCryptoModalOpen} tutorId={tutorId} courseId={courseId} price={price} />
+			<CryptoPaymentModal
+				isCryptoModalOpen={isCryptoModalOpen}
+				setIsCryptoModalOpen={setIsCryptoModalOpen}
+				tutorId={tutorId}
+				courseId={courseId}
+				price={price}
+			/>
 
 			<div className="relative min-w-full aspect-video">
 				<video
@@ -95,7 +105,17 @@ const CourseVideo = ({
 				>
 					{price ? formatPrice(price) : "Free"}
 				</p>
-				{canStudy ? (
+				{!price && !canStudy ? (
+					<Button
+						onClick={handlePurchase}
+						size="lg"
+						disabled={isLoading}
+						className="animated-blink"
+						variant={"success"}
+					>
+						{isLoading?"Enrolling": "Enroll for Free"}
+					</Button>
+				) : canStudy ? (
 					<Button
 						onClick={handleStudy}
 						size="lg"

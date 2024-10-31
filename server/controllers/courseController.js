@@ -73,6 +73,7 @@ const browseAllCourses = async (req, res) => {
 	}
 };
 
+
 const purchaseCourse = async (req, res) => {
 	try {
 		const userId = req.userId;
@@ -81,32 +82,11 @@ const purchaseCourse = async (req, res) => {
 		// Find the course by its ID
 		const course = await Course.findById(courseId);
 		const tutor = await User.findById(course.tutor);
+		// Check if the user is already enrolled in the course
+		const user = await User.findById(userId);		
 
 		if (!course) {
 			return res.status(404).json({ message: "Course not found" });
-		}
-
-		if (!tutor.stripeOnboardingComplete) {
-			return res
-				.status(403)
-				.json({ message: "Tutor has not setup stripe to receive payments" });
-		}
-
-		// Ensure the course is published
-		if (!course.isPublished) {
-			return res.status(403).json({ message: "Course is not published" });
-		}
-
-		// Check if the user is already enrolled in the course
-		const user = await User.findById(userId);
-		if (
-			user.enrolledCourses.some(
-				(enrollment) => enrollment.course.toString() === courseId
-			)
-		) {
-			return res
-				.status(403)
-				.json({ message: "User is already enrolled in this course" });
 		}
 
 		const courseClassroom = await Classroom.findOne({ course: courseId });
@@ -136,6 +116,30 @@ const purchaseCourse = async (req, res) => {
 				message: "Course enrolled successfully for free",
 			});
 		}
+
+		if (!tutor.stripeOnboardingComplete) {
+			return res
+				.status(403)
+				.json({ message: "Tutor has not setup stripe to receive payments" });
+		}
+
+		// Ensure the course is published
+		if (!course.isPublished) {
+			return res.status(403).json({ message: "Course is not published" });
+		}
+
+
+		if (
+			user.enrolledCourses.some(
+				(enrollment) => enrollment.course.toString() === courseId
+			)
+		) {
+			return res
+				.status(403)
+				.json({ message: "User is already enrolled in this course" });
+		}
+
+		
 
 		const line_items = [
 			{
@@ -270,7 +274,7 @@ const handleStripeWebhook = async (req, res) => {
 			await user.save();
 
 			const channel = client.channel("messaging", courseId);
-			
+
 			await channel.addMembers([
 				{ user_id: userId, channel_role: "channel_member" },
 			]);

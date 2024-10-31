@@ -42,7 +42,7 @@ const userSchema = new Schema(
 				status: String,
 				courseId: { type: Schema.Types.ObjectId, ref: "Course" },
 				stripeTransactionId: String,
-				txHash: String,
+				txHash: { type: String, unique: true },
 				createdAt: { type: Date, default: Date.now },
 			},
 		],
