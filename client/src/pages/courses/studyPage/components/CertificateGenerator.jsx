@@ -71,6 +71,7 @@ const CertificateGenerator = ({
 		}
 		if (isConfirmed) {
 			console.log("Transaction confirmed!");
+			setOpen(false)
 			toast.success("Certificate minted successfully!", { id: toastId });
 		}
 		// toast.dismiss(toastId);
