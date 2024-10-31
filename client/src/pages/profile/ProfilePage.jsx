@@ -70,9 +70,10 @@ export default function ProfilePage() {
 
 		// Check if there is an existing image URL
 		const existingImageUrl = user.avatar;
+		const isGoogleAccountImage = existingImageUrl.includes("googleusercontent.com")
 
 		// If an existing image URL is found, delete the corresponding file from Firebase Storage
-		if (existingImageUrl) {
+		if (existingImageUrl && !isGoogleAccountImage) {
 			const existingImageRef = ref(storage, existingImageUrl);
 			try {
 				await deleteObject(existingImageRef);
