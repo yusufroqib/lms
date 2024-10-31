@@ -15,7 +15,7 @@ const getMyClassrooms = async (req, res) => {
 			})
 			.populate({
 				path: "course",
-				select: "courseImage", // Select the course image field
+				select: "courseImage title", // Select the course image field
 			})
 			.populate({
 				path: "students",
