@@ -40,7 +40,7 @@ export function useCoursePayment() {
 			openConnectModal?.();
 			return false;
 		}
-		if (paymentWallet !== address) {
+		if (paymentWallet && paymentWallet !== address) {
 			// toast.error(Please connect the correct wallet to interact.");
 			toast.error(`Please connect the correct wallet ${truncateAddress}.`);
 			return false;
@@ -118,7 +118,8 @@ export function useCoursePayment() {
 
 	const approveUSDC = wrapWithConnectionAndChainCheck((amount) =>
 		approveUSDCRaw({
-			Please connect the correct wallet			abi: USDC_ABI,
+			address: USDC_CA,
+			abi: USDC_ABI,
 			functionName: "approve",
 			args: [COURSE_PAYMENT_CA, parseUnits(amount, 6)],
 		})
