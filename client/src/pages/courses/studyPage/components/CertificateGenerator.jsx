@@ -71,7 +71,7 @@ const CertificateGenerator = ({
 		}
 		if (isConfirmed) {
 			console.log("Transaction confirmed!");
-			setOpen(false)
+			setOpen(false);
 			toast.success("Certificate minted successfully!", { id: toastId });
 		}
 		// toast.dismiss(toastId);
@@ -89,7 +89,7 @@ const CertificateGenerator = ({
 		generateCertID(userId).then((id) => setCertId(id));
 	}, []);
 
-	// console.log(certId);
+	console.log({ isAlreadyCompleted, certificate, certId });
 
 	useEffect(() => {
 		// if (isAlreadyCompleted  && certId) {
@@ -241,8 +241,7 @@ const CertificateGenerator = ({
 				studentName: fullName,
 			}).unwrap();
 			console.log(result);
-			result.tokenURI &&
-				mintCertificate(userId, courseId, result.tokenURI);
+			result.tokenURI && mintCertificate(userId, courseId, result.tokenURI);
 
 			console.log(result.tokenURI);
 			// console.log(result.apiEndpoint);

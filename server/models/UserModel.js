@@ -60,7 +60,11 @@ const userSchema = new Schema(
 		saved: [{ type: Schema.Types.ObjectId, ref: "Post" }],
 		enrolledCourses: [
 			{
-				course: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+				course: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "Course",
+					unique: true,
+				},
 				lastStudiedAt: { type: Date, default: null },
 			},
 		],

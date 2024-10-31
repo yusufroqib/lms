@@ -104,6 +104,7 @@ const courseSchema = new Schema(
 				user: {
 					type: Schema.Types.ObjectId,
 					ref: "User",
+					unique: true
 				},
 				amount: Number,
 				date: {

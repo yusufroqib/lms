@@ -55,7 +55,7 @@ const ChapterContents = ({
 	const updateProgress = async () => {
 		try {
 			setIsLoading(true);
-			
+
 			if (!isCompleted && !isTutor)
 				await updateCourseProgress({
 					courseId,
@@ -66,8 +66,7 @@ const ChapterContents = ({
 
 				setIsCourseJustCompleted(true);
 				dispatch(openConfetti());
-
-			} 
+			}
 			// else if (
 			// 	!isCompleted &&
 			// 	isAlreadyCompleted && 		//!I need to come back to check here
@@ -76,7 +75,7 @@ const ChapterContents = ({
 			// ) {
 			// 	dispatch(openConfetti());
 			// }
-			
+
 			if (nextChapterId) {
 				navigate(`/study/${courseId}/chapter/${nextChapterId}`);
 			}
@@ -88,7 +87,7 @@ const ChapterContents = ({
 			setIsLoading(false);
 		}
 	};
-
+	console.log({ isAlreadyCompleted, isCourseJustCompleted });
 	// const completeOnEnd = !!purchase && !userProgress?.isCompleted;
 	return (
 		<div>
@@ -156,8 +155,8 @@ const ChapterContents = ({
 					)}
 				</div>
 			</div>
-			{(isCourseJustCompleted ||  isAlreadyCompleted) && (
-			// {(isCourseJustCompleted || (!certificate && isAlreadyCompleted)) && (
+			{(isCourseJustCompleted || isAlreadyCompleted) && (
+				// {(isCourseJustCompleted || (!certificate && isAlreadyCompleted)) && (
 				<CertificateGenerator
 					isAlreadyCompleted={isAlreadyCompleted}
 					courseTitle={courseTitle}

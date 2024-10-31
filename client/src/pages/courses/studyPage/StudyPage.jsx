@@ -88,7 +88,7 @@ const StudyPage = () => {
 		// navigate("/courses/search");
 		return <Navigate to={"/courses/search"} />;
 	}
-	// if(isSuccess) console.log(course)
+	 console.log(course)
 
 	if (!!course && (isSuccess || isTutorSuccess)) {
 		const isPurchased = course.purchasedBy.some((item) => item.user === _id);

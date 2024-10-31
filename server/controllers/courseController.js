@@ -73,7 +73,6 @@ const browseAllCourses = async (req, res) => {
 	}
 };
 
-
 const purchaseCourse = async (req, res) => {
 	try {
 		const userId = req.userId;
@@ -83,7 +82,7 @@ const purchaseCourse = async (req, res) => {
 		const course = await Course.findById(courseId);
 		const tutor = await User.findById(course.tutor);
 		// Check if the user is already enrolled in the course
-		const user = await User.findById(userId);		
+		const user = await User.findById(userId);
 
 		if (!course) {
 			return res.status(404).json({ message: "Course not found" });
@@ -128,7 +127,6 @@ const purchaseCourse = async (req, res) => {
 			return res.status(403).json({ message: "Course is not published" });
 		}
 
-
 		if (
 			user.enrolledCourses.some(
 				(enrollment) => enrollment.course.toString() === courseId
@@ -138,8 +136,6 @@ const purchaseCourse = async (req, res) => {
 				.status(403)
 				.json({ message: "User is already enrolled in this course" });
 		}
-
-		
 
 		const line_items = [
 			{
@@ -487,12 +483,28 @@ const updateChapterProgress = async (req, res) => {
 		}
 
 		// Check if all chapters are completed
-		const allChaptersCompleted = course.chapters.every((chapter) =>
-			chapter.userProgress.some(
+		const publishedChapterIds = course.chapters
+			.filter((chapter) => chapter.isPublished)
+			.map((chapter) => chapter._id);
+
+		// Count completed chapters for the user
+		const validCompletedChapters = course.chapters.reduce((count, chapter) => {
+			const userProgress = chapter.userProgress.find(
 				(progress) =>
 					progress.userId.toString() === userId && progress.isCompleted
-			)
-		);
+			);
+			if (userProgress) {
+				return count + 1;
+			}
+			return count;
+		}, 0);
+
+		// Calculate progress percentage
+		const progressPercentage =
+			publishedChapterIds.length > 0
+				? (validCompletedChapters / publishedChapterIds.length) * 100
+				: 0;
+		const allChaptersCompleted = progressPercentage === 100;
 
 		// Update completedCourseAt in purchasedBy array if all chapters are completed
 		if (allChaptersCompleted) {
