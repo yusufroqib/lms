@@ -41,6 +41,8 @@ const CryptoPaymentModal = ({
 	const { isLoading: isConfirmingApproval, isSuccess: isApprovalConfirmed } =
 		useWaitForTransactionReceipt({
 			hash: approveDataHash,
+			confirmations: 2,
+
 		});
 	const { isLoading: isConfirming, isSuccess: isConfirmed } =
 		useWaitForTransactionReceipt({
