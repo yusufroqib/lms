@@ -50,14 +50,14 @@ const LiveClassroomLayout = ({ children }) => {
 		return (
 			<StreamVideoProvider>
 				<StreamChatProvider>
-					<main className="relative bg-dark-2">
+					<main className="relative min-h-screen bg-dark-2">
 						{!location.pathname.includes("meeting") && <Navbar />}
 
-						<div className="flex">
+						<div className="flex ">
 							{!location.pathname.includes("meeting") && <Sidebar />}
 
 							<section
-								className={`flex h-[100dvh] flex-1 flex-col  ${
+								className={`flex min-h-[100dvh] flex-1 flex-col   ${
 									!location.pathname.includes("meeting") &&
 									"px-6 pb-6 pt-28 max-md:pb-14  sm:px-14"
 								}`}
