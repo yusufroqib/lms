@@ -68,7 +68,10 @@ const prepareCertificateData = async (req, res) => {
 			attributes: [
 				{ trait_type: "Course", value: courseTitle },
 				{ trait_type: "Student", value: studentName },
-				{ trait_type: "Completion Date", value: existingCertificate.date.toISOString() },
+				{
+					trait_type: "Completion Date",
+					value: existingCertificate.date.toISOString(),
+				},
 			],
 		};
 
@@ -127,7 +130,6 @@ const verifyCertificate = async (req, res) => {
 	}
 };
 
-
 const getUserCertificatePerCourse = async (req, res) => {
 	try {
 		const userId = req.userId;
@@ -153,10 +155,12 @@ const getAllUserCertificates = async (req, res) => {
 		const startIndex = (page - 1) * limit;
 
 		const userId = req.userId;
+		console.log({ userId });
 
 		const totalCertificates = await Certificate.countDocuments({
 			student: userId,
 		});
+		console.log({ totalCertificates });
 		const totalPages = Math.ceil(totalCertificates / limit);
 
 		const certificates = await Certificate.find({ student: userId })
@@ -182,5 +186,5 @@ const getAllUserCertificates = async (req, res) => {
 module.exports = {
 	prepareCertificateData,
 	verifyCertificate,
-	getAllUserCertificates
+	getAllUserCertificates,
 };
