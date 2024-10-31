@@ -45,6 +45,7 @@ const CryptoPaymentModal = ({
 	const { isLoading: isConfirming, isSuccess: isConfirmed } =
 		useWaitForTransactionReceipt({
 			hash: purchaseDataHash,
+			confirmations: 2,
 		});
 	const { data: isAllowanceSufficient, refetch } = getAllowanceStat(
 		address,
