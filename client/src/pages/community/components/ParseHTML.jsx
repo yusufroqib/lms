@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Prism from "prismjs";
 import parse from "html-react-parser";
 import "prismjs/components/prism-python";
@@ -27,9 +27,14 @@ import "prismjs/plugins/toolbar/prism-toolbar.min.css";
 import "prismjs/plugins/toolbar/prism-toolbar.min";
 import "prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min";
 const ParseHTML = ({ data }) => {
-    useEffect(() => {
-        Prism.highlightAll();
-    });
-    return <div className={"markdown w-full min-w-full"}>{parse(data)}</div>;
+	try {
+		useEffect(() => {
+			Prism.highlightAll();
+		});
+        const parsedData = parse(data)
+		return <div className={"markdown w-full min-w-full"}>{parsedData}</div>;
+	} catch (error) {
+		console.log(error);
+	}
 };
 export default ParseHTML;

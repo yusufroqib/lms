@@ -226,7 +226,7 @@ const Post = ({ type, mongoUserId, postDetails }) => {
 					{isSubmitting ? (
 						<>{type === "Edit" ? "Editing..." : "Posting..."}</>
 					) : (
-						<>{type === "Edit" ? "Edit Post" : "Create a Post"}</>
+						<>{type === "Edit" ? "Update Post" : "Create a Post"}</>
 					)}
 				</Button>{" "}
 			</form>

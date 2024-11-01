@@ -69,7 +69,7 @@ const PostPage = () => {
 		const showActionButtons = userId && userId === result?.author?._id;
 
 		return (
-			<>
+			<div>
 				<div className="bg-gray-100 p-3 rounded-lg">
 					<div className="flex-start w-full flex-col ">
 						<div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
@@ -130,7 +130,7 @@ const PostPage = () => {
 						/>
 					</div>
 					<div className="border-gray-200   p-2">
-						<ParseHTML data={result.content} />
+						{<ParseHTML data={result.content} />}
 
 						{/* <article className="markdown w-full min-w-full  ">
 						{parse(result.content)}
@@ -148,8 +148,9 @@ const PostPage = () => {
 								/>
 							))}
 						</div>
-						{showActionButtons && <EditDeleteAction type="Post" itemId={postId} />}
-
+						{showActionButtons && (
+							<EditDeleteAction type="Post" itemId={postId} />
+						)}
 					</div>
 				</div>
 
@@ -166,7 +167,7 @@ const PostPage = () => {
 					postId={JSON.stringify(result._id)}
 					authorId={JSON.stringify(userId)}
 				/>
-			</>
+			</div>
 		);
 	}
 };
