@@ -44,7 +44,7 @@ const CryptoWallet = () => {
 	const { address } = useAccount();
 
 	const { data: tutorUSDCBalance, refetch } = getTutorBalance(tutorId);
-	const USDCBalance = Number(formatUnits(tutorUSDCBalance || 0, 6)) || 0;
+	const USDCBalance = Number(formatUnits(tutorUSDCBalance || 0, 18)) || 0;
 	const [toastId, setToastId] = useState(null);
 	const [withdrawalToastId, setWithdrawalToastId] = useState(null);
 	const {
@@ -143,7 +143,7 @@ const CryptoWallet = () => {
 
 	const handleWithdrawal = () => {
 		// Implement withdrawal logic here
-		console.log(`Withdrawing ${withdrawalAmount} USDC`);
+		console.log(`Withdrawing ${withdrawalAmount} xUSD`);
 		// console.log(typeof withdrawalAmount)
 		withdrawTutorBalance(tutorId, withdrawalAmount);
 		setIsWithdrawing(false);
@@ -155,7 +155,7 @@ const CryptoWallet = () => {
 			<Card>
 				<CardHeader>
 					<CardTitle className="text-2xl font-bold flex items-center">
-						<Wallet className="mr-2" /> USDC Wallet Details
+						<Wallet className="mr-2" /> xUSD Wallet Details
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
@@ -171,7 +171,7 @@ const CryptoWallet = () => {
 						<div className="space-y-6">
 							<div className="flex items-center justify-between">
 								<span className="text-lg font-semibold">
-									Current USDC Balance:
+									Current xUSD Balance:
 								</span>
 								<span className="text-2xl font-bold text-green-600">
 									${USDCBalance?.toFixed(2) || "0.00"}
@@ -275,14 +275,14 @@ const CryptoWallet = () => {
 									</AlertDialog>
 
 									<Button onClick={() => setIsWithdrawing(true)}>
-										<ArrowRightLeft className="mr-2 h-4 w-4" /> Withdraw USDC
+										<ArrowRightLeft className="mr-2 h-4 w-4" /> Withdraw xUSD
 									</Button>
 								</div>
 							)}
 
 							{isWithdrawing && (
 								<div>
-									<h3 className="text-lg font-semibold mb-2">Withdraw USDC</h3>
+									<h3 className="text-lg font-semibold mb-2">Withdraw xUSD</h3>
 									<div className="flex space-x-2">
 										<Input
 											type="number"
@@ -293,7 +293,7 @@ const CryptoWallet = () => {
 										<Button
 											disabled={
 												!withdrawalAmount ||
-												!Number(formatUnits(tutorUSDCBalance, 6))
+												!Number(formatUnits(tutorUSDCBalance, 18))
 											}
 											onClick={handleWithdrawal}
 										>

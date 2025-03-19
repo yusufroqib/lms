@@ -29,11 +29,39 @@ import {
 } from "./features/auth/authApiSlice";
 import toast from "react-hot-toast";
 import { AuthCheck } from "./features/auth/AuthCheck";
+import { defineChain } from "viem";
+
+const crossFiTestnet = defineChain({
+	id: 4157,
+	caipNetworkId: "eip155:4157",
+	chainNamespace: "eip155",
+	name: "CrossFi Testnet",
+	nativeCurrency: {
+		decimals: 18,
+		name: "XFI",
+		symbol: "XFI",
+	},
+	rpcUrls: {
+		default: {
+			http: [import.meta.env.VITE_CROSSFI_RPC_URL],
+		},
+	},
+	blockExplorers: {
+		default: {
+			name: "XFI Scan",
+			url: import.meta.env.VITE_CROSSFI_EXPLORER_URL,
+		},
+	},
+	contracts: {
+		// Add the contracts here
+	},
+});
+
 
 const config = getDefaultConfig({
 	appName: "Learniverse",
 	projectId: "044601f65212332475a09bc14ceb3c34",
-	chains: [celoAlfajores, celo, arbitrumSepolia, liskSepolia],
+	chains: [crossFiTestnet, celoAlfajores, celo, arbitrumSepolia, liskSepolia],
 });
 
 const queryClient = new QueryClient();

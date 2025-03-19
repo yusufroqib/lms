@@ -53,7 +53,7 @@ export function useCoursePaymentEvents(address) {
         const newPurchase = {
           student,
           tutorId,
-          amount: formatUnits(amount, 6),
+          amount: formatUnits(amount, 18),
           courseId,
           transactionHash: log.transactionHash,
           blockNumber: log.blockNumber,
@@ -72,7 +72,7 @@ export function useCoursePaymentEvents(address) {
     onLogs: (logs) => {
       logs.forEach((log) => {
         const [tutorId, amount] = log.args;
-        const withdrawal = { tutorId, amount: formatUnits(amount, 6), transactionHash: log.transactionHash, blockNumber: log.blockNumber };
+        const withdrawal = { tutorId, amount: formatUnits(amount, 18), transactionHash: log.transactionHash, blockNumber: log.blockNumber };
         setWithdrawals((prev) => [...prev, withdrawal]);
       });
     },

@@ -98,14 +98,14 @@ const CryptoPaymentModal = ({
 		if (isConfirmingApproval) {
 			if (approvalToastId) toast.dismiss(approvalToastId);
 			const newToastId = toast.loading(
-				"Approving USDC... Waiting for confirmation on the blockchain..."
+				"Approving xUSD... Waiting for confirmation on the blockchain..."
 			);
 			setApprovalToastId(newToastId);
 			// console.log("Waiting for confirmation...");
 		}
 		if (isApprovalConfirmed) {
 			// console.log("Transaction confirmed!");
-			toast.success("USDC approved successfully, kindly proceed with payment", {
+			toast.success("xUSD approved successfully, kindly proceed with payment", {
 				id: approvalToastId,
 			});
 			refetch();
@@ -117,6 +117,7 @@ const CryptoPaymentModal = ({
 	}, [isApproving, isConfirmingApproval, isApprovalConfirmed, approveError]);
 
 	// useAccount
+	console.log("PRICE::::", price.toString())
 
 	// console.log(tutorBalance);
 	const handlePurchase = async () => {
@@ -126,7 +127,6 @@ const CryptoPaymentModal = ({
 			purchaseCourse(tutorId, price.toString(), courseId);
 		}
 
-		// Proceed with purchase
 	};
 
 	return (
@@ -141,10 +141,10 @@ const CryptoPaymentModal = ({
 				</AlertDialogHeader>
 				<p>
 					<strong>Amount: </strong>
-					{price} USDC
+					{price} xUSD
 				</p>
 				<p>
-					<strong>Network: </strong>CELO Alfajores
+					<strong>Network: </strong>CrossFi
 				</p>
 				<AlertDialogFooter>
 					<Button

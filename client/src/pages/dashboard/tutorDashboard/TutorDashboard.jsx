@@ -54,7 +54,7 @@ const TutorDashboard = ({ setDashboardMode }) => {
 	const stripeBalance =
 		(tutorBalance && tutorBalance?.available[0]?.amount / 100) || 0;
 
-	const USDCBalance = Number(formatUnits(tutorUSDCBalance || 0, 6)) || 0;
+	const USDCBalance = Number(formatUnits(tutorUSDCBalance || 0, 18)) || 0;
 
 	if (isLoading) {
 		return (
@@ -109,7 +109,7 @@ const TutorDashboard = ({ setDashboardMode }) => {
 										{stripeBalance?.toFixed(2) || "0.00"}
 									</p>
 									<p>
-										<strong>USDC: </strong>${USDCBalance?.toFixed(2) || "0.00"}
+										<strong>xUSD: </strong>${USDCBalance?.toFixed(2) || "0.00"}
 									</p>
 								</>
 							}

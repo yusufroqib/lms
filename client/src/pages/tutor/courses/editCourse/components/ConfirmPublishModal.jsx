@@ -58,7 +58,7 @@ export const ConfirmPublishModal = ({
 		{ id: "card", label: "Card Payment" },
 		{
 			id: "crypto",
-			label: `USDC Payment ${
+			label: `xUSD Payment ${
 				paymentWallet ? `(${truncateWalletAddress(paymentWallet)})` : ""
 			}`,
 		},

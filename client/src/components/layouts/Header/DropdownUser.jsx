@@ -318,7 +318,7 @@ const DropdownUser = () => {
 																to="/wallets/crypto"
 																className="flex items-center gap-3.5 text-base opacity-65 font-medium duration-300 ease-in-out hover:text-blue-600 "
 															>
-																USDC
+																xUSD
 															</Link>
 														</li>
 														<li>

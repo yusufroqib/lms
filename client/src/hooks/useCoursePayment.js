@@ -46,6 +46,7 @@ export function useCoursePayment() {
 			return false;
 		}
 		if (chain?.id !== CORRECT_CHAIN_ID) {
+			console.log("CHAIN ID", chain?.id, CORRECT_CHAIN_ID)
 			toast.error("Switching to the correct network...");
 			try {
 				switchChain({ chainId: CORRECT_CHAIN_ID });
@@ -121,7 +122,7 @@ export function useCoursePayment() {
 			address: USDC_CA,
 			abi: USDC_ABI,
 			functionName: "approve",
-			args: [COURSE_PAYMENT_CA, parseUnits(amount, 6)],
+			args: [COURSE_PAYMENT_CA, parseUnits(amount, 18)],
 		})
 	);
 	// Register Tutor
@@ -152,7 +153,7 @@ export function useCoursePayment() {
 				address: COURSE_PAYMENT_CA,
 				abi: COURSE_PAYMENT_ABI,
 				functionName: "withdrawTutorBalance",
-				args: [tutorId, parseUnits(amount, 6)],
+				args: [tutorId, parseUnits(amount, 18)],
 			})
 	);
 
@@ -168,7 +169,7 @@ export function useCoursePayment() {
 			address: COURSE_PAYMENT_CA,
 			abi: COURSE_PAYMENT_ABI,
 			functionName: "checkAllowance",
-			args: [address, parseUnits(price, 6)],
+			args: [address, parseUnits(price, 18)],
 		});
 	}, []);
 
@@ -179,7 +180,7 @@ export function useCoursePayment() {
 				address: COURSE_PAYMENT_CA,
 				abi: COURSE_PAYMENT_ABI,
 				functionName: "purchaseCourse",
-				args: [tutorId, parseUnits(amount, 6), courseId],
+				args: [tutorId, parseUnits(amount, 18), courseId],
 			})
 	);
 
@@ -215,9 +216,9 @@ export function useCoursePayment() {
 
 	// Format balances
 	const formattedTotalTutorBalances = totalTutorBalances
-		? formatUnits(totalTutorBalances, 6)
+		? formatUnits(totalTutorBalances, 18)
 		: "0";
-	const formattedPlatformFee = platformFee ? formatUnits(platformFee, 6) : "0";
+	const formattedPlatformFee = platformFee ? formatUnits(platformFee, 18) : "0";
 
 	// console.log(getAllowanceStat)
 

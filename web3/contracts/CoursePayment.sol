@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+// 893591312500000000
+// 1548464343750000000
 contract CoursePayment is Ownable {
     using SafeERC20 for IERC20;
 

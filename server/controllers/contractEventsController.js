@@ -101,7 +101,7 @@ const setupEventListeners = () => {
 							transactions: {
 								type: "purchase",
 								paymentMethod: "crypto",
-								amount: ethers.formatUnits(amount, 6),
+								amount: ethers.formatUnits(amount, 18),
 								status: "completed",
 								courseId: course._id,
 								createdAt: new Date(),
@@ -126,7 +126,7 @@ const setupEventListeners = () => {
 						$push: {
 							purchasedBy: {
 								user: user._id,
-								amount: ethers.formatUnits(amount, 6),
+								amount: ethers.formatUnits(amount, 18),
 								date: new Date(),
 							},
 						},
@@ -157,7 +157,7 @@ const setupEventListeners = () => {
 							transactions: {
 								type: "payout",
 								paymentMethod: "crypto",
-								amount: ethers.formatUnits(amount, 6),
+								amount: ethers.formatUnits(amount, 18),
 								status: "completed",
 								createdAt: new Date(),
 								txHash: txHash,
