@@ -35,7 +35,7 @@ const crossFiTestnet = defineChain({
 	id: 4157,
 	caipNetworkId: "eip155:4157",
 	chainNamespace: "eip155",
-	name: "CrossFi Testnet",
+	name: "CrossFi",
 	nativeCurrency: {
 		decimals: 18,
 		name: "XFI",
